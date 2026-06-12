@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI案件進捗管理 | Ai・よろ</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<style>
+:root{
+  --font-sans:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic UI",sans-serif;
+  --color-primary:#4A4A4A;--color-primary-d:#2B2B2B;--color-primary-m:#6B6B6B;
+  --color-primary-l:#E8E8E8;--color-primary-p:#F4F4F4;
+  --color-bg:#FFFFFF;--color-bg2:#F7F7F7;--color-bg3:#EEEEEE;
+  --color-text:#1E1E1E;--color-text2:#6B6B6B;--color-text3:#AAAAAA;
+  --color-border:#E0E0E0;--color-border2:#CCCCCC;
+  --color-warn:#7A6A3A;--color-warn-bg:#F5F0E0;
+  --color-ok-bg:#EAF2EA;--color-ok:#2A5E2A;
+  --radius:9px;--radius-sm:6px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans);background:var(--color-bg2);color:var(--color-text);min-height:100vh}
+.app{max-width:1320px;margin:0 auto;padding:1.5rem 1rem}
+.app-header{display:flex;align-items:center;gap:16px;margin-bottom:1.5rem;padding-bottom:1.25rem;border-bottom:1px solid var(--color-border)}
+.logo-mark{width:40px;height:40px;border-radius:8px;background:var(--color-primary-d);display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;font-weight:700;flex-shrink:0}
+.app-header h1{font-size:18px;font-weight:700;color:var(--color-primary-d)}
+.app-header .subtitle{font-size:12px;color:var(--color-text2);margin-top:2px}
+.sync-bar{display:flex;align-items:center;gap:8px;margin-bottom:1rem;font-size:12px;color:var(--color-text2);background:var(--color-bg);border:1px solid var(--color-border);border-radius:var(--radius-sm);padding:7px 12px}
+.sync-dot{width:8px;height:8px;border-radius:50%;background:#5BAD72;flex-shrink:0}
+.sync-dot.syncing{background:#B8A060;animation:pulse 1s infinite}
+.sync-dot.error{background:#B05050}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin-bottom:1rem}
+.metric{background:var(--color-bg);border:1px solid var(--color-border);border-radius:var(--radius);padding:.85rem 1rem}
+.metric .label{font-size:11px;color:var(--color-text2);margin-bottom:5px;font-weight:500;letter-spacing:.03em}
+.metric .val{font-size:22px;font-weight:700;color:var(--color-primary-d)}
+.metric.hi{background:var(--color-primary-p);border-color:var(--color-primary-l)}
+.metric.hi .val{color:var(--color-primary)}
+.filter-row{display:flex;gap:8px;margin-bottom:.75rem;flex-wrap:wrap}
+.filter-row input,.filter-row select{font-size:13px;padding:7px 10px;border:1px solid var(--color-border);border-radius:var(--radius-sm);background:var(--color-bg);color:var(--color-text);outline:none;font-family:var(--font-sans)}
+.filter-row input{flex:1;min-width:150px}
+.btn{font-size:13px;padding:7px 14px;border:1px solid var(--color-border);border-radius:var(--radius-sm);background:var(--color-bg);color:var(--color-text);cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;gap:5px;font-family:var(--font-sans);font-weight:500;transition:all .15s}
+.btn:hover{background:var(--color-bg2)}
+.btn-primary{background:var(--color-primary-d);color:#fff;border-color:var(--color-primary-d)}
+.btn-primary:hover{background:var(--color-primary)}
+.btn-sm{font-size:12px;padding:4px 10px}
+.table-wrap{background:var(--color-bg);border:1px solid var(--color-border);border-radius:var(--radius);overflow:auto;box-shadow:0 1px 4px rgba(0,0,0,.05)}
+table{width:100%;border-collapse:collapse;font-size:13px;min-width:960px}
+th{text-align:left;padding:9px 11px;font-weight:600;font-size:11px;color:var(--color-text2);border-bottom:1px solid var(--color-border);background:var(--color-primary-p);white-space:nowrap;letter-spacing:.04em;cursor:pointer;user-select:none}
+th:hover{background:var(--color-primary-l)}
+td{padding:9px 11px;border-bottom:1px solid var(--color-border);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--color-bg2)}
+.company-link{color:var(--color-primary-d);cursor:pointer;font-weight:600;border-bottom:1px solid var(--color-border2)}
+.company-link:hover{color:var(--color-primary)}
+.badge{display:inline-block;font-size:11px;padding:2px 8px;border-radius:4px;font-weight:600;white-space:nowrap}
+.b-todo{background:#EBEBEB;color:#555}
+.b-wip{background:#E8F0E8;color:#2A5E2A;border:1px solid #C0D8C0}
+.b-review{background:#EAE8F0;color:#3A3070}
+.b-done{background:var(--color-primary-d);color:#fff}
+.b-hold{background:#F0F0F0;color:#888}
+.fix-pending{background:var(--color-warn-bg);color:var(--color-warn);font-size:11px;padding:2px 7px;border-radius:4px;font-weight:600}
+.fix-all-done{background:var(--color-ok-bg);color:var(--color-ok);font-size:11px;padding:2px 7px;border-radius:4px;font-weight:600}
+.fix-none{color:var(--color-text3);font-size:12px}
+.deadline-warn{color:var(--color-warn);font-weight:600}
+.deadline-over{color:#B05050;font-weight:600}
+.prog-wrap{display:flex;align-items:center;gap:6px}
+.prog-bar{flex:1;height:5px;background:var(--color-bg3);border-radius:3px;overflow:hidden;min-width:40px}
+.prog-fill{height:100%;border-radius:3px;background:var(--color-primary)}
+.prog-val{font-size:11px;color:var(--color-text2);min-width:26px}
+.ico-btn{background:none;border:none;cursor:pointer;color:var(--color-text3);padding:3px 5px;border-radius:4px;font-size:15px}
+.ico-btn:hover{color:var(--color-primary-d);background:var(--color-primary-p)}
+.empty{text-align:center;padding:3rem;color:var(--color-text2);font-size:13px}
+.memo-cell{font-size:12px;color:var(--color-text2);max-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mtg-next{font-size:12px;white-space:nowrap}
+.mtg-next.soon{color:var(--color-warn);font-weight:600}
+.mtg-next.past{color:var(--color-text3)}
+/* panel */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:50}
+.overlay.open{display:block}
+.panel{position:fixed;top:0;right:0;width:min(560px,100vw);height:100vh;background:var(--color-bg);border-left:1px solid var(--color-border);z-index:51;display:flex;flex-direction:column;transform:translateX(100%);transition:transform .25s ease;box-shadow:-4px 0 24px rgba(0,0,0,.08)}
+.panel.open{transform:translateX(0)}
+.panel-header{padding:1.25rem;border-bottom:1px solid var(--color-border);display:flex;align-items:flex-start;gap:8px;flex-shrink:0;background:var(--color-primary-p)}
+.panel-header h2{font-size:16px;font-weight:700;flex:1;line-height:1.4;color:var(--color-primary-d)}
+.panel-close{background:none;border:none;cursor:pointer;color:var(--color-text2);font-size:20px;padding:0}
+.tabs{display:flex;border-bottom:1px solid var(--color-border);flex-shrink:0}
+.tab{font-size:13px;padding:10px 16px;cursor:pointer;color:var(--color-text2);border-bottom:2px solid transparent;background:none;border-top:none;border-left:none;border-right:none;font-family:var(--font-sans);font-weight:500}
+.tab.active{color:var(--color-primary-d);border-bottom-color:var(--color-primary-d);font-weight:700}
+.tab:hover:not(.active){color:var(--color-primary-d);background:var(--color-primary-p)}
+.panel-body{padding:1.25rem;flex:1;overflow-y:auto}
+.section{margin-bottom:1.5rem}
+.section-title{font-size:11px;font-weight:700;color:var(--color-primary-d);letter-spacing:.07em;text-transform:uppercase;margin-bottom:.75rem;display:flex;align-items:center;gap:6px}
+.section-title::before{content:"";display:block;width:3px;height:13px;background:var(--color-primary);border-radius:2px}
+.edit-field{margin-bottom:10px}
+.edit-field label{display:block;font-size:12px;color:var(--color-text2);margin-bottom:4px;font-weight:500}
+.edit-field input,.edit-field select,.edit-field textarea{width:100%;font-size:13px;padding:7px 10px;border:1px solid var(--color-border);border-radius:var(--radius-sm);background:var(--color-bg);color:var(--color-text);font-family:var(--font-sans);outline:none}
+.edit-field input:focus,.edit-field select:focus,.edit-field textarea:focus{border-color:var(--color-primary);box-shadow:0 0 0 2px var(--color-primary-p)}
+.edit-field textarea{resize:vertical;min-height:60px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.mtg-item{display:inline-flex;align-items:center;gap:4px;background:var(--color-primary-p);color:var(--color-primary-d);font-size:12px;padding:3px 8px;border-radius:4px;margin:2px;font-weight:500;border:1px solid var(--color-primary-l)}
+.mtg-item button{background:none;border:none;cursor:pointer;color:var(--color-primary-m);font-size:13px;padding:0;line-height:1}
+.add-row{display:flex;gap:6px;margin-top:6px}
+.add-row input{flex:1;font-size:13px;padding:6px 9px;border:1px solid var(--color-border);border-radius:var(--radius-sm);background:var(--color-bg);color:var(--color-text);font-family:var(--font-sans);outline:none}
+.timeline{border-left:2px solid var(--color-primary-l);padding-left:1rem;margin-top:.5rem}
+.tl-item{position:relative;margin-bottom:.75rem}
+.tl-item::before{content:"";position:absolute;left:-1.35rem;top:.35rem;width:8px;height:8px;border-radius:50%;background:var(--color-border2)}
+.tl-item.past::before{background:#5BAD72}
+.tl-item.soon::before{background:#B8A060}
+.tl-item.over::before{background:#B05050}
+.tl-date{font-size:11px;color:var(--color-text2)}
+.tl-label{font-size:13px;font-weight:600}
+.save-bar{padding:1rem 1.25rem;border-top:1px solid var(--color-border);display:flex;gap:8px;justify-content:flex-end;background:var(--color-bg);flex-shrink:0}
+
+/* ===== 修正項目（チェックボックス式） ===== */
+.fix-item{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border:1px solid var(--color-border);border-radius:var(--radius-sm);margin-bottom:6px;transition:.15s;cursor:pointer}
+.fix-item:hover{border-color:var(--color-primary-l);background:var(--color-primary-p)}
+.fix-item.done-item{opacity:.5;background:var(--color-bg2)}
+.fix-check{width:18px;height:18px;border:2px solid var(--color-border2);border-radius:4px;flex-shrink:0;display:flex;align-items:center;justify-content:center;margin-top:1px;transition:.15s;background:var(--color-bg)}
+.fix-item.done-item .fix-check{background:var(--color-primary-d);border-color:var(--color-primary-d);color:#fff}
+.fix-item-left{flex:1;min-width:0}
+.fix-item-title{font-size:13px;font-weight:500;margin-bottom:2px;word-break:break-word;line-height:1.5}
+.fix-item-title.strikethrough{text-decoration:line-through;color:var(--color-text2)}
+.fix-item-meta{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:3px}
+.fix-item-date{font-size:11px;color:var(--color-text2)}
+.fix-status-badge{font-size:11px;padding:1px 7px;border-radius:4px;font-weight:600;border:none;font-family:var(--font-sans);background:#EBEBEB;color:#555}
+.fix-item.done-item .fix-status-badge{background:var(--color-ok-bg);color:var(--color-ok)}
+.fix-note{font-size:12px;color:var(--color-text2);font-style:italic}
+.fix-actions{display:flex;gap:2px;flex-shrink:0}
+
+/* AIペーストエリア */
+.ai-paste-box{border:1.5px dashed var(--color-border2);border-radius:var(--radius-sm);padding:12px;background:var(--color-bg2);margin-bottom:12px}
+.ai-paste-box textarea{width:100%;font-size:13px;padding:8px 10px;border:1px solid var(--color-border);border-radius:var(--radius-sm);background:var(--color-bg);color:var(--color-text);font-family:var(--font-sans);resize:vertical;min-height:80px;outline:none;margin-bottom:8px}
+.ai-paste-box textarea:focus{border-color:var(--color-primary)}
+.ai-hint{font-size:12px;color:var(--color-text2);margin-bottom:8px;line-height:1.6}
+.ai-loading{display:none;font-size:12px;color:var(--color-text2);padding:8px 0;text-align:center}
+.fix-progress{display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--color-primary-p);border-radius:var(--radius-sm);margin-bottom:10px}
+.fix-progress-bar{flex:1;height:6px;background:var(--color-bg3);border-radius:3px;overflow:hidden}
+.fix-progress-fill{height:100%;border-radius:3px;background:var(--color-primary);transition:width .4s}
+.fix-progress-label{font-size:12px;color:var(--color-text2);white-space:nowrap;font-weight:500}
+
+/* modal */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:200;align-items:center;justify-content:center}
+.modal-bg.open{display:flex}
+.modal{background:var(--color-bg);border-radius:var(--radius);padding:1.5rem;width:min(480px,94vw);border:1px solid var(--color-border);max-height:90vh;overflow-y:auto;box-shadow:0 8px 40px rgba(0,0,0,.12)}
+.modal-header{display:flex;align-items:center;gap:10px;margin-bottom:1rem;padding-bottom:.75rem;border-bottom:1px solid var(--color-border)}
+.modal-header h2{font-size:16px;font-weight:700;color:var(--color-primary-d);flex:1}
+.modal-footer{display:flex;justify-content:flex-end;gap:8px;margin-top:1rem}
+.toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);background:var(--color-primary-d);color:#fff;padding:10px 22px;border-radius:6px;font-size:13px;z-index:300;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap;box-shadow:0 4px 16px rgba(0,0,0,.2)}
+.toast.show{opacity:1}
+.hint{padding:10px 12px;background:var(--color-primary-p);border-radius:var(--radius-sm);font-size:12px;color:var(--color-text2);border:1px solid var(--color-primary-l)}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="app-header">
+    <div class="logo-mark">Ai</div>
+    <div>
+      <h1>Ai・よろ 案件進捗管理</h1>
+      <div class="subtitle">Googleスプレッドシートとリアルタイム同期</div>
+    </div>
+  </div>
+  <div class="sync-bar">
+    <div class="sync-dot" id="sync-dot"></div>
+    <span id="sync-label">接続中…</span>
+    <button class="btn btn-sm" onclick="loadFromGAS()" style="margin-left:auto"><i class="ti ti-refresh"></i> 再読み込み</button>
+  </div>
+  <div class="summary" id="summary"></div>
+  <div class="filter-row">
+    <input type="text" id="search" placeholder="🔍 会社名・担当者で検索…">
+    <select id="filter-status"><option value="">すべてのステータス</option><option>未着手</option><option>進行中</option><option>レビュー待ち</option><option>完了</option><option>保留</option></select>
+    <select id="filter-person"><option value="">すべての担当者</option></select>
+    <select id="filter-deadline"><option value="">期日：すべて</option><option value="over">期日超過</option><option value="week">7日以内</option><option value="month">30日以内</option></select>
+    <select id="filter-fix"><option value="">修正：すべて</option><option value="has">未完了あり</option><option value="none">修正なし</option><option value="done">全完了</option></select>
+    <button class="btn btn-sm" onclick="clearFilters()"><i class="ti ti-x"></i> リセット</button>
+    <button class="btn btn-primary" onclick="openAdd()"><i class="ti ti-plus"></i> 案件追加</button>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr>
+        <th onclick="sortBy('company')">会社名</th>
+        <th onclick="sortBy('type')">種別</th>
+        <th onclick="sortBy('person')">担当者</th>
+        <th onclick="sortBy('amount')">金額</th>
+        <th onclick="sortBy('deadline')">最終期日</th>
+        <th>次回MTG</th>
+        <th onclick="sortBy('progress')">進捗</th>
+        <th onclick="sortBy('status')">ステータス</th>
+        <th>修正項目</th>
+        <th>メモ</th>
+        <th></th>
+      </tr></thead>
+      <tbody id="tbody"></tbody>
+    </table>
+  </div>
+</div>
+
+<div class="overlay" id="overlay" onclick="closePanel()"></div>
+<div class="panel" id="panel">
+  <div class="panel-header">
+    <h2 id="panel-company"></h2>
+    <button class="panel-close" onclick="closePanel()"><i class="ti ti-x"></i></button>
+  </div>
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('info')">案件情報</button>
+    <button class="tab" onclick="switchTab('fixes')">修正項目 <span id="fix-count-badge"></span></button>
+    <button class="tab" onclick="switchTab('timeline')">タイムライン</button>
+  </div>
+  <div class="panel-body" id="panel-body"></div>
+  <div class="save-bar">
+    <button class="btn" onclick="closePanel()">閉じる</button>
+    <button class="btn btn-primary" id="save-btn" onclick="savePanel()"><i class="ti ti-check"></i> 保存してシート反映</button>
+  </div>
+</div>
+
+<div class="modal-bg" id="add-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="logo-mark" style="width:30px;height:30px;font-size:12px">Ai</div>
+      <h2>案件を追加</h2>
+    </div>
+    <div class="row2">
+      <div class="edit-field"><label>会社名 *</label><input id="a-company"></div>
+      <div class="edit-field"><label>種別</label><input id="a-type" placeholder="システム構築 など"></div>
+    </div>
+    <div class="row2">
+      <div class="edit-field"><label>担当者</label><input id="a-person"></div>
+      <div class="edit-field"><label>金額 (円)</label><input id="a-amount" type="number" value="0"></div>
+    </div>
+    <div class="row2">
+      <div class="edit-field"><label>最終期日</label><input id="a-deadline" type="date"></div>
+      <div class="edit-field"><label>最終修正締切</label><input id="a-revision" type="date"></div>
+    </div>
+    <div class="edit-field"><label>ステータス</label>
+      <select id="a-status"><option>未着手</option><option>進行中</option><option>レビュー待ち</option><option>完了</option><option>保留</option></select>
+    </div>
+    <div class="edit-field"><label>メモ</label><textarea id="a-memo"></textarea></div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeAdd()">キャンセル</button>
+      <button class="btn btn-primary" onclick="saveAdd()"><i class="ti ti-check"></i> 追加して保存</button>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const GAS_URL="https://script.google.com/macros/s/AKfycbw2TmIA0Cm3_2MI9ziOnZd1_lLP-0EDGE9XxYM0qNsqluprvt9rLME4_8WHHcVMEkUM/exec";
+
+// ===== PDFから更新した最新データ =====
+const INITIAL_DATA=[
+  {id:1,company:"株式会社T's agency holdings",type:"システム構築",person:"神谷さん",amount:0,deadline:"2026-05-31",revision:"",mtg:[],progress:0,status:"進行中",memo:"神谷さん10日訪問予定",fixes:[]},
+  {id:2,company:"アクセルサーブ法律事務所",type:"人脈案件管理",person:"神谷さん/高杉",amount:450000,deadline:"2026-05-30",revision:"",mtg:["2026-06-02"],progress:0,status:"進行中",memo:"6月2日MTG実施。追加要望・修正なし",fixes:[]},
+  {id:3,company:"ケーエーエヌユー株式会社",type:"マイソク自動化",person:"神谷さん/高杉",amount:700000,deadline:"2026-01-31",revision:"",mtg:[],progress:100,status:"完了",memo:"納品済み。経理追加は税理士相談中",fixes:[]},
+  {id:4,company:"アールビーライズ株式会社（就業者管理）",type:"システム構築",person:"岡野さん/関さん",amount:1050000,deadline:"2026-02-28",revision:"",mtg:[],progress:0,status:"進行中",memo:"修正多発。5月末完了見込み。保守移行予定",fixes:[]},
+  {id:5,company:"アールビーライズ株式会社（LINE構築）",type:"追加開発",person:"岡野さん/高杉",amount:1400000,deadline:"2026-07-31",revision:"",mtg:[],progress:0,status:"進行中",memo:"キントーン完了後1週間で構築→1ヶ月で完了予定",fixes:[]},
+  {id:6,company:"株式会社リアルト・ハーツ",type:"値決めシート自動化",person:"神谷さん/高杉",amount:900000,deadline:"2026-02-28",revision:"",mtg:[],progress:100,status:"完了",memo:"納品完了。追加構築¥200,000見積提出・稟議中",fixes:[]},
+  {id:7,company:"株式会社ONE REAL ESTATE",type:"不動産物件管理",person:"神谷さん/高杉",amount:1500000,deadline:"2026-06-30",revision:"",mtg:[],progress:0,status:"進行中",memo:"6月中旬まで要望対応→中旬以降修正対応→6月完了",fixes:[]},
+  {id:8,company:"株式会社アットランド",type:"LステップCC構築",person:"神谷さん/高杉",amount:1350000,deadline:"2026-05-31",revision:"",mtg:["2026-06-01"],progress:0,status:"進行中",memo:"動作確認後完了。定例6月実施",fixes:[]},
+  {id:9,company:"Exstan行政書士法人",type:"案件・タスク・請求管理",person:"岡野さん/高杉",amount:1050000,deadline:"2026-05-31",revision:"",mtg:[],progress:90,status:"進行中",memo:"来週定例し終了予定。保守つき",fixes:[]},
+  {id:10,company:"株式会社BigBridge",type:"受注管理",person:"神谷さん/高杉",amount:1050000,deadline:"2026-07-31",revision:"",mtg:["2026-06-02"],progress:0,status:"進行中",memo:"LINE受注システムほぼ完成。6月2日仕様確認MTG",fixes:[]},
+  {id:11,company:"株式会社ファルム",type:"レッツ原価連携",person:"岡野さん/高杉",amount:1200000,deadline:"2026-04-30",revision:"",mtg:["2026-06-01"],progress:90,status:"進行中",memo:"構築・動作確認完了。クライアント間すり合わせ待ち。6月MTG",fixes:[]},
+  {id:12,company:"株式会社くすのき",type:"顧客管理",person:"神谷さん/高杉",amount:1350000,deadline:"2026-07-31",revision:"",mtg:["2026-06-01"],progress:0,status:"進行中",memo:"次回6月1日MTG",fixes:[]},
+  {id:13,company:"ブルーチップ・トランスレーション株式会社",type:"通訳者・請求管理",person:"神谷さん/高杉",amount:1350000,deadline:"2026-07-31",revision:"",mtg:[],progress:0,status:"進行中",memo:"訪問済み。データ・情報提供中",fixes:[]},
+];
+
+let projects=[], nextId=100, nextFixId=1, panelId=null, currentTab="info";
+let sortKey="deadline", sortDir=1;
+const scls={未着手:"b-todo",進行中:"b-wip",レビュー待ち:"b-review",完了:"b-done",保留:"b-hold"};
+
+function fd(d){if(!d)return"–";const p=d.split("-");return p[0]+"/"+(+p[1])+"/"+(+p[2])}
+function fa(n){return(!n&&n!==0)||n===0?"–":"¥"+Number(n).toLocaleString()}
+function tod(){const d=new Date();d.setHours(0,0,0,0);return d;}
+function dcls(d){if(!d)return"";const diff=(new Date(d)-tod())/(864e5);return diff<0?"deadline-over":diff<=14?"deadline-warn":"";}
+function nextMtg(mtg){
+  if(!mtg||!mtg.length)return null;
+  const t=tod();
+  const future=mtg.map(m=>new Date(m)).filter(d=>d>=t).sort((a,b)=>a-b);
+  return future.length?future[0].toISOString().slice(0,10):null;
+}
+function setSyncState(state,msg){
+  const dot=document.getElementById("sync-dot");
+  dot.className="sync-dot"+(state==="syncing"?" syncing":state==="error"?" error":"");
+  document.getElementById("sync-label").textContent=msg;
+}
+function showToast(msg){
+  const t=document.getElementById("toast");
+  t.textContent=msg;t.classList.add("show");
+  setTimeout(()=>t.classList.remove("show"),2500);
+}
+async function gasRequest(params){
+  const url=GAS_URL+"?"+new URLSearchParams({action:params.action});
+  const opts=params.action==="getAll"?{method:"GET"}:{method:"POST",headers:{"Content-Type":"text/plain"},body:JSON.stringify(params)};
+  const res=await fetch(url,opts);
+  const json=await res.json();
+  if(!json.ok)throw new Error(json.error||"エラー");
+  return json.data;
+}
+async function loadFromGAS(){
+  setSyncState("syncing","スプレッドシートから読み込み中…");
+  try{
+    const data=await gasRequest({action:"getAll"});
+    if(data&&data.length>0){
+      projects=data.map(p=>({
+        ...p,
+        mtg:Array.isArray(p.mtg)?p.mtg:(p.mtg?tryParse(p.mtg):[]),
+        fixes:Array.isArray(p.fixes)?p.fixes:(p.fixes?tryParse(p.fixes):[]),
+        amount:Number(p.amount)||0,progress:Number(p.progress)||0,id:Number(p.id)||0
+      }));
+      nextId=Math.max(...projects.map(p=>p.id))+1;
+      setSyncState("ok","スプレッドシートと同期済み — "+new Date().toLocaleTimeString("ja-JP"));
+    } else {
+      // スプレッドシートが空ならPDFデータを初期投入
+      projects=INITIAL_DATA.map(p=>({...p}));
+      nextId=20;
+      setSyncState("ok","初期データを読み込みました — "+new Date().toLocaleTimeString("ja-JP"));
+      // スプレッドシートに一括保存
+      for(const p of projects){ await gasRequest({action:"save",project:p}); }
+      showToast("✓ 最新データをスプレッドシートに保存しました");
+    }
+    render();
+  }catch(e){
+    // オフライン時もPDFデータで動作
+    projects=INITIAL_DATA.map(p=>({...p}));
+    nextId=20;
+    setSyncState("error","オフライン — ローカルデータで表示中");
+    render();
+  }
+}
+function tryParse(v){try{return JSON.parse(v);}catch{return [];}}
+async function saveProjectToGAS(project){
+  setSyncState("syncing","保存中…");
+  try{
+    await gasRequest({action:"save",project});
+    setSyncState("ok","保存完了 — "+new Date().toLocaleTimeString("ja-JP"));
+    showToast("✓ スプレッドシートに保存しました");
+  }catch(e){setSyncState("error","保存エラー: "+e.message);showToast("⚠ 保存に失敗: "+e.message);}
+}
+async function deleteProjectFromGAS(id){
+  try{await gasRequest({action:"delete",id});showToast("削除しました");}catch(e){}
+}
+function sortBy(key){if(sortKey===key)sortDir*=-1;else{sortKey=key;sortDir=1;}render();}
+function renderSummary(){
+  const t=projects.length,a=projects.filter(p=>p.status==="進行中").length,d=projects.filter(p=>p.status==="完了").length;
+  const rev=projects.reduce((s,p)=>s+Number(p.amount||0),0);
+  const near=projects.filter(p=>p.deadline&&(new Date(p.deadline)-tod())/(864e5)<=14&&p.status!=="完了").length;
+  const pf=projects.reduce((s,p)=>s+(p.fixes||[]).filter(f=>!f.done).length,0);
+  document.getElementById("summary").innerHTML=`
+    <div class="metric"><div class="label">総案件数</div><div class="val">${t}</div></div>
+    <div class="metric"><div class="label">進行中</div><div class="val">${a}</div></div>
+    <div class="metric"><div class="label">完了</div><div class="val">${d}</div></div>
+    <div class="metric hi"><div class="label">総受注額</div><div class="val" style="font-size:15px">¥${rev.toLocaleString()}</div></div>
+    <div class="metric${near>0?" hi":""}"><div class="label">期日14日以内</div><div class="val" style="color:${near>0?"var(--color-warn)":""}">${near}</div></div>
+    <div class="metric${pf>0?" hi":""}"><div class="label">未完了の修正</div><div class="val" style="color:${pf>0?"var(--color-warn)":""}">${pf}</div></div>`;
+}
+function renderPersonFilter(){
+  const sel=document.getElementById("filter-person"),cur=sel.value;
+  const ps=[...new Set(projects.map(p=>p.person).filter(Boolean))].sort();
+  sel.innerHTML='<option value="">すべての担当者</option>'+ps.map(p=>`<option>${p}</option>`).join("");
+  sel.value=cur;
+}
+function clearFilters(){
+  ["search","filter-status","filter-person","filter-deadline","filter-fix"].forEach(id=>{document.getElementById(id).value="";});
+  render();
+}
+function render(){
+  renderSummary();renderPersonFilter();
+  const q=document.getElementById("search").value.toLowerCase();
+  const fs=document.getElementById("filter-status").value;
+  const fp=document.getElementById("filter-person").value;
+  const fd2=document.getElementById("filter-deadline").value;
+  const ff=document.getElementById("filter-fix").value;
+  const t=tod();
+  let list=projects.filter(p=>{
+    if(q&&!p.company.toLowerCase().includes(q)&&!(p.person||"").toLowerCase().includes(q))return false;
+    if(fs&&p.status!==fs)return false;
+    if(fp&&p.person!==fp)return false;
+    if(fd2){
+      if(!p.deadline)return false;
+      const diff=(new Date(p.deadline)-t)/(864e5);
+      if(fd2==="over"&&diff>=0)return false;
+      if(fd2==="week"&&(diff<0||diff>7))return false;
+      if(fd2==="month"&&(diff<0||diff>30))return false;
+    }
+    if(ff){
+      const fixes=p.fixes||[];
+      const pending=fixes.filter(f=>!f.done).length;
+      if(ff==="has"&&pending===0)return false;
+      if(ff==="none"&&fixes.length>0)return false;
+      if(ff==="done"&&(fixes.length===0||pending>0))return false;
+    }
+    return true;
+  });
+  list.sort((a,b)=>{
+    let av=a[sortKey]??"",bv=b[sortKey]??"";
+    if(sortKey==="amount"||sortKey==="progress"){av=Number(av);bv=Number(bv);}
+    return av<bv?-sortDir:av>bv?sortDir:0;
+  });
+  const tb=document.getElementById("tbody");
+  if(!list.length){tb.innerHTML=`<tr><td colspan="11" class="empty">${projects.length===0?"読み込み中…":"条件に一致する案件が見つかりません"}</td></tr>`;return;}
+  tb.innerHTML=list.map(p=>{
+    const fixes=p.fixes||[],total=fixes.length,pending=fixes.filter(f=>!f.done).length;
+    const fixBadge=total===0?`<span class="fix-none">–</span>`:pending===0?`<span class="fix-all-done">✓全完了 ${total}</span>`:`<span class="fix-pending">${pending}件残り/${total}</span>`;
+    const nm=nextMtg(p.mtg||[]);
+    const nmDiff=nm?(new Date(nm)-t)/(864e5):null;
+    const nmCls=nm?(nmDiff<=7?"soon":nmDiff<0?"past":""):"";
+    const nmTxt=nm?`<span class="mtg-next ${nmCls}">${fd(nm)}</span>`:`<span style="color:var(--color-text3);font-size:12px">–</span>`;
+    return`<tr>
+      <td><span class="company-link" onclick="openPanel(${p.id})">${p.company}</span></td>
+      <td style="color:var(--color-text2);font-size:12px">${p.type||"–"}</td>
+      <td style="font-weight:500;white-space:nowrap;font-size:12px">${p.person||"–"}</td>
+      <td style="white-space:nowrap">${fa(p.amount)}</td>
+      <td class="${dcls(p.deadline)}" style="white-space:nowrap">${fd(p.deadline)}</td>
+      <td>${nmTxt}</td>
+      <td style="min-width:80px"><div class="prog-wrap"><div class="prog-bar"><div class="prog-fill" style="width:${p.progress}%"></div></div><span class="prog-val">${p.progress}%</span></div></td>
+      <td><span class="badge ${scls[p.status]||"b-todo"}">${p.status}</span></td>
+      <td>${fixBadge}</td>
+      <td class="memo-cell" title="${p.memo||""}">${p.memo||"–"}</td>
+      <td><button class="ico-btn" onclick="confirmDelete(${p.id})"><i class="ti ti-trash"></i></button></td>
+    </tr>`;
+  }).join("");
+}
+
+function openPanel(id){
+  panelId=id;currentTab="info";
+  const p=projects.find(x=>x.id===id);
+  document.getElementById("panel-company").textContent=p.company;
+  updateFixBadge(p);setActiveTab("info");renderTab();
+  document.getElementById("overlay").classList.add("open");
+  document.getElementById("panel").classList.add("open");
+}
+function updateFixBadge(p){
+  const fixes=p.fixes||[],pending=fixes.filter(f=>!f.done).length;
+  document.getElementById("fix-count-badge").textContent=fixes.length?`(${pending}残り)`:"";
+}
+function switchTab(tab){
+  if(currentTab==="info"&&tab!=="info")collectInfoFields();
+  currentTab=tab;setActiveTab(tab);renderTab();
+}
+function setActiveTab(tab){
+  document.querySelectorAll(".tab").forEach((t,i)=>{t.classList.toggle("active",["info","fixes","timeline"][i]===tab);});
+  document.getElementById("save-btn").style.display=tab==="info"?"inline-flex":"none";
+}
+function renderTab(){
+  const p=projects.find(x=>x.id===panelId);
+  if(currentTab==="info")renderInfo(p);
+  else if(currentTab==="fixes")renderFixes(p);
+  else renderTimeline(p);
+}
+function renderInfo(p){
+  document.getElementById("panel-body").innerHTML=`
+    <div class="section">
+      <div class="section-title">基本情報</div>
+      <div class="edit-field"><label>担当者</label><input id="p-person" type="text"></div>
+      <div class="row2">
+        <div class="edit-field"><label>最終期日</label><input id="p-deadline" type="date"></div>
+        <div class="edit-field"><label>最終修正締切</label><input id="p-revision" type="date"></div>
+      </div>
+      <div class="row2">
+        <div class="edit-field"><label>金額 (円)</label><input id="p-amount" type="number"></div>
+        <div class="edit-field"><label>種別</label><input id="p-type" type="text"></div>
+      </div>
+      <div class="edit-field"><label>ステータス</label>
+        <select id="p-status">${["未着手","進行中","レビュー待ち","完了","保留"].map(s=>`<option${s===p.status?" selected":""}>${s}</option>`).join("")}</select>
+      </div>
+      <div class="edit-field"><label>進捗 — <span id="p-prog-label">${p.progress||0}</span>%</label>
+        <input type="range" id="p-progress" min="0" max="100" style="width:100%;accent-color:var(--color-primary)" oninput="document.getElementById('p-prog-label').textContent=this.value">
+      </div>
+      <div class="edit-field"><label>MTG日程</label>
+        <div id="mtg-list"></div>
+        <div class="add-row"><input type="date" id="mtg-input"><button class="btn btn-sm" onclick="addMtg()">+ 追加</button></div>
+      </div>
+      <div class="edit-field"><label>メモ</label><textarea id="p-memo"></textarea></div>
+    </div>`;
+  document.getElementById("p-person").value  =p.person||"";
+  document.getElementById("p-deadline").value =p.deadline||"";
+  document.getElementById("p-revision").value =p.revision||"";
+  document.getElementById("p-amount").value   =p.amount??0;
+  document.getElementById("p-type").value     =p.type||"";
+  document.getElementById("p-progress").value =p.progress??0;
+  document.getElementById("p-memo").value     =p.memo||"";
+  renderMtgList(p);
+}
+function renderMtgList(p){
+  const el=document.getElementById("mtg-list");if(!el)return;
+  el.innerHTML=(p.mtg||[]).map((m,i)=>`<span class="mtg-item">${fd(m)}<button onclick="removeMtg(${i})">×</button></span>`).join("");
+}
+
+// ===== 修正項目（チェックボックス式）=====
+function renderFixes(p){
+  const fixes=p.fixes||[];
+  const total=fixes.length, done=fixes.filter(f=>f.done).length, pending=total-done;
+  const pct=total?Math.round(done/total*100):0;
+
+  const rows=fixes.length?fixes.map((f,i)=>`
+    <div class="fix-item${f.done?" done-item":""}" onclick="toggleFix(${i})">
+      <div class="fix-check">${f.done?'<i class="ti ti-check" style="font-size:12px"></i>':''}</div>
+      <div class="fix-item-left">
+        <div class="fix-item-title${f.done?" strikethrough":""}">${f.title}</div>
+        ${f.note?`<div class="fix-note">${f.note}</div>`:""}
+        ${f.date?`<div class="fix-item-meta"><span class="fix-item-date">${fd(f.date)}</span></div>`:""}
+      </div>
+      <button class="ico-btn" onclick="event.stopPropagation();deleteFix(${i})"><i class="ti ti-x"></i></button>
+    </div>`).join(""):`<div style="font-size:13px;color:var(--color-text2);text-align:center;padding:1.5rem 0">修正項目はありません</div>`;
+
+  document.getElementById("panel-body").innerHTML=`
+    <div class="section">
+      ${total>0?`<div class="fix-progress">
+        <div class="fix-progress-bar"><div class="fix-progress-fill" style="width:${pct}%"></div></div>
+        <span class="fix-progress-label">${done}/${total} 完了 (${pct}%)</span>
+      </div>`:""}
+
+      <!-- AIペースト欄 -->
+      <div class="ai-paste-box">
+        <div class="ai-hint">📋 MTG議事録や文字起こしをそのままペーストすると、AIが修正項目を自動で分解します</div>
+        <textarea id="ai-paste-input" placeholder="例）・ダッシュボードの表示が崩れている&#10;・メール通知が届かない&#10;・CSVエクスポートで文字化け"></textarea>
+        <div id="ai-loading" class="ai-loading">⏳ AIが修正項目を分解中…</div>
+        <div style="display:flex;gap:6px">
+          <button class="btn btn-sm btn-primary" onclick="aiParseFixes()"><i class="ti ti-sparkles"></i> AIで項目に分解</button>
+          <button class="btn btn-sm" onclick="manualAddFix()"><i class="ti ti-plus"></i> 手動で追加</button>
+        </div>
+      </div>
+
+      <div id="fix-manual-form" style="display:none;border:1px solid var(--color-primary-l);border-radius:var(--radius-sm);padding:12px;background:var(--color-primary-p);margin-bottom:10px">
+        <div class="edit-field" style="margin-bottom:6px"><input id="fix-title-m" placeholder="修正内容 *" style="width:100%;font-size:13px;padding:7px 10px;border:1px solid var(--color-border);border-radius:var(--radius-sm);background:var(--color-bg);color:var(--color-text);font-family:var(--font-sans);outline:none"></div>
+        <div class="edit-field" style="margin-bottom:6px"><input id="fix-note-m" placeholder="補足（任意）" style="width:100%;font-size:13px;padding:7px 10px;border:1px solid var(--color-border);border-radius:var(--radius-sm);background:var(--color-bg);color:var(--color-text);font-family:var(--font-sans);outline:none"></div>
+        <div style="display:flex;gap:6px;margin-bottom:6px"><input type="date" id="fix-date-m" style="flex:1;font-size:13px;padding:6px 9px;border:1px solid var(--color-border);border-radius:var(--radius-sm);background:var(--color-bg);color:var(--color-text);font-family:var(--font-sans);outline:none"></div>
+        <div style="display:flex;gap:6px;justify-content:flex-end">
+          <button class="btn btn-sm" onclick="document.getElementById('fix-manual-form').style.display='none'">キャンセル</button>
+          <button class="btn btn-sm btn-primary" onclick="addFixManual()">追加</button>
+        </div>
+      </div>
+
+      <div id="fix-rows">${rows}</div>
+    </div>`;
+}
+
+// AIによる修正項目の自動分解
+async function aiParseFixes(){
+  const text=document.getElementById("ai-paste-input").value.trim();
+  if(!text){alert("テキストをペーストしてください");return;}
+  document.getElementById("ai-loading").style.display="block";
+  try{
+    const res=await fetch("https://api.anthropic.com/v1/messages",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({
+        model:"claude-sonnet-4-6",
+        max_tokens:1000,
+        messages:[{role:"user",content:`以下のテキストから修正・対応が必要な項目を箇条書きで抽出してください。
+各項目は「タイトル（20字以内）|||補足説明（あれば）」の形式でJSON配列として出力してください。
+補足がなければ空文字にしてください。
+必ずJSONのみ出力し、マークダウンの\`\`\`は使わないでください。
+出力形式: [{"title":"...","note":"..."},...]
+
+テキスト:
+${text}`}]
+      })
+    });
+    const data=await res.json();
+    const raw=data.content?.[0]?.text||"[]";
+    const items=JSON.parse(raw.replace(/```json|```/g,"").trim());
+    const p=projects.find(x=>x.id===panelId);
+    if(!p.fixes)p.fixes=[];
+    items.forEach(item=>{
+      p.fixes.push({id:nextFixId++,title:item.title,note:item.note||"",date:"",done:false});
+    });
+    updateFixBadge(p);renderFixes(p);render();
+    await saveProjectToGAS(p);
+    showToast(`✓ ${items.length}件の修正項目を追加しました`);
+  }catch(e){
+    showToast("⚠ AI分解に失敗しました。手動で追加してください");
+  }finally{
+    const el=document.getElementById("ai-loading");
+    if(el)el.style.display="none";
+  }
+}
+
+function manualAddFix(){
+  const f=document.getElementById("fix-manual-form");
+  f.style.display=f.style.display==="none"?"block":"none";
+}
+async function addFixManual(){
+  const title=document.getElementById("fix-title-m").value.trim();
+  if(!title){alert("修正内容を入力してください");return;}
+  const p=projects.find(x=>x.id===panelId);
+  if(!p.fixes)p.fixes=[];
+  p.fixes.push({id:nextFixId++,title,note:document.getElementById("fix-note-m").value.trim(),date:document.getElementById("fix-date-m").value,done:false});
+  updateFixBadge(p);renderFixes(p);render();
+  await saveProjectToGAS(p);
+}
+
+// チェックボックスのトグル
+async function toggleFix(idx){
+  const p=projects.find(x=>x.id===panelId);
+  p.fixes[idx].done=!p.fixes[idx].done;
+  updateFixBadge(p);renderFixes(p);render();
+  await saveProjectToGAS(p);
+}
+async function deleteFix(idx){
+  const p=projects.find(x=>x.id===panelId);
+  p.fixes.splice(idx,1);updateFixBadge(p);renderFixes(p);render();
+  await saveProjectToGAS(p);
+}
+
+function renderTimeline(p){
+  const events=[];
+  if(p.revision)events.push({date:p.revision,label:"最終修正締切"});
+  if(p.deadline)events.push({date:p.deadline,label:"最終期日"});
+  (p.mtg||[]).forEach(m=>events.push({date:m,label:"MTG"}));
+  (p.fixes||[]).filter(f=>f.date).forEach(f=>events.push({date:f.date,label:`修正: ${f.title}`,done:f.done}));
+  events.sort((a,b)=>a.date.localeCompare(b.date));
+  const t=tod();
+  function tlcls(d){const diff=(new Date(d)-t)/(864e5);return diff<0?"past":diff<=14?"soon":"";}
+  const html=events.length?events.map(e=>`
+    <div class="tl-item ${tlcls(e.date)}">
+      <div class="tl-date">${fd(e.date)}</div>
+      <div class="tl-label">${e.label}${e.done!==undefined?` <span style="font-size:11px;padding:1px 6px;border-radius:4px;background:${e.done?"var(--color-ok-bg)":"#EBEBEB"};color:${e.done?"var(--color-ok)":"#555"};font-weight:600">${e.done?"完了":"未完了"}</span>`:""}</div>
+    </div>`).join(""):`<div style="font-size:13px;color:var(--color-text2)">日程未登録</div>`;
+  document.getElementById("panel-body").innerHTML=`
+    <div class="section">
+      <div style="display:flex;gap:14px;font-size:12px;color:var(--color-text2);margin-bottom:1rem;flex-wrap:wrap">
+        <span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#5BAD72;margin-right:4px;vertical-align:1px"></span>過去</span>
+        <span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#B8A060;margin-right:4px;vertical-align:1px"></span>14日以内</span>
+        <span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--color-border2);margin-right:4px;vertical-align:1px"></span>今後</span>
+      </div>
+      <div class="timeline">${html}</div>
+    </div>`;
+}
+
+function collectInfoFields(){
+  const p=projects.find(x=>x.id===panelId);if(!p)return;
+  const g=id=>{const el=document.getElementById(id);return el?el.value:null;};
+  if(g("p-person")===null)return;
+  p.person=g("p-person");p.deadline=g("p-deadline");p.revision=g("p-revision");
+  p.amount=Number(g("p-amount"))||0;p.type=g("p-type");
+  p.status=g("p-status");p.progress=Number(g("p-progress"))||0;p.memo=g("p-memo");
+}
+function addMtg(){
+  const v=document.getElementById("mtg-input").value;if(!v)return;
+  const p=projects.find(x=>x.id===panelId);
+  if(!p.mtg)p.mtg=[];
+  if(!p.mtg.includes(v)){p.mtg.push(v);p.mtg.sort();}
+  renderMtgList(p);document.getElementById("mtg-input").value="";
+}
+function removeMtg(idx){
+  const p=projects.find(x=>x.id===panelId);p.mtg.splice(idx,1);renderMtgList(p);
+}
+async function savePanel(){
+  collectInfoFields();
+  const p=projects.find(x=>x.id===panelId);
+  render();await saveProjectToGAS(p);renderInfo(p);
+}
+function closePanel(){
+  if(currentTab==="info")collectInfoFields();
+  document.getElementById("overlay").classList.remove("open");
+  document.getElementById("panel").classList.remove("open");
+  panelId=null;render();
+}
+async function confirmDelete(id){
+  if(!confirm("この案件を削除しますか？"))return;
+  await deleteProjectFromGAS(id);
+  projects=projects.filter(p=>p.id!==id);render();
+}
+function openAdd(){document.getElementById("add-modal").classList.add("open")}
+function closeAdd(){document.getElementById("add-modal").classList.remove("open")}
+async function saveAdd(){
+  const company=document.getElementById("a-company").value.trim();
+  if(!company){alert("会社名を入力してください");return;}
+  const newP={id:nextId++,company,type:document.getElementById("a-type").value.trim(),person:document.getElementById("a-person").value.trim(),amount:Number(document.getElementById("a-amount").value)||0,deadline:document.getElementById("a-deadline").value,revision:document.getElementById("a-revision").value,mtg:[],progress:0,status:document.getElementById("a-status").value,memo:document.getElementById("a-memo").value.trim(),fixes:[]};
+  projects.push(newP);closeAdd();render();
+  await saveProjectToGAS(newP);
+}
+["search","filter-status","filter-person","filter-deadline","filter-fix"].forEach(id=>{
+  document.getElementById(id).addEventListener("change",render);
+  if(id==="search")document.getElementById(id).addEventListener("input",render);
+});
+document.getElementById("add-modal").addEventListener("click",e=>{if(e.target===e.currentTarget)closeAdd()});
+loadFromGAS();
+</script>
+</body>
+</html>
