@@ -266,7 +266,29 @@ const INITIAL_DATA=[
 
 let projects=[], nextId=100, nextFixId=1, panelId=null, currentPTab="info";
 let currentSection="active", sortKey="deadline", sortDir=1;
-const scls={未着手:"b-todo",進行中:"b-wip",レビュー待ち:"b-review",完了:"b-done",保留:"b-hold"};
+
+// ステータス → セクション の定義
+const STATUS_SECTION={
+  "契約前":       "prospect",
+  "デモ提示予定": "prospect",
+  "検討中":       "prospect",
+  "進行中":       "active",
+  "フィードバック待ち": "active",
+  "構築完了":     "completed",
+};
+// セクション別ステータス選択肢
+const SECTION_STATUSES={
+  prospect: ["契約前","デモ提示予定","検討中"],
+  active:   ["進行中","フィードバック待ち"],
+  completed:["構築完了"],
+};
+const scls={
+  "契約前":"b-todo","デモ提示予定":"b-todo","検討中":"b-hold",
+  "進行中":"b-wip","フィードバック待ち":"b-review",
+  "構築完了":"b-done",
+  // 旧ステータス後方互換
+  "未着手":"b-todo","完了":"b-done","保留":"b-hold","レビュー待ち":"b-review"
+};
 
 function fd(d){if(!d)return"–";const p=d.split("-");return p[0]+"/"+(+p[1])+"/"+(+p[2]||"")}
 function fa(n){return(!n&&n!==0)||n===0?"–":"¥"+Number(n).toLocaleString()}
@@ -575,8 +597,8 @@ function renderInfoActive(p){
         <div class="edit-field"><label>金額 (円)</label><input id="p-amount" type="number"></div>
         <div class="edit-field"><label>種別</label><input id="p-type" type="text"></div>
       </div>
-      <div class="edit-field"><label>ステータス</label>
-        <select id="p-status">${["未着手","進行中","レビュー待ち","完了","保留"].map(s=>`<option${s===p.status?" selected":""}>${s}</option>`).join("")}</select>
+      <div class="edit-field"><label>ステータス <span style="font-size:11px;color:var(--color-text2);font-weight:400">（変更するとタブが自動移動します）</span></label>
+        <select id="p-status">${Object.keys(STATUS_SECTION).map(s=>`<option${s===p.status?" selected":""}>${s}</option>`).join("")}</select>
       </div>
       <div class="edit-field"><label>進捗 — <span id="p-prog-label">${p.progress||0}</span>%</label>
         <input type="range" id="p-progress" min="0" max="100" style="width:100%;accent-color:var(--color-primary)" oninput="document.getElementById('p-prog-label').textContent=this.value">
@@ -607,6 +629,9 @@ function renderInfoCompleted(p){
         <div class="edit-field"><label>種別</label><input id="p-type" type="text"></div>
       </div>
       <div class="edit-field"><label>納品日</label><input id="p-deadline" type="date"></div>
+      <div class="edit-field"><label>ステータス <span style="font-size:11px;color:var(--color-text2);font-weight:400">（変更するとタブが自動移動します）</span></label>
+        <select id="p-status">${Object.keys(STATUS_SECTION).map(s=>`<option${s===p.status?" selected":""}>${s}</option>`).join("")}</select>
+      </div>
     </div>
     <div class="section">
       <div class="section-title">保守情報</div>
@@ -644,6 +669,9 @@ function renderInfoProspect(p){
         <div class="edit-field"><label>種別・想定構築内容</label><input id="p-type" type="text"></div>
       </div>
       <div class="edit-field"><label>見込み金額 (円)</label><input id="p-prospectAmount" type="number"></div>
+      <div class="edit-field"><label>ステータス <span style="font-size:11px;color:var(--color-text2);font-weight:400">（変更するとタブが自動移動します）</span></label>
+        <select id="p-status">${Object.keys(STATUS_SECTION).map(s=>`<option${s===p.status?" selected":""}>${s}</option>`).join("")}</select>
+      </div>
       <div class="edit-field"><label>デモ完成</label>
         <select id="p-demoReady"><option value="false">未完成</option><option value="true">完成</option></select>
       </div>
@@ -687,21 +715,22 @@ function renderFixes(p){
   document.getElementById("panel-body").innerHTML=`
     <div class="section">
       ${total>0?`<div class="fix-progress"><div class="fix-progress-bar"><div class="fix-progress-fill" style="width:${pct}%"></div></div><span class="fix-progress-label">${done}/${total} 完了 (${pct}%)</span></div>`:""}
-      <div class="ai-paste-box">
-        <div class="ai-hint">📋 議事録・文字起こしをペースト → AIが修正項目に自動分解します</div>
-        <textarea id="ai-paste-input" placeholder="修正内容をここにペースト…"></textarea>
-        <div id="ai-loading" style="display:none;font-size:12px;color:var(--color-text2);padding:6px 0;text-align:center">⏳ AI分解中…</div>
-        <div style="display:flex;gap:6px">
-          <button class="btn btn-sm btn-primary" onclick="aiParseFixes()"><i class="ti ti-sparkles"></i> AIで分解</button>
-          <button class="btn btn-sm" onclick="toggleManualFix()"><i class="ti ti-plus"></i> 手動追加</button>
+      <!-- クイック追加エリア -->
+      <div style="background:var(--color-primary-p);border:1px solid var(--color-primary-l);border-radius:var(--radius-sm);padding:10px;margin-bottom:10px">
+        <div style="display:flex;gap:6px;align-items:center">
+          <input id="fix-quick" placeholder="修正内容を入力してEnter…" style="flex:1;font-size:13px;padding:7px 10px;border:1px solid var(--color-border);border-radius:var(--radius-sm);background:var(--color-bg);color:var(--color-text);font-family:var(--font-sans);outline:none" onkeydown="if(event.key==='Enter'){event.preventDefault();addFixQuick();}">
+          <button class="btn btn-sm btn-primary" onclick="addFixQuick()"><i class="ti ti-plus"></i> 追加</button>
         </div>
-      </div>
-      <div id="fix-manual-form" style="display:none;border:1px solid var(--color-primary-l);border-radius:var(--radius-sm);padding:12px;background:var(--color-primary-p);margin-bottom:10px">
-        <input id="fix-title-m" placeholder="修正内容 *" style="width:100%;font-size:13px;padding:7px 10px;border:1px solid var(--color-border);border-radius:var(--radius-sm);background:var(--color-bg);color:var(--color-text);font-family:var(--font-sans);outline:none;margin-bottom:6px">
-        <input id="fix-note-m" placeholder="補足（任意）" style="width:100%;font-size:13px;padding:7px 10px;border:1px solid var(--color-border);border-radius:var(--radius-sm);background:var(--color-bg);color:var(--color-text);font-family:var(--font-sans);outline:none;margin-bottom:6px">
-        <div style="display:flex;gap:6px;justify-content:flex-end">
-          <button class="btn btn-sm" onclick="toggleManualFix()">キャンセル</button>
-          <button class="btn btn-sm btn-primary" onclick="addFixManual()">追加</button>
+        <div style="font-size:11px;color:var(--color-text3);margin-top:5px">複数行まとめて入力する場合は↓</div>
+        <div id="fix-bulk-toggle" style="margin-top:4px">
+          <button class="btn btn-sm" onclick="toggleBulkInput()" style="font-size:11px;padding:3px 8px">📋 まとめて入力</button>
+        </div>
+        <div id="fix-bulk-area" style="display:none;margin-top:8px">
+          <textarea id="fix-bulk-text" placeholder="1行1項目で入力&#10;例）&#10;ダッシュボードの表示崩れ&#10;メール通知が届かない&#10;CSV文字化け" style="width:100%;font-size:13px;padding:8px 10px;border:1px solid var(--color-border);border-radius:var(--radius-sm);background:var(--color-bg);color:var(--color-text);font-family:var(--font-sans);resize:vertical;min-height:90px;outline:none;margin-bottom:6px"></textarea>
+          <div style="display:flex;gap:6px;justify-content:flex-end">
+            <button class="btn btn-sm" onclick="toggleBulkInput()">キャンセル</button>
+            <button class="btn btn-sm btn-primary" onclick="addFixBulk()"><i class="ti ti-list-check"></i> 一括追加</button>
+          </div>
         </div>
       </div>
       <div id="fix-rows">${rows}</div>
@@ -735,10 +764,22 @@ function collectInfoFields(){
     p.deadline=g("p-deadline");p.amount=Number(g("p-amount"))||0;
     const mv=g("p-maintenance");p.maintenance=mv==="true"?true:mv==="false"?false:null;
     p.maintenancePeriod=g("p-maintenancePeriod")||"";p.maintenanceFee=Number(g("p-maintenanceFee"))||0;
+    p.status=g("p-status")||"構築完了";
   }else if(p.section==="prospect"){
     p.prospectAmount=Number(g("p-prospectAmount"))||0;
     p.demoReady=g("p-demoReady")==="true";
     p.nextSchedule=g("p-nextSchedule")||"";p.startEstimate=g("p-startEstimate")||"";
+    p.status=g("p-status")||"契約前";
+  }
+  // ステータスに基づいてセクションを自動移動
+  const newSection=STATUS_SECTION[p.status];
+  if(newSection&&newSection!==p.section){
+    p.section=newSection;
+    // 完了済みに移動する場合は必須フィールドを初期化
+    if(newSection==="completed"){p.maintenance=p.maintenance??null;p.maintenanceFee=p.maintenanceFee||0;p.maintenancePeriod=p.maintenancePeriod||"";}
+    if(newSection==="prospect"){p.prospectAmount=p.prospectAmount||p.amount||0;p.demoReady=p.demoReady||false;p.nextSchedule=p.nextSchedule||"";p.startEstimate=p.startEstimate||"";}
+    showToast(`「${p.company}」を${newSection==="active"?"構築中":newSection==="completed"?"完了済み":"見込み"}に移動しました`);
+    currentSection=newSection;
   }
 }
 function addMtg(){
@@ -760,29 +801,44 @@ function closePanel(){
   panelId=null;render();
 }
 
-// AI分解
-async function aiParseFixes(){
-  const text=document.getElementById("ai-paste-input").value.trim();
-  if(!text){alert("テキストをペーストしてください");return;}
-  document.getElementById("ai-loading").style.display="block";
-  try{
-    const res=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-4-6",max_tokens:1000,messages:[{role:"user",content:`以下のテキストから修正・対応が必要な項目を抽出し、JSONのみ出力してください。マークダウン不要。\n形式: [{"title":"20字以内","note":"補足or空文字"},...]\n\n${text}`}]})});
-    const data=await res.json();
-    const items=JSON.parse((data.content?.[0]?.text||"[]").replace(/```json|```/g,"").trim());
-    const p=projects.find(x=>x.id===panelId);
-    if(!p.fixes)p.fixes=[];
-    items.forEach(item=>p.fixes.push({id:nextFixId++,title:item.title,note:item.note||"",done:false}));
-    buildPTabs(p);renderFixes(p);render();await saveProjectToGAS(p);
-    showToast(`✓ ${items.length}件追加しました`);
-  }catch(e){showToast("⚠ AI分解失敗。手動で追加してください");}
-  finally{const el=document.getElementById("ai-loading");if(el)el.style.display="none";}
+// クイック追加（1件・Enter対応）
+async function addFixQuick(){
+  const input=document.getElementById("fix-quick");
+  const title=input.value.trim();
+  if(!title)return;
+  const p=projects.find(x=>x.id===panelId);
+  if(!p.fixes)p.fixes=[];
+  p.fixes.push({id:nextFixId++,title,note:"",done:false});
+  input.value="";
+  buildPTabs(p);renderFixes(p);render();
+  await saveProjectToGAS(p);
+  // フォーカスを戻す
+  setTimeout(()=>{const el=document.getElementById("fix-quick");if(el)el.focus();},50);
 }
-function toggleManualFix(){const f=document.getElementById("fix-manual-form");f.style.display=f.style.display==="none"?"block":"none";}
-async function addFixManual(){
-  const title=document.getElementById("fix-title-m").value.trim();if(!title){alert("修正内容を入力してください");return;}
-  const p=projects.find(x=>x.id===panelId);if(!p.fixes)p.fixes=[];
-  p.fixes.push({id:nextFixId++,title,note:document.getElementById("fix-note-m").value.trim(),done:false});
-  buildPTabs(p);renderFixes(p);render();await saveProjectToGAS(p);
+
+// まとめて入力トグル
+function toggleBulkInput(){
+  const area=document.getElementById("fix-bulk-area");
+  area.style.display=area.style.display==="none"?"block":"none";
+  if(area.style.display==="block")document.getElementById("fix-bulk-text").focus();
+}
+
+// 一括追加（1行1項目）
+async function addFixBulk(){
+  const text=document.getElementById("fix-bulk-text").value;
+  const lines=text.split("\n").map(l=>l.trim()).filter(l=>l&&!l.match(/^[-・•*#]/)||l.replace(/^[-・•*#\s]+/,"").trim());
+  const items=text.split("\n")
+    .map(l=>l.replace(/^[-・•*#\s]+/,"").trim())
+    .filter(l=>l.length>0);
+  if(!items.length){alert("項目を入力してください");return;}
+  const p=projects.find(x=>x.id===panelId);
+  if(!p.fixes)p.fixes=[];
+  items.forEach(title=>p.fixes.push({id:nextFixId++,title:title.slice(0,50),note:"",done:false}));
+  document.getElementById("fix-bulk-text").value="";
+  toggleBulkInput();
+  buildPTabs(p);renderFixes(p);render();
+  await saveProjectToGAS(p);
+  showToast(`✓ ${items.length}件追加しました`);
 }
 async function toggleFix(idx){
   const p=projects.find(x=>x.id===panelId);p.fixes[idx].done=!p.fixes[idx].done;
@@ -801,7 +857,7 @@ function openAdd(){
   if(currentSection==="active"||currentSection==="completed"){
     body=`<div class="row2"><div class="edit-field"><label>会社名 *</label><input id="a-company"></div><div class="edit-field"><label>種別</label><input id="a-type"></div></div>
     <div class="row2"><div class="edit-field"><label>担当者</label><input id="a-person"></div><div class="edit-field"><label>金額 (円)</label><input id="a-amount" type="number" value="0"></div></div>
-    <div class="row2"><div class="edit-field"><label>${currentSection==="completed"?"納品日":"最終期日"}</label><input id="a-deadline" type="date"></div><div class="edit-field"><label>ステータス</label><select id="a-status"><option>未着手</option><option>進行中</option><option>完了</option><option>保留</option></select></div></div>
+    <div class="row2"><div class="edit-field"><label>${currentSection==="completed"?"納品日":"最終期日"}</label><input id="a-deadline" type="date"></div><div class="edit-field"><label>ステータス</label><select id="a-status">${(SECTION_STATUSES[currentSection]||SECTION_STATUSES.active).map(s=>`<option>${s}</option>`).join("")}</select></div></div>
     ${currentSection==="completed"?`<div class="edit-field"><label>保守</label><select id="a-maintenance"><option value="">未設定</option><option value="true">あり</option><option value="false">なし</option></select></div>`:""}
     <div class="edit-field"><label>メモ</label><textarea id="a-memo"></textarea></div>`;
   }else{
