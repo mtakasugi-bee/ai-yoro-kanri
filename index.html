@@ -19,7 +19,7 @@
 }
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:var(--font-sans);background:var(--color-bg2);color:var(--color-text);min-height:100vh}
-.app{max-width:1320px;margin:0 auto;padding:1.5rem 1rem}
+.app{max-width:1380px;margin:0 auto;padding:1.5rem 1rem}
 .app-header{display:flex;align-items:center;gap:16px;margin-bottom:1.5rem;padding-bottom:1.25rem;border-bottom:1px solid var(--color-border)}
 .logo-mark{width:40px;height:40px;border-radius:8px;background:var(--color-primary-d);display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;font-weight:700;flex-shrink:0}
 .app-header h1{font-size:18px;font-weight:700;color:var(--color-primary-d)}
@@ -29,25 +29,40 @@ body{font-family:var(--font-sans);background:var(--color-bg2);color:var(--color-
 .sync-dot.syncing{background:#B8A060;animation:pulse 1s infinite}
 .sync-dot.error{background:#B05050}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
-.summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin-bottom:1rem}
-.metric{background:var(--color-bg);border:1px solid var(--color-border);border-radius:var(--radius);padding:.85rem 1rem}
-.metric .label{font-size:11px;color:var(--color-text2);margin-bottom:5px;font-weight:500;letter-spacing:.03em}
-.metric .val{font-size:22px;font-weight:700;color:var(--color-primary-d)}
+
+/* サマリー */
+.summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(115px,1fr));gap:8px;margin-bottom:1.25rem}
+.metric{background:var(--color-bg);border:1px solid var(--color-border);border-radius:var(--radius);padding:.8rem 1rem}
+.metric .label{font-size:11px;color:var(--color-text2);margin-bottom:4px;font-weight:500}
+.metric .val{font-size:20px;font-weight:700;color:var(--color-primary-d)}
 .metric.hi{background:var(--color-primary-p);border-color:var(--color-primary-l)}
-.metric.hi .val{color:var(--color-primary)}
-.filter-row{display:flex;gap:8px;margin-bottom:.75rem;flex-wrap:wrap}
+
+/* タブ */
+.section-tabs{display:flex;gap:0;border-bottom:2px solid var(--color-border);margin-bottom:1rem}
+.section-tab{font-size:14px;padding:10px 22px;cursor:pointer;color:var(--color-text2);border-bottom:3px solid transparent;background:none;border-top:none;border-left:none;border-right:none;font-family:var(--font-sans);font-weight:500;margin-bottom:-2px;transition:.15s;display:flex;align-items:center;gap:6px}
+.section-tab.active{color:var(--color-primary-d);border-bottom-color:var(--color-primary-d);font-weight:700}
+.section-tab:hover:not(.active){color:var(--color-primary-d);background:var(--color-primary-p)}
+.section-tab .tab-count{font-size:11px;padding:1px 7px;border-radius:10px;background:var(--color-primary-l);color:var(--color-primary-m);font-weight:600}
+.section-tab.active .tab-count{background:var(--color-primary-d);color:#fff}
+
+/* フィルター */
+.filter-row{display:flex;gap:8px;margin-bottom:.75rem;flex-wrap:wrap;align-items:center}
 .filter-row input,.filter-row select{font-size:13px;padding:7px 10px;border:1px solid var(--color-border);border-radius:var(--radius-sm);background:var(--color-bg);color:var(--color-text);outline:none;font-family:var(--font-sans)}
 .filter-row input{flex:1;min-width:150px}
+
+/* ボタン */
 .btn{font-size:13px;padding:7px 14px;border:1px solid var(--color-border);border-radius:var(--radius-sm);background:var(--color-bg);color:var(--color-text);cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;gap:5px;font-family:var(--font-sans);font-weight:500;transition:all .15s}
 .btn:hover{background:var(--color-bg2)}
 .btn-primary{background:var(--color-primary-d);color:#fff;border-color:var(--color-primary-d)}
 .btn-primary:hover{background:var(--color-primary)}
 .btn-sm{font-size:12px;padding:4px 10px}
+
+/* テーブル共通 */
 .table-wrap{background:var(--color-bg);border:1px solid var(--color-border);border-radius:var(--radius);overflow:auto;box-shadow:0 1px 4px rgba(0,0,0,.05)}
-table{width:100%;border-collapse:collapse;font-size:13px;min-width:960px}
+table{width:100%;border-collapse:collapse;font-size:13px}
 th{text-align:left;padding:9px 11px;font-weight:600;font-size:11px;color:var(--color-text2);border-bottom:1px solid var(--color-border);background:var(--color-primary-p);white-space:nowrap;letter-spacing:.04em;cursor:pointer;user-select:none}
 th:hover{background:var(--color-primary-l)}
-td{padding:9px 11px;border-bottom:1px solid var(--color-border);vertical-align:middle}
+td{padding:9px 11px;border-bottom:1px solid var(--color-border);vertical-align:top}
 tr:last-child td{border-bottom:none}
 tr:hover td{background:var(--color-bg2)}
 .company-link{color:var(--color-primary-d);cursor:pointer;font-weight:600;border-bottom:1px solid var(--color-border2)}
@@ -70,22 +85,31 @@ tr:hover td{background:var(--color-bg2)}
 .ico-btn{background:none;border:none;cursor:pointer;color:var(--color-text3);padding:3px 5px;border-radius:4px;font-size:15px}
 .ico-btn:hover{color:var(--color-primary-d);background:var(--color-primary-p)}
 .empty{text-align:center;padding:3rem;color:var(--color-text2);font-size:13px}
-.memo-cell{font-size:12px;color:var(--color-text2);max-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* メモ：省略なし、折り返し表示 */
+.memo-cell{font-size:12px;color:var(--color-text2);max-width:200px;word-break:break-all;white-space:pre-wrap;line-height:1.5}
 .mtg-next{font-size:12px;white-space:nowrap}
 .mtg-next.soon{color:var(--color-warn);font-weight:600}
 .mtg-next.past{color:var(--color-text3)}
-/* panel */
+/* 見込みバッジ */
+.prospect-badge{display:inline-block;font-size:11px;padding:2px 8px;border-radius:4px;font-weight:600;white-space:nowrap}
+.pb-demo-ok{background:#E8F0E8;color:#2A5E2A}
+.pb-demo-ng{background:#EBEBEB;color:#666}
+.pb-hot{background:var(--color-warn-bg);color:var(--color-warn)}
+/* 保守バッジ */
+.maintenance-badge{font-size:11px;padding:2px 8px;border-radius:4px;font-weight:600;background:#EAE8F0;color:#3A3070}
+
+/* パネル */
 .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:50}
 .overlay.open{display:block}
-.panel{position:fixed;top:0;right:0;width:min(560px,100vw);height:100vh;background:var(--color-bg);border-left:1px solid var(--color-border);z-index:51;display:flex;flex-direction:column;transform:translateX(100%);transition:transform .25s ease;box-shadow:-4px 0 24px rgba(0,0,0,.08)}
+.panel{position:fixed;top:0;right:0;width:min(580px,100vw);height:100vh;background:var(--color-bg);border-left:1px solid var(--color-border);z-index:51;display:flex;flex-direction:column;transform:translateX(100%);transition:transform .25s ease;box-shadow:-4px 0 24px rgba(0,0,0,.08)}
 .panel.open{transform:translateX(0)}
 .panel-header{padding:1.25rem;border-bottom:1px solid var(--color-border);display:flex;align-items:flex-start;gap:8px;flex-shrink:0;background:var(--color-primary-p)}
 .panel-header h2{font-size:16px;font-weight:700;flex:1;line-height:1.4;color:var(--color-primary-d)}
 .panel-close{background:none;border:none;cursor:pointer;color:var(--color-text2);font-size:20px;padding:0}
-.tabs{display:flex;border-bottom:1px solid var(--color-border);flex-shrink:0}
-.tab{font-size:13px;padding:10px 16px;cursor:pointer;color:var(--color-text2);border-bottom:2px solid transparent;background:none;border-top:none;border-left:none;border-right:none;font-family:var(--font-sans);font-weight:500}
-.tab.active{color:var(--color-primary-d);border-bottom-color:var(--color-primary-d);font-weight:700}
-.tab:hover:not(.active){color:var(--color-primary-d);background:var(--color-primary-p)}
+.ptabs{display:flex;border-bottom:1px solid var(--color-border);flex-shrink:0;overflow-x:auto}
+.ptab{font-size:13px;padding:9px 15px;cursor:pointer;color:var(--color-text2);border-bottom:2px solid transparent;background:none;border-top:none;border-left:none;border-right:none;font-family:var(--font-sans);font-weight:500;white-space:nowrap}
+.ptab.active{color:var(--color-primary-d);border-bottom-color:var(--color-primary-d);font-weight:700}
+.ptab:hover:not(.active){color:var(--color-primary-d);background:var(--color-primary-p)}
 .panel-body{padding:1.25rem;flex:1;overflow-y:auto}
 .section{margin-bottom:1.5rem}
 .section-title{font-size:11px;font-weight:700;color:var(--color-primary-d);letter-spacing:.07em;text-transform:uppercase;margin-bottom:.75rem;display:flex;align-items:center;gap:6px}
@@ -94,8 +118,9 @@ tr:hover td{background:var(--color-bg2)}
 .edit-field label{display:block;font-size:12px;color:var(--color-text2);margin-bottom:4px;font-weight:500}
 .edit-field input,.edit-field select,.edit-field textarea{width:100%;font-size:13px;padding:7px 10px;border:1px solid var(--color-border);border-radius:var(--radius-sm);background:var(--color-bg);color:var(--color-text);font-family:var(--font-sans);outline:none}
 .edit-field input:focus,.edit-field select:focus,.edit-field textarea:focus{border-color:var(--color-primary);box-shadow:0 0 0 2px var(--color-primary-p)}
-.edit-field textarea{resize:vertical;min-height:60px}
+.edit-field textarea{resize:vertical;min-height:70px}
 .row2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
 .mtg-item{display:inline-flex;align-items:center;gap:4px;background:var(--color-primary-p);color:var(--color-primary-d);font-size:12px;padding:3px 8px;border-radius:4px;margin:2px;font-weight:500;border:1px solid var(--color-primary-l)}
 .mtg-item button{background:none;border:none;cursor:pointer;color:var(--color-primary-m);font-size:13px;padding:0;line-height:1}
 .add-row{display:flex;gap:6px;margin-top:6px}
@@ -110,37 +135,28 @@ tr:hover td{background:var(--color-bg2)}
 .tl-label{font-size:13px;font-weight:600}
 .save-bar{padding:1rem 1.25rem;border-top:1px solid var(--color-border);display:flex;gap:8px;justify-content:flex-end;background:var(--color-bg);flex-shrink:0}
 
-/* ===== 修正項目（チェックボックス式） ===== */
+/* 修正項目 */
 .fix-item{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border:1px solid var(--color-border);border-radius:var(--radius-sm);margin-bottom:6px;transition:.15s;cursor:pointer}
 .fix-item:hover{border-color:var(--color-primary-l);background:var(--color-primary-p)}
-.fix-item.done-item{opacity:.5;background:var(--color-bg2)}
-.fix-check{width:18px;height:18px;border:2px solid var(--color-border2);border-radius:4px;flex-shrink:0;display:flex;align-items:center;justify-content:center;margin-top:1px;transition:.15s;background:var(--color-bg)}
+.fix-item.done-item{opacity:.5}
+.fix-check{width:18px;height:18px;border:2px solid var(--color-border2);border-radius:4px;flex-shrink:0;display:flex;align-items:center;justify-content:center;margin-top:1px;background:var(--color-bg)}
 .fix-item.done-item .fix-check{background:var(--color-primary-d);border-color:var(--color-primary-d);color:#fff}
 .fix-item-left{flex:1;min-width:0}
 .fix-item-title{font-size:13px;font-weight:500;margin-bottom:2px;word-break:break-word;line-height:1.5}
 .fix-item-title.strikethrough{text-decoration:line-through;color:var(--color-text2)}
-.fix-item-meta{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:3px}
-.fix-item-date{font-size:11px;color:var(--color-text2)}
-.fix-status-badge{font-size:11px;padding:1px 7px;border-radius:4px;font-weight:600;border:none;font-family:var(--font-sans);background:#EBEBEB;color:#555}
-.fix-item.done-item .fix-status-badge{background:var(--color-ok-bg);color:var(--color-ok)}
 .fix-note{font-size:12px;color:var(--color-text2);font-style:italic}
-.fix-actions{display:flex;gap:2px;flex-shrink:0}
-
-/* AIペーストエリア */
-.ai-paste-box{border:1.5px dashed var(--color-border2);border-radius:var(--radius-sm);padding:12px;background:var(--color-bg2);margin-bottom:12px}
-.ai-paste-box textarea{width:100%;font-size:13px;padding:8px 10px;border:1px solid var(--color-border);border-radius:var(--radius-sm);background:var(--color-bg);color:var(--color-text);font-family:var(--font-sans);resize:vertical;min-height:80px;outline:none;margin-bottom:8px}
-.ai-paste-box textarea:focus{border-color:var(--color-primary)}
-.ai-hint{font-size:12px;color:var(--color-text2);margin-bottom:8px;line-height:1.6}
-.ai-loading{display:none;font-size:12px;color:var(--color-text2);padding:8px 0;text-align:center}
 .fix-progress{display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--color-primary-p);border-radius:var(--radius-sm);margin-bottom:10px}
 .fix-progress-bar{flex:1;height:6px;background:var(--color-bg3);border-radius:3px;overflow:hidden}
 .fix-progress-fill{height:100%;border-radius:3px;background:var(--color-primary);transition:width .4s}
 .fix-progress-label{font-size:12px;color:var(--color-text2);white-space:nowrap;font-weight:500}
+.ai-paste-box{border:1.5px dashed var(--color-border2);border-radius:var(--radius-sm);padding:12px;background:var(--color-bg2);margin-bottom:12px}
+.ai-paste-box textarea{width:100%;font-size:13px;padding:8px 10px;border:1px solid var(--color-border);border-radius:var(--radius-sm);background:var(--color-bg);color:var(--color-text);font-family:var(--font-sans);resize:vertical;min-height:70px;outline:none;margin-bottom:8px}
+.ai-hint{font-size:12px;color:var(--color-text2);margin-bottom:8px;line-height:1.6}
 
-/* modal */
+/* モーダル */
 .modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:200;align-items:center;justify-content:center}
 .modal-bg.open{display:flex}
-.modal{background:var(--color-bg);border-radius:var(--radius);padding:1.5rem;width:min(480px,94vw);border:1px solid var(--color-border);max-height:90vh;overflow-y:auto;box-shadow:0 8px 40px rgba(0,0,0,.12)}
+.modal{background:var(--color-bg);border-radius:var(--radius);padding:1.5rem;width:min(520px,94vw);border:1px solid var(--color-border);max-height:90vh;overflow-y:auto;box-shadow:0 8px 40px rgba(0,0,0,.12)}
 .modal-header{display:flex;align-items:center;gap:10px;margin-bottom:1rem;padding-bottom:.75rem;border-bottom:1px solid var(--color-border)}
 .modal-header h2{font-size:16px;font-weight:700;color:var(--color-primary-d);flex:1}
 .modal-footer{display:flex;justify-content:flex-end;gap:8px;margin-top:1rem}
@@ -164,46 +180,43 @@ tr:hover td{background:var(--color-bg2)}
     <button class="btn btn-sm" onclick="loadFromGAS()" style="margin-left:auto"><i class="ti ti-refresh"></i> 再読み込み</button>
   </div>
   <div class="summary" id="summary"></div>
+  <div id="person-summary" style="margin-bottom:1.25rem"></div>
+
+  <!-- セクションタブ -->
+  <div class="section-tabs">
+    <button class="section-tab active" onclick="switchSection('active')" id="stab-active">
+      <i class="ti ti-building"></i> 構築中案件 <span class="tab-count" id="cnt-active">0</span>
+    </button>
+    <button class="section-tab" onclick="switchSection('completed')" id="stab-completed">
+      <i class="ti ti-circle-check"></i> 完了済み案件 <span class="tab-count" id="cnt-completed">0</span>
+    </button>
+    <button class="section-tab" onclick="switchSection('prospect')" id="stab-prospect">
+      <i class="ti ti-star"></i> 見込み案件 <span class="tab-count" id="cnt-prospect">0</span>
+    </button>
+  </div>
+
+  <!-- フィルター行 -->
   <div class="filter-row">
     <input type="text" id="search" placeholder="🔍 会社名・担当者で検索…">
-    <select id="filter-status"><option value="">すべてのステータス</option><option>未着手</option><option>進行中</option><option>レビュー待ち</option><option>完了</option><option>保留</option></select>
     <select id="filter-person"><option value="">すべての担当者</option></select>
     <select id="filter-deadline"><option value="">期日：すべて</option><option value="over">期日超過</option><option value="week">7日以内</option><option value="month">30日以内</option></select>
-    <select id="filter-fix"><option value="">修正：すべて</option><option value="has">未完了あり</option><option value="none">修正なし</option><option value="done">全完了</option></select>
+    <select id="filter-fix"><option value="">修正：すべて</option><option value="has">未完了あり</option><option value="done">全完了</option></select>
     <button class="btn btn-sm" onclick="clearFilters()"><i class="ti ti-x"></i> リセット</button>
-    <button class="btn btn-primary" onclick="openAdd()"><i class="ti ti-plus"></i> 案件追加</button>
+    <button class="btn btn-primary" id="add-btn" onclick="openAdd()"><i class="ti ti-plus"></i> 案件追加</button>
   </div>
-  <div class="table-wrap">
-    <table>
-      <thead><tr>
-        <th onclick="sortBy('company')">会社名</th>
-        <th onclick="sortBy('type')">種別</th>
-        <th onclick="sortBy('person')">担当者</th>
-        <th onclick="sortBy('amount')">金額</th>
-        <th onclick="sortBy('deadline')">最終期日</th>
-        <th>次回MTG</th>
-        <th onclick="sortBy('progress')">進捗</th>
-        <th onclick="sortBy('status')">ステータス</th>
-        <th>修正項目</th>
-        <th>メモ</th>
-        <th></th>
-      </tr></thead>
-      <tbody id="tbody"></tbody>
-    </table>
-  </div>
+
+  <!-- テーブルエリア -->
+  <div id="table-area"></div>
 </div>
 
+<!-- パネル -->
 <div class="overlay" id="overlay" onclick="closePanel()"></div>
 <div class="panel" id="panel">
   <div class="panel-header">
     <h2 id="panel-company"></h2>
     <button class="panel-close" onclick="closePanel()"><i class="ti ti-x"></i></button>
   </div>
-  <div class="tabs">
-    <button class="tab active" onclick="switchTab('info')">案件情報</button>
-    <button class="tab" onclick="switchTab('fixes')">修正項目 <span id="fix-count-badge"></span></button>
-    <button class="tab" onclick="switchTab('timeline')">タイムライン</button>
-  </div>
+  <div class="ptabs" id="ptabs"></div>
   <div class="panel-body" id="panel-body"></div>
   <div class="save-bar">
     <button class="btn" onclick="closePanel()">閉じる</button>
@@ -211,28 +224,14 @@ tr:hover td{background:var(--color-bg2)}
   </div>
 </div>
 
+<!-- 追加モーダル -->
 <div class="modal-bg" id="add-modal">
   <div class="modal">
     <div class="modal-header">
       <div class="logo-mark" style="width:30px;height:30px;font-size:12px">Ai</div>
-      <h2>案件を追加</h2>
+      <h2 id="add-modal-title">案件を追加</h2>
     </div>
-    <div class="row2">
-      <div class="edit-field"><label>会社名 *</label><input id="a-company"></div>
-      <div class="edit-field"><label>種別</label><input id="a-type" placeholder="システム構築 など"></div>
-    </div>
-    <div class="row2">
-      <div class="edit-field"><label>担当者</label><input id="a-person"></div>
-      <div class="edit-field"><label>金額 (円)</label><input id="a-amount" type="number" value="0"></div>
-    </div>
-    <div class="row2">
-      <div class="edit-field"><label>最終期日</label><input id="a-deadline" type="date"></div>
-      <div class="edit-field"><label>最終修正締切</label><input id="a-revision" type="date"></div>
-    </div>
-    <div class="edit-field"><label>ステータス</label>
-      <select id="a-status"><option>未着手</option><option>進行中</option><option>レビュー待ち</option><option>完了</option><option>保留</option></select>
-    </div>
-    <div class="edit-field"><label>メモ</label><textarea id="a-memo"></textarea></div>
+    <div id="add-modal-body"></div>
     <div class="modal-footer">
       <button class="btn" onclick="closeAdd()">キャンセル</button>
       <button class="btn btn-primary" onclick="saveAdd()"><i class="ti ti-check"></i> 追加して保存</button>
@@ -244,28 +243,32 @@ tr:hover td{background:var(--color-bg2)}
 <script>
 const GAS_URL="https://script.google.com/macros/s/AKfycbw2TmIA0Cm3_2MI9ziOnZd1_lLP-0EDGE9XxYM0qNsqluprvt9rLME4_8WHHcVMEkUM/exec";
 
-// ===== PDFから更新した最新データ =====
 const INITIAL_DATA=[
-  {id:1,company:"株式会社T's agency holdings",type:"システム構築",person:"神谷さん",amount:0,deadline:"2026-05-31",revision:"",mtg:[],progress:0,status:"進行中",memo:"神谷さん10日訪問予定",fixes:[]},
-  {id:2,company:"アクセルサーブ法律事務所",type:"人脈案件管理",person:"神谷さん/高杉",amount:450000,deadline:"2026-05-30",revision:"",mtg:["2026-06-02"],progress:0,status:"進行中",memo:"6月2日MTG実施。追加要望・修正なし",fixes:[]},
-  {id:3,company:"ケーエーエヌユー株式会社",type:"マイソク自動化",person:"神谷さん/高杉",amount:700000,deadline:"2026-01-31",revision:"",mtg:[],progress:100,status:"完了",memo:"納品済み。経理追加は税理士相談中",fixes:[]},
-  {id:4,company:"アールビーライズ株式会社（就業者管理）",type:"システム構築",person:"岡野さん/関さん",amount:1050000,deadline:"2026-02-28",revision:"",mtg:[],progress:0,status:"進行中",memo:"修正多発。5月末完了見込み。保守移行予定",fixes:[]},
-  {id:5,company:"アールビーライズ株式会社（LINE構築）",type:"追加開発",person:"岡野さん/高杉",amount:1400000,deadline:"2026-07-31",revision:"",mtg:[],progress:0,status:"進行中",memo:"キントーン完了後1週間で構築→1ヶ月で完了予定",fixes:[]},
-  {id:6,company:"株式会社リアルト・ハーツ",type:"値決めシート自動化",person:"神谷さん/高杉",amount:900000,deadline:"2026-02-28",revision:"",mtg:[],progress:100,status:"完了",memo:"納品完了。追加構築¥200,000見積提出・稟議中",fixes:[]},
-  {id:7,company:"株式会社ONE REAL ESTATE",type:"不動産物件管理",person:"神谷さん/高杉",amount:1500000,deadline:"2026-06-30",revision:"",mtg:[],progress:0,status:"進行中",memo:"6月中旬まで要望対応→中旬以降修正対応→6月完了",fixes:[]},
-  {id:8,company:"株式会社アットランド",type:"LステップCC構築",person:"神谷さん/高杉",amount:1350000,deadline:"2026-05-31",revision:"",mtg:["2026-06-01"],progress:0,status:"進行中",memo:"動作確認後完了。定例6月実施",fixes:[]},
-  {id:9,company:"Exstan行政書士法人",type:"案件・タスク・請求管理",person:"岡野さん/高杉",amount:1050000,deadline:"2026-05-31",revision:"",mtg:[],progress:90,status:"進行中",memo:"来週定例し終了予定。保守つき",fixes:[]},
-  {id:10,company:"株式会社BigBridge",type:"受注管理",person:"神谷さん/高杉",amount:1050000,deadline:"2026-07-31",revision:"",mtg:["2026-06-02"],progress:0,status:"進行中",memo:"LINE受注システムほぼ完成。6月2日仕様確認MTG",fixes:[]},
-  {id:11,company:"株式会社ファルム",type:"レッツ原価連携",person:"岡野さん/高杉",amount:1200000,deadline:"2026-04-30",revision:"",mtg:["2026-06-01"],progress:90,status:"進行中",memo:"構築・動作確認完了。クライアント間すり合わせ待ち。6月MTG",fixes:[]},
-  {id:12,company:"株式会社くすのき",type:"顧客管理",person:"神谷さん/高杉",amount:1350000,deadline:"2026-07-31",revision:"",mtg:["2026-06-01"],progress:0,status:"進行中",memo:"次回6月1日MTG",fixes:[]},
-  {id:13,company:"ブルーチップ・トランスレーション株式会社",type:"通訳者・請求管理",person:"神谷さん/高杉",amount:1350000,deadline:"2026-07-31",revision:"",mtg:[],progress:0,status:"進行中",memo:"訪問済み。データ・情報提供中",fixes:[]},
+  {id:1,section:"active",company:"株式会社T's agency holdings",type:"楽々販売構築",person:"神谷さん",amount:0,deadline:"2026-05-31",revision:"",mtg:[],progress:0,status:"進行中",memo:"神谷さん10日訪問予定",fixes:[]},
+  {id:2,section:"active",company:"アクセルサーブ法律事務所",type:"人脈案件管理",person:"神谷さん/高杉",amount:450000,deadline:"2026-05-30",revision:"",mtg:["2026-06-02"],progress:0,status:"進行中",memo:"6月2日MTG実施。追加要望・修正なし",fixes:[]},
+  {id:3,section:"completed",company:"ケーエーエヌユー株式会社",type:"マイソク自動化",person:"神谷さん/高杉",amount:700000,deadline:"2026-01-31",revision:"",mtg:[],progress:100,status:"完了",memo:"納品済み。経理追加は税理士相談中",fixes:[],maintenance:false,maintenanceFee:0,maintenancePeriod:""},
+  {id:4,section:"active",company:"アールビーライズ株式会社（就業者管理）",type:"就業者管理",person:"岡野さん/関さん",amount:1050000,deadline:"2026-02-28",revision:"",mtg:[],progress:0,status:"進行中",memo:"修正多発。5月末完了見込み。保守移行予定",fixes:[]},
+  {id:5,section:"active",company:"アールビーライズ株式会社（LINE構築）",type:"LINE構築",person:"岡野さん/高杉",amount:1400000,deadline:"2026-07-31",revision:"",mtg:[],progress:0,status:"進行中",memo:"キントーン完了後1週間で構築→1ヶ月完了予定",fixes:[]},
+  {id:6,section:"completed",company:"株式会社リアルト・ハーツ",type:"値決めシート自動化",person:"神谷さん/高杉",amount:900000,deadline:"2026-02-28",revision:"",mtg:[],progress:100,status:"完了",memo:"追加構築¥200,000見積提出・稟議中",fixes:[],maintenance:true,maintenanceFee:0,maintenancePeriod:"保守提案中"},
+  {id:7,section:"active",company:"株式会社ONE REAL ESTATE",type:"不動産物件管理",person:"神谷さん/高杉",amount:1500000,deadline:"2026-06-30",revision:"",mtg:[],progress:0,status:"進行中",memo:"6月中旬まで要望対応→中旬以降修正対応→6月完了",fixes:[]},
+  {id:8,section:"active",company:"株式会社アットランド",type:"LステップCC構築",person:"神谷さん/高杉",amount:1350000,deadline:"2026-05-31",revision:"",mtg:["2026-06-01"],progress:0,status:"進行中",memo:"動作確認後完了。定例6月実施",fixes:[]},
+  {id:9,section:"active",company:"Exstan行政書士法人",type:"案件・タスク・請求管理",person:"岡野さん/高杉",amount:1050000,deadline:"2026-05-31",revision:"",mtg:[],progress:90,status:"進行中",memo:"来週定例し終了予定。保守つき",fixes:[]},
+  {id:10,section:"active",company:"株式会社BigBridge",type:"受注管理",person:"神谷さん/高杉",amount:1050000,deadline:"2026-07-31",revision:"",mtg:["2026-06-02"],progress:0,status:"進行中",memo:"LINE受注システムほぼ完成。6月2日仕様確認MTG",fixes:[]},
+  {id:11,section:"active",company:"株式会社ファルム",type:"レッツ原価連携",person:"岡野さん/高杉",amount:1200000,deadline:"2026-04-30",revision:"",mtg:["2026-06-01"],progress:90,status:"進行中",memo:"構築・動作確認完了。クライアント間すり合わせ待ち",fixes:[]},
+  {id:12,section:"active",company:"株式会社くすのき",type:"顧客管理",person:"神谷さん/高杉",amount:1350000,deadline:"2026-07-31",revision:"",mtg:["2026-06-01"],progress:0,status:"進行中",memo:"次回6月1日MTG",fixes:[]},
+  {id:13,section:"active",company:"ブルーチップ・トランスレーション株式会社",type:"通訳者・請求管理",person:"神谷さん/高杉",amount:1350000,deadline:"2026-07-31",revision:"",mtg:[],progress:0,status:"進行中",memo:"訪問済み。データ・情報提供中",fixes:[]},
+  // 見込み
+  {id:14,section:"prospect",company:"株式会社リアルト・ハーツ（追加）",type:"PDF自動取り込み",person:"神谷さん/高杉",amount:200000,deadline:"",revision:"",mtg:[],progress:0,status:"未着手",memo:"稟議待ち",fixes:[],demoReady:false,nextSchedule:"",startEstimate:"",prospectAmount:200000},
+  {id:15,section:"prospect",company:"株式会社ウェバートン",type:"",person:"",amount:0,deadline:"",revision:"",mtg:[],progress:0,status:"未着手",memo:"6月デモ提示　6月入金",fixes:[],demoReady:false,nextSchedule:"2026-06-01",startEstimate:"2026-06",prospectAmount:1000000},
+  {id:16,section:"prospect",company:"アサヒ冷熱株式会社",type:"",person:"",amount:0,deadline:"",revision:"",mtg:[],progress:0,status:"未着手",memo:"3名受講　7月入金",fixes:[],demoReady:false,nextSchedule:"",startEstimate:"2026-07",prospectAmount:1200000},
+  {id:17,section:"prospect",company:"有限会社船宿あみ達",type:"",person:"",amount:0,deadline:"",revision:"",mtg:[],progress:0,status:"未着手",memo:"6月見積提示　6月入金",fixes:[],demoReady:false,nextSchedule:"2026-06-01",startEstimate:"2026-06",prospectAmount:2000000},
 ];
 
-let projects=[], nextId=100, nextFixId=1, panelId=null, currentTab="info";
-let sortKey="deadline", sortDir=1;
+let projects=[], nextId=100, nextFixId=1, panelId=null, currentPTab="info";
+let currentSection="active", sortKey="deadline", sortDir=1;
 const scls={未着手:"b-todo",進行中:"b-wip",レビュー待ち:"b-review",完了:"b-done",保留:"b-hold"};
 
-function fd(d){if(!d)return"–";const p=d.split("-");return p[0]+"/"+(+p[1])+"/"+(+p[2])}
+function fd(d){if(!d)return"–";const p=d.split("-");return p[0]+"/"+(+p[1])+"/"+(+p[2]||"")}
 function fa(n){return(!n&&n!==0)||n===0?"–":"¥"+Number(n).toLocaleString()}
 function tod(){const d=new Date();d.setHours(0,0,0,0);return d;}
 function dcls(d){if(!d)return"";const diff=(new Date(d)-tod())/(864e5);return diff<0?"deadline-over":diff<=14?"deadline-warn":"";}
@@ -275,23 +278,18 @@ function nextMtg(mtg){
   const future=mtg.map(m=>new Date(m)).filter(d=>d>=t).sort((a,b)=>a-b);
   return future.length?future[0].toISOString().slice(0,10):null;
 }
-function setSyncState(state,msg){
-  const dot=document.getElementById("sync-dot");
-  dot.className="sync-dot"+(state==="syncing"?" syncing":state==="error"?" error":"");
-  document.getElementById("sync-label").textContent=msg;
+function tryParse(v){try{return JSON.parse(v);}catch{return[];}}
+function setSyncState(s,m){
+  document.getElementById("sync-dot").className="sync-dot"+(s==="syncing"?" syncing":s==="error"?" error":"");
+  document.getElementById("sync-label").textContent=m;
 }
-function showToast(msg){
-  const t=document.getElementById("toast");
-  t.textContent=msg;t.classList.add("show");
-  setTimeout(()=>t.classList.remove("show"),2500);
-}
+function showToast(m){const t=document.getElementById("toast");t.textContent=m;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),2500);}
+
 async function gasRequest(params){
   const url=GAS_URL+"?"+new URLSearchParams({action:params.action});
   const opts=params.action==="getAll"?{method:"GET"}:{method:"POST",headers:{"Content-Type":"text/plain"},body:JSON.stringify(params)};
-  const res=await fetch(url,opts);
-  const json=await res.json();
-  if(!json.ok)throw new Error(json.error||"エラー");
-  return json.data;
+  const res=await fetch(url,opts);const json=await res.json();
+  if(!json.ok)throw new Error(json.error||"エラー");return json.data;
 }
 async function loadFromGAS(){
   setSyncState("syncing","スプレッドシートから読み込み中…");
@@ -299,57 +297,108 @@ async function loadFromGAS(){
     const data=await gasRequest({action:"getAll"});
     if(data&&data.length>0){
       projects=data.map(p=>({
-        ...p,
-        mtg:Array.isArray(p.mtg)?p.mtg:(p.mtg?tryParse(p.mtg):[]),
-        fixes:Array.isArray(p.fixes)?p.fixes:(p.fixes?tryParse(p.fixes):[]),
-        amount:Number(p.amount)||0,progress:Number(p.progress)||0,id:Number(p.id)||0
+        ...p,section:p.section||"active",
+        mtg:Array.isArray(p.mtg)?p.mtg:tryParse(p.mtg||"[]"),
+        fixes:Array.isArray(p.fixes)?p.fixes:tryParse(p.fixes||"[]"),
+        amount:Number(p.amount)||0,progress:Number(p.progress)||0,id:Number(p.id)||0,
+        prospectAmount:Number(p.prospectAmount)||0,
+        demoReady:p.demoReady==="true"||p.demoReady===true,
+        maintenance:p.maintenance==="true"||p.maintenance===true,
       }));
       nextId=Math.max(...projects.map(p=>p.id))+1;
-      setSyncState("ok","スプレッドシートと同期済み — "+new Date().toLocaleTimeString("ja-JP"));
-    } else {
-      // スプレッドシートが空ならPDFデータを初期投入
-      projects=INITIAL_DATA.map(p=>({...p}));
-      nextId=20;
-      setSyncState("ok","初期データを読み込みました — "+new Date().toLocaleTimeString("ja-JP"));
-      // スプレッドシートに一括保存
-      for(const p of projects){ await gasRequest({action:"save",project:p}); }
-      showToast("✓ 最新データをスプレッドシートに保存しました");
+      setSyncState("ok","同期済み — "+new Date().toLocaleTimeString("ja-JP"));
+    }else{
+      projects=INITIAL_DATA.map(p=>({...p}));nextId=20;
+      setSyncState("ok","初期データ読み込み完了");
+      for(const p of projects)await gasRequest({action:"save",project:p});
+      showToast("✓ 初期データをスプレッドシートに保存しました");
     }
     render();
   }catch(e){
-    // オフライン時もPDFデータで動作
-    projects=INITIAL_DATA.map(p=>({...p}));
-    nextId=20;
-    setSyncState("error","オフライン — ローカルデータで表示中");
-    render();
+    projects=INITIAL_DATA.map(p=>({...p}));nextId=20;
+    setSyncState("error","オフライン — ローカルデータで表示");render();
   }
 }
-function tryParse(v){try{return JSON.parse(v);}catch{return [];}}
-async function saveProjectToGAS(project){
+async function saveProjectToGAS(p){
   setSyncState("syncing","保存中…");
-  try{
-    await gasRequest({action:"save",project});
-    setSyncState("ok","保存完了 — "+new Date().toLocaleTimeString("ja-JP"));
-    showToast("✓ スプレッドシートに保存しました");
-  }catch(e){setSyncState("error","保存エラー: "+e.message);showToast("⚠ 保存に失敗: "+e.message);}
+  try{await gasRequest({action:"save",project:p});setSyncState("ok","保存完了 — "+new Date().toLocaleTimeString("ja-JP"));showToast("✓ 保存しました");}
+  catch(e){setSyncState("error","保存エラー: "+e.message);showToast("⚠ 保存失敗");}
 }
 async function deleteProjectFromGAS(id){
   try{await gasRequest({action:"delete",id});showToast("削除しました");}catch(e){}
 }
-function sortBy(key){if(sortKey===key)sortDir*=-1;else{sortKey=key;sortDir=1;}render();}
+
+function switchSection(s){
+  currentSection=s;
+  ["active","completed","prospect"].forEach(k=>{
+    document.getElementById("stab-"+k).classList.toggle("active",k===s);
+  });
+  // フィルター表示切替
+  document.getElementById("filter-deadline").style.display=s==="prospect"?"none":"";
+  document.getElementById("filter-fix").style.display=s==="prospect"?"none":"";
+  render();
+}
+
 function renderSummary(){
-  const t=projects.length,a=projects.filter(p=>p.status==="進行中").length,d=projects.filter(p=>p.status==="完了").length;
-  const rev=projects.reduce((s,p)=>s+Number(p.amount||0),0);
-  const near=projects.filter(p=>p.deadline&&(new Date(p.deadline)-tod())/(864e5)<=14&&p.status!=="完了").length;
-  const pf=projects.reduce((s,p)=>s+(p.fixes||[]).filter(f=>!f.done).length,0);
+  const active=projects.filter(p=>p.section==="active");
+  const comp=projects.filter(p=>p.section==="completed");
+  const prosp=projects.filter(p=>p.section==="prospect");
+  // 受注金額 = 構築中 + 完了済み（契約済み）
+  const rev=active.reduce((s,p)=>s+Number(p.amount||0),0)+comp.reduce((s,p)=>s+Number(p.amount||0),0);
+  // 見込み金額 = prospectのみ
+  const prospRev=prosp.reduce((s,p)=>s+Number(p.prospectAmount||0),0);
+  const pf=active.reduce((s,p)=>s+(p.fixes||[]).filter(f=>!f.done).length,0);
+  const near=active.filter(p=>p.deadline&&(new Date(p.deadline)-tod())/(864e5)<=14).length;
+
   document.getElementById("summary").innerHTML=`
-    <div class="metric"><div class="label">総案件数</div><div class="val">${t}</div></div>
-    <div class="metric"><div class="label">進行中</div><div class="val">${a}</div></div>
-    <div class="metric"><div class="label">完了</div><div class="val">${d}</div></div>
-    <div class="metric hi"><div class="label">総受注額</div><div class="val" style="font-size:15px">¥${rev.toLocaleString()}</div></div>
+    <div class="metric"><div class="label">構築中</div><div class="val">${active.length}</div></div>
+    <div class="metric"><div class="label">完了済み</div><div class="val">${comp.length}</div></div>
+    <div class="metric"><div class="label">見込み</div><div class="val">${prosp.length}</div></div>
+    <div class="metric hi"><div class="label">受注金額（契約済み）</div><div class="val" style="font-size:13px">¥${rev.toLocaleString()}</div></div>
+    <div class="metric hi"><div class="label">見込み金額（契約前）</div><div class="val" style="font-size:13px">¥${prospRev.toLocaleString()}</div></div>
     <div class="metric${near>0?" hi":""}"><div class="label">期日14日以内</div><div class="val" style="color:${near>0?"var(--color-warn)":""}">${near}</div></div>
     <div class="metric${pf>0?" hi":""}"><div class="label">未完了の修正</div><div class="val" style="color:${pf>0?"var(--color-warn)":""}">${pf}</div></div>`;
+
+  // タブカウント更新
+  document.getElementById("cnt-active").textContent=active.length;
+  document.getElementById("cnt-completed").textContent=comp.length;
+  document.getElementById("cnt-prospect").textContent=prosp.length;
+
+  // ===== 担当者別集計 =====
+  // 担当者を分解（"神谷さん/高杉" → ["神谷さん","高杉"] のように分割）
+  const personMap={};
+  [...active,...comp].forEach(p=>{
+    const persons=(p.person||"").split(/[\/・,、]/).map(s=>s.trim()).filter(Boolean);
+    persons.forEach(name=>{
+      if(!personMap[name])personMap[name]={active:0,completed:0,amount:0};
+      if(p.section==="active"){personMap[name].active++;personMap[name].amount+=Number(p.amount||0);}
+      else{personMap[name].completed++;personMap[name].amount+=Number(p.amount||0);}
+    });
+  });
+  const personEntries=Object.entries(personMap).sort((a,b)=>(b[1].active+b[1].completed)-(a[1].active+a[1].completed));
+  if(personEntries.length>0){
+    const cards=personEntries.map(([name,d])=>`
+      <div style="background:var(--color-bg);border:1px solid var(--color-border);border-radius:var(--radius);padding:.7rem 1rem;display:flex;align-items:center;gap:12px;min-width:0">
+        <div style="width:32px;height:32px;border-radius:50%;background:var(--color-primary-d);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0">${name.slice(0,2)}</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:13px;font-weight:700;color:var(--color-primary-d);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${name}</div>
+          <div style="font-size:11px;color:var(--color-text2);margin-top:2px">
+            構築中 <strong>${d.active}</strong> 件 &nbsp;完了 <strong>${d.completed}</strong> 件
+          </div>
+        </div>
+        <div style="text-align:right;flex-shrink:0">
+          <div style="font-size:12px;font-weight:700;color:var(--color-primary-d)">¥${d.amount.toLocaleString()}</div>
+          <div style="font-size:10px;color:var(--color-text3)">担当合計</div>
+        </div>
+      </div>`).join("");
+    document.getElementById("person-summary").innerHTML=`
+      <div style="font-size:11px;font-weight:700;color:var(--color-text2);letter-spacing:.06em;text-transform:uppercase;margin-bottom:.6rem">担当者別案件数</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px">${cards}</div>`;
+  } else {
+    document.getElementById("person-summary").innerHTML="";
+  }
 }
+
 function renderPersonFilter(){
   const sel=document.getElementById("filter-person"),cur=sel.value;
   const ps=[...new Set(projects.map(p=>p.person).filter(Boolean))].sort();
@@ -357,94 +406,163 @@ function renderPersonFilter(){
   sel.value=cur;
 }
 function clearFilters(){
-  ["search","filter-status","filter-person","filter-deadline","filter-fix"].forEach(id=>{document.getElementById(id).value="";});
+  ["search","filter-person","filter-deadline","filter-fix"].forEach(id=>{const el=document.getElementById(id);if(el)el.value="";});
   render();
 }
+
 function render(){
   renderSummary();renderPersonFilter();
-  const q=document.getElementById("search").value.toLowerCase();
-  const fs=document.getElementById("filter-status").value;
+  const q=(document.getElementById("search").value||"").toLowerCase();
   const fp=document.getElementById("filter-person").value;
   const fd2=document.getElementById("filter-deadline").value;
   const ff=document.getElementById("filter-fix").value;
   const t=tod();
+
   let list=projects.filter(p=>{
+    if(p.section!==currentSection)return false;
     if(q&&!p.company.toLowerCase().includes(q)&&!(p.person||"").toLowerCase().includes(q))return false;
-    if(fs&&p.status!==fs)return false;
     if(fp&&p.person!==fp)return false;
-    if(fd2){
-      if(!p.deadline)return false;
-      const diff=(new Date(p.deadline)-t)/(864e5);
-      if(fd2==="over"&&diff>=0)return false;
-      if(fd2==="week"&&(diff<0||diff>7))return false;
-      if(fd2==="month"&&(diff<0||diff>30))return false;
-    }
-    if(ff){
-      const fixes=p.fixes||[];
-      const pending=fixes.filter(f=>!f.done).length;
-      if(ff==="has"&&pending===0)return false;
-      if(ff==="none"&&fixes.length>0)return false;
-      if(ff==="done"&&(fixes.length===0||pending>0))return false;
+    if(currentSection==="active"){
+      if(fd2){
+        if(!p.deadline)return false;
+        const diff=(new Date(p.deadline)-t)/(864e5);
+        if(fd2==="over"&&diff>=0)return false;
+        if(fd2==="week"&&(diff<0||diff>7))return false;
+        if(fd2==="month"&&(diff<0||diff>30))return false;
+      }
+      if(ff){
+        const fixes=p.fixes||[];
+        const pending=fixes.filter(f=>!f.done).length;
+        if(ff==="has"&&pending===0)return false;
+        if(ff==="done"&&(fixes.length===0||pending>0))return false;
+      }
     }
     return true;
   });
+
   list.sort((a,b)=>{
     let av=a[sortKey]??"",bv=b[sortKey]??"";
-    if(sortKey==="amount"||sortKey==="progress"){av=Number(av);bv=Number(bv);}
+    if(sortKey==="amount"||sortKey==="progress"||sortKey==="prospectAmount"){av=Number(av);bv=Number(bv);}
     return av<bv?-sortDir:av>bv?sortDir:0;
   });
-  const tb=document.getElementById("tbody");
-  if(!list.length){tb.innerHTML=`<tr><td colspan="11" class="empty">${projects.length===0?"読み込み中…":"条件に一致する案件が見つかりません"}</td></tr>`;return;}
-  tb.innerHTML=list.map(p=>{
+
+  const area=document.getElementById("table-area");
+  if(!list.length){area.innerHTML=`<div class="table-wrap"><div class="empty">該当する案件がありません</div></div>`;return;}
+
+  if(currentSection==="active") area.innerHTML=renderActiveTable(list);
+  else if(currentSection==="completed") area.innerHTML=renderCompletedTable(list);
+  else area.innerHTML=renderProspectTable(list);
+}
+
+function renderActiveTable(list){
+  const rows=list.map(p=>{
     const fixes=p.fixes||[],total=fixes.length,pending=fixes.filter(f=>!f.done).length;
-    const fixBadge=total===0?`<span class="fix-none">–</span>`:pending===0?`<span class="fix-all-done">✓全完了 ${total}</span>`:`<span class="fix-pending">${pending}件残り/${total}</span>`;
+    const fixBadge=total===0?`<span class="fix-none">–</span>`:pending===0?`<span class="fix-all-done">✓全完了${total}</span>`:`<span class="fix-pending">${pending}残り/${total}</span>`;
     const nm=nextMtg(p.mtg||[]);
-    const nmDiff=nm?(new Date(nm)-t)/(864e5):null;
+    const nmDiff=nm?(new Date(nm)-tod())/(864e5):null;
     const nmCls=nm?(nmDiff<=7?"soon":nmDiff<0?"past":""):"";
-    const nmTxt=nm?`<span class="mtg-next ${nmCls}">${fd(nm)}</span>`:`<span style="color:var(--color-text3);font-size:12px">–</span>`;
     return`<tr>
       <td><span class="company-link" onclick="openPanel(${p.id})">${p.company}</span></td>
       <td style="color:var(--color-text2);font-size:12px">${p.type||"–"}</td>
-      <td style="font-weight:500;white-space:nowrap;font-size:12px">${p.person||"–"}</td>
+      <td style="font-weight:500;font-size:12px">${p.person||"–"}</td>
       <td style="white-space:nowrap">${fa(p.amount)}</td>
       <td class="${dcls(p.deadline)}" style="white-space:nowrap">${fd(p.deadline)}</td>
-      <td>${nmTxt}</td>
+      <td>${nm?`<span class="mtg-next ${nmCls}">${fd(nm)}</span>`:`<span style="color:var(--color-text3);font-size:12px">–</span>`}</td>
       <td style="min-width:80px"><div class="prog-wrap"><div class="prog-bar"><div class="prog-fill" style="width:${p.progress}%"></div></div><span class="prog-val">${p.progress}%</span></div></td>
       <td><span class="badge ${scls[p.status]||"b-todo"}">${p.status}</span></td>
       <td>${fixBadge}</td>
-      <td class="memo-cell" title="${p.memo||""}">${p.memo||"–"}</td>
+      <td class="memo-cell">${p.memo||"–"}</td>
       <td><button class="ico-btn" onclick="confirmDelete(${p.id})"><i class="ti ti-trash"></i></button></td>
     </tr>`;
   }).join("");
+  return`<div class="table-wrap"><table>
+    <thead><tr>
+      <th onclick="sortBy('company')">会社名</th><th onclick="sortBy('type')">種別</th>
+      <th onclick="sortBy('person')">担当者</th><th onclick="sortBy('amount')">金額</th>
+      <th onclick="sortBy('deadline')">最終期日</th><th>次回MTG</th>
+      <th onclick="sortBy('progress')">進捗</th><th onclick="sortBy('status')">ステータス</th>
+      <th>修正項目</th><th>メモ</th><th></th>
+    </tr></thead><tbody>${rows}</tbody>
+  </table></div>`;
 }
 
+function renderCompletedTable(list){
+  const rows=list.map(p=>`<tr>
+    <td><span class="company-link" onclick="openPanel(${p.id})">${p.company}</span></td>
+    <td style="color:var(--color-text2);font-size:12px">${p.type||"–"}</td>
+    <td style="font-weight:500;font-size:12px">${p.person||"–"}</td>
+    <td style="white-space:nowrap">${fa(p.amount)}</td>
+    <td style="white-space:nowrap;color:var(--color-text2)">${fd(p.deadline)}</td>
+    <td>${p.maintenance?`<span class="maintenance-badge">保守あり</span>`:p.maintenance===false?`<span style="color:var(--color-text3);font-size:12px">なし</span>`:"-"}</td>
+    <td style="font-size:12px;color:var(--color-text2)">${p.maintenancePeriod||"–"}</td>
+    <td style="white-space:nowrap">${p.maintenanceFee?`¥${Number(p.maintenanceFee).toLocaleString()}`:"–"}</td>
+    <td class="memo-cell">${p.memo||"–"}</td>
+    <td><button class="ico-btn" onclick="confirmDelete(${p.id})"><i class="ti ti-trash"></i></button></td>
+  </tr>`).join("");
+  return`<div class="table-wrap"><table>
+    <thead><tr>
+      <th onclick="sortBy('company')">会社名</th><th>種別</th><th>担当者</th>
+      <th onclick="sortBy('amount')">金額</th><th onclick="sortBy('deadline')">納品日</th>
+      <th>保守</th><th>保守期間</th><th>保守金額</th><th>メモ</th><th></th>
+    </tr></thead><tbody>${rows}</tbody>
+  </table></div>`;
+}
+
+function renderProspectTable(list){
+  const rows=list.map(p=>`<tr>
+    <td><span class="company-link" onclick="openPanel(${p.id})">${p.company}</span></td>
+    <td style="color:var(--color-text2);font-size:12px">${p.type||"–"}</td>
+    <td style="font-weight:500;font-size:12px">${p.person||"–"}</td>
+    <td style="white-space:nowrap">${p.prospectAmount?`¥${Number(p.prospectAmount).toLocaleString()}`:"–"}</td>
+    <td>${p.demoReady?`<span class="prospect-badge pb-demo-ok">✓ 完成</span>`:`<span class="prospect-badge pb-demo-ng">未完成</span>`}</td>
+    <td class="${dcls(p.nextSchedule)}" style="white-space:nowrap">${fd(p.nextSchedule)}</td>
+    <td style="font-size:12px;color:var(--color-text2)">${p.startEstimate||"–"}</td>
+    <td class="memo-cell">${p.memo||"–"}</td>
+    <td><button class="ico-btn" onclick="confirmDelete(${p.id})"><i class="ti ti-trash"></i></button></td>
+  </tr>`).join("");
+  return`<div class="table-wrap"><table>
+    <thead><tr>
+      <th onclick="sortBy('company')">会社名</th><th>種別</th><th>担当者</th>
+      <th onclick="sortBy('prospectAmount')">見込み金額</th><th>デモ</th>
+      <th>次回日程</th><th>スタート見込み</th><th>メモ</th><th></th>
+    </tr></thead><tbody>${rows}</tbody>
+  </table></div>`;
+}
+
+function sortBy(k){if(sortKey===k)sortDir*=-1;else{sortKey=k;sortDir=1;}render();}
+
+// ===== パネル =====
 function openPanel(id){
-  panelId=id;currentTab="info";
+  panelId=id;currentPTab="info";
   const p=projects.find(x=>x.id===id);
   document.getElementById("panel-company").textContent=p.company;
-  updateFixBadge(p);setActiveTab("info");renderTab();
+  buildPTabs(p);renderPTab(p);
   document.getElementById("overlay").classList.add("open");
   document.getElementById("panel").classList.add("open");
 }
-function updateFixBadge(p){
-  const fixes=p.fixes||[],pending=fixes.filter(f=>!f.done).length;
-  document.getElementById("fix-count-badge").textContent=fixes.length?`(${pending}残り)`:"";
+function buildPTabs(p){
+  const tabs=p.section==="prospect"
+    ?[["info","案件情報"],["timeline","タイムライン"]]
+    :[["info","案件情報"],["fixes",`修正項目 ${p.fixes&&p.fixes.length?"("+p.fixes.filter(f=>!f.done).length+"残り)":""}`],["timeline","タイムライン"]];
+  document.getElementById("ptabs").innerHTML=tabs.map(([k,l])=>`<button class="ptab${k===currentPTab?" active":""}" onclick="switchPTab('${k}')">${l}</button>`).join("");
+  document.getElementById("save-btn").style.display=currentPTab==="info"?"inline-flex":"none";
 }
-function switchTab(tab){
-  if(currentTab==="info"&&tab!=="info")collectInfoFields();
-  currentTab=tab;setActiveTab(tab);renderTab();
-}
-function setActiveTab(tab){
-  document.querySelectorAll(".tab").forEach((t,i)=>{t.classList.toggle("active",["info","fixes","timeline"][i]===tab);});
-  document.getElementById("save-btn").style.display=tab==="info"?"inline-flex":"none";
-}
-function renderTab(){
+function switchPTab(tab){
+  if(currentPTab==="info"&&tab!=="info")collectInfoFields();
+  currentPTab=tab;
   const p=projects.find(x=>x.id===panelId);
-  if(currentTab==="info")renderInfo(p);
-  else if(currentTab==="fixes")renderFixes(p);
+  buildPTabs(p);renderPTab(p);
+}
+function renderPTab(p){
+  if(currentPTab==="info"){
+    if(p.section==="active")renderInfoActive(p);
+    else if(p.section==="completed")renderInfoCompleted(p);
+    else renderInfoProspect(p);
+  }else if(currentPTab==="fixes")renderFixes(p);
   else renderTimeline(p);
 }
-function renderInfo(p){
+
+function renderInfoActive(p){
   document.getElementById("panel-body").innerHTML=`
     <div class="section">
       <div class="section-title">基本情報</div>
@@ -467,171 +585,161 @@ function renderInfo(p){
         <div id="mtg-list"></div>
         <div class="add-row"><input type="date" id="mtg-input"><button class="btn btn-sm" onclick="addMtg()">+ 追加</button></div>
       </div>
-      <div class="edit-field"><label>メモ</label><textarea id="p-memo"></textarea></div>
+      <div class="edit-field"><label>メモ</label><textarea id="p-memo" style="min-height:100px"></textarea></div>
     </div>`;
-  document.getElementById("p-person").value  =p.person||"";
-  document.getElementById("p-deadline").value =p.deadline||"";
-  document.getElementById("p-revision").value =p.revision||"";
-  document.getElementById("p-amount").value   =p.amount??0;
-  document.getElementById("p-type").value     =p.type||"";
-  document.getElementById("p-progress").value =p.progress??0;
-  document.getElementById("p-memo").value     =p.memo||"";
+  document.getElementById("p-person").value=p.person||"";
+  document.getElementById("p-deadline").value=p.deadline||"";
+  document.getElementById("p-revision").value=p.revision||"";
+  document.getElementById("p-amount").value=p.amount??0;
+  document.getElementById("p-type").value=p.type||"";
+  document.getElementById("p-progress").value=p.progress??0;
+  document.getElementById("p-memo").value=p.memo||"";
   renderMtgList(p);
 }
+
+function renderInfoCompleted(p){
+  document.getElementById("panel-body").innerHTML=`
+    <div class="section">
+      <div class="section-title">基本情報</div>
+      <div class="edit-field"><label>担当者</label><input id="p-person" type="text"></div>
+      <div class="row2">
+        <div class="edit-field"><label>金額 (円)</label><input id="p-amount" type="number"></div>
+        <div class="edit-field"><label>種別</label><input id="p-type" type="text"></div>
+      </div>
+      <div class="edit-field"><label>納品日</label><input id="p-deadline" type="date"></div>
+    </div>
+    <div class="section">
+      <div class="section-title">保守情報</div>
+      <div class="edit-field"><label>保守</label>
+        <select id="p-maintenance">
+          <option value="">未設定</option>
+          <option value="true">あり</option>
+          <option value="false">なし</option>
+        </select>
+      </div>
+      <div class="row2">
+        <div class="edit-field"><label>保守期間</label><input id="p-maintenancePeriod" type="text" placeholder="例: 2026/06〜"></div>
+        <div class="edit-field"><label>保守金額 (円/月)</label><input id="p-maintenanceFee" type="number"></div>
+      </div>
+    </div>
+    <div class="section">
+      <div class="edit-field"><label>メモ</label><textarea id="p-memo" style="min-height:100px"></textarea></div>
+    </div>`;
+  document.getElementById("p-person").value=p.person||"";
+  document.getElementById("p-amount").value=p.amount??0;
+  document.getElementById("p-type").value=p.type||"";
+  document.getElementById("p-deadline").value=p.deadline||"";
+  document.getElementById("p-maintenance").value=p.maintenance===true?"true":p.maintenance===false?"false":"";
+  document.getElementById("p-maintenancePeriod").value=p.maintenancePeriod||"";
+  document.getElementById("p-maintenanceFee").value=p.maintenanceFee||0;
+  document.getElementById("p-memo").value=p.memo||"";
+}
+
+function renderInfoProspect(p){
+  document.getElementById("panel-body").innerHTML=`
+    <div class="section">
+      <div class="section-title">見込み情報</div>
+      <div class="row2">
+        <div class="edit-field"><label>担当者</label><input id="p-person" type="text"></div>
+        <div class="edit-field"><label>種別・想定構築内容</label><input id="p-type" type="text"></div>
+      </div>
+      <div class="edit-field"><label>見込み金額 (円)</label><input id="p-prospectAmount" type="number"></div>
+      <div class="edit-field"><label>デモ完成</label>
+        <select id="p-demoReady"><option value="false">未完成</option><option value="true">完成</option></select>
+      </div>
+      <div class="row2">
+        <div class="edit-field"><label>次回日程</label><input id="p-nextSchedule" type="date"></div>
+        <div class="edit-field"><label>スタート見込み</label><input id="p-startEstimate" type="text" placeholder="例: 2026-07"></div>
+      </div>
+      <div class="edit-field"><label>MTG日程</label>
+        <div id="mtg-list"></div>
+        <div class="add-row"><input type="date" id="mtg-input"><button class="btn btn-sm" onclick="addMtg()">+ 追加</button></div>
+      </div>
+      <div class="edit-field"><label>メモ</label><textarea id="p-memo" style="min-height:100px"></textarea></div>
+    </div>`;
+  document.getElementById("p-person").value=p.person||"";
+  document.getElementById("p-type").value=p.type||"";
+  document.getElementById("p-prospectAmount").value=p.prospectAmount||0;
+  document.getElementById("p-demoReady").value=p.demoReady?"true":"false";
+  document.getElementById("p-nextSchedule").value=p.nextSchedule||"";
+  document.getElementById("p-startEstimate").value=p.startEstimate||"";
+  document.getElementById("p-memo").value=p.memo||"";
+  renderMtgList(p);
+}
+
 function renderMtgList(p){
   const el=document.getElementById("mtg-list");if(!el)return;
   el.innerHTML=(p.mtg||[]).map((m,i)=>`<span class="mtg-item">${fd(m)}<button onclick="removeMtg(${i})">×</button></span>`).join("");
 }
 
-// ===== 修正項目（チェックボックス式）=====
 function renderFixes(p){
-  const fixes=p.fixes||[];
-  const total=fixes.length, done=fixes.filter(f=>f.done).length, pending=total-done;
+  const fixes=p.fixes||[],total=fixes.length,done=fixes.filter(f=>f.done).length,pending=total-done;
   const pct=total?Math.round(done/total*100):0;
-
   const rows=fixes.length?fixes.map((f,i)=>`
     <div class="fix-item${f.done?" done-item":""}" onclick="toggleFix(${i})">
       <div class="fix-check">${f.done?'<i class="ti ti-check" style="font-size:12px"></i>':''}</div>
       <div class="fix-item-left">
         <div class="fix-item-title${f.done?" strikethrough":""}">${f.title}</div>
         ${f.note?`<div class="fix-note">${f.note}</div>`:""}
-        ${f.date?`<div class="fix-item-meta"><span class="fix-item-date">${fd(f.date)}</span></div>`:""}
       </div>
       <button class="ico-btn" onclick="event.stopPropagation();deleteFix(${i})"><i class="ti ti-x"></i></button>
     </div>`).join(""):`<div style="font-size:13px;color:var(--color-text2);text-align:center;padding:1.5rem 0">修正項目はありません</div>`;
-
   document.getElementById("panel-body").innerHTML=`
     <div class="section">
-      ${total>0?`<div class="fix-progress">
-        <div class="fix-progress-bar"><div class="fix-progress-fill" style="width:${pct}%"></div></div>
-        <span class="fix-progress-label">${done}/${total} 完了 (${pct}%)</span>
-      </div>`:""}
-
-      <!-- AIペースト欄 -->
+      ${total>0?`<div class="fix-progress"><div class="fix-progress-bar"><div class="fix-progress-fill" style="width:${pct}%"></div></div><span class="fix-progress-label">${done}/${total} 完了 (${pct}%)</span></div>`:""}
       <div class="ai-paste-box">
-        <div class="ai-hint">📋 MTG議事録や文字起こしをそのままペーストすると、AIが修正項目を自動で分解します</div>
-        <textarea id="ai-paste-input" placeholder="例）・ダッシュボードの表示が崩れている&#10;・メール通知が届かない&#10;・CSVエクスポートで文字化け"></textarea>
-        <div id="ai-loading" class="ai-loading">⏳ AIが修正項目を分解中…</div>
+        <div class="ai-hint">📋 議事録・文字起こしをペースト → AIが修正項目に自動分解します</div>
+        <textarea id="ai-paste-input" placeholder="修正内容をここにペースト…"></textarea>
+        <div id="ai-loading" style="display:none;font-size:12px;color:var(--color-text2);padding:6px 0;text-align:center">⏳ AI分解中…</div>
         <div style="display:flex;gap:6px">
-          <button class="btn btn-sm btn-primary" onclick="aiParseFixes()"><i class="ti ti-sparkles"></i> AIで項目に分解</button>
-          <button class="btn btn-sm" onclick="manualAddFix()"><i class="ti ti-plus"></i> 手動で追加</button>
+          <button class="btn btn-sm btn-primary" onclick="aiParseFixes()"><i class="ti ti-sparkles"></i> AIで分解</button>
+          <button class="btn btn-sm" onclick="toggleManualFix()"><i class="ti ti-plus"></i> 手動追加</button>
         </div>
       </div>
-
       <div id="fix-manual-form" style="display:none;border:1px solid var(--color-primary-l);border-radius:var(--radius-sm);padding:12px;background:var(--color-primary-p);margin-bottom:10px">
-        <div class="edit-field" style="margin-bottom:6px"><input id="fix-title-m" placeholder="修正内容 *" style="width:100%;font-size:13px;padding:7px 10px;border:1px solid var(--color-border);border-radius:var(--radius-sm);background:var(--color-bg);color:var(--color-text);font-family:var(--font-sans);outline:none"></div>
-        <div class="edit-field" style="margin-bottom:6px"><input id="fix-note-m" placeholder="補足（任意）" style="width:100%;font-size:13px;padding:7px 10px;border:1px solid var(--color-border);border-radius:var(--radius-sm);background:var(--color-bg);color:var(--color-text);font-family:var(--font-sans);outline:none"></div>
-        <div style="display:flex;gap:6px;margin-bottom:6px"><input type="date" id="fix-date-m" style="flex:1;font-size:13px;padding:6px 9px;border:1px solid var(--color-border);border-radius:var(--radius-sm);background:var(--color-bg);color:var(--color-text);font-family:var(--font-sans);outline:none"></div>
+        <input id="fix-title-m" placeholder="修正内容 *" style="width:100%;font-size:13px;padding:7px 10px;border:1px solid var(--color-border);border-radius:var(--radius-sm);background:var(--color-bg);color:var(--color-text);font-family:var(--font-sans);outline:none;margin-bottom:6px">
+        <input id="fix-note-m" placeholder="補足（任意）" style="width:100%;font-size:13px;padding:7px 10px;border:1px solid var(--color-border);border-radius:var(--radius-sm);background:var(--color-bg);color:var(--color-text);font-family:var(--font-sans);outline:none;margin-bottom:6px">
         <div style="display:flex;gap:6px;justify-content:flex-end">
-          <button class="btn btn-sm" onclick="document.getElementById('fix-manual-form').style.display='none'">キャンセル</button>
+          <button class="btn btn-sm" onclick="toggleManualFix()">キャンセル</button>
           <button class="btn btn-sm btn-primary" onclick="addFixManual()">追加</button>
         </div>
       </div>
-
       <div id="fix-rows">${rows}</div>
     </div>`;
-}
-
-// AIによる修正項目の自動分解
-async function aiParseFixes(){
-  const text=document.getElementById("ai-paste-input").value.trim();
-  if(!text){alert("テキストをペーストしてください");return;}
-  document.getElementById("ai-loading").style.display="block";
-  try{
-    const res=await fetch("https://api.anthropic.com/v1/messages",{
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({
-        model:"claude-sonnet-4-6",
-        max_tokens:1000,
-        messages:[{role:"user",content:`以下のテキストから修正・対応が必要な項目を箇条書きで抽出してください。
-各項目は「タイトル（20字以内）|||補足説明（あれば）」の形式でJSON配列として出力してください。
-補足がなければ空文字にしてください。
-必ずJSONのみ出力し、マークダウンの\`\`\`は使わないでください。
-出力形式: [{"title":"...","note":"..."},...]
-
-テキスト:
-${text}`}]
-      })
-    });
-    const data=await res.json();
-    const raw=data.content?.[0]?.text||"[]";
-    const items=JSON.parse(raw.replace(/```json|```/g,"").trim());
-    const p=projects.find(x=>x.id===panelId);
-    if(!p.fixes)p.fixes=[];
-    items.forEach(item=>{
-      p.fixes.push({id:nextFixId++,title:item.title,note:item.note||"",date:"",done:false});
-    });
-    updateFixBadge(p);renderFixes(p);render();
-    await saveProjectToGAS(p);
-    showToast(`✓ ${items.length}件の修正項目を追加しました`);
-  }catch(e){
-    showToast("⚠ AI分解に失敗しました。手動で追加してください");
-  }finally{
-    const el=document.getElementById("ai-loading");
-    if(el)el.style.display="none";
-  }
-}
-
-function manualAddFix(){
-  const f=document.getElementById("fix-manual-form");
-  f.style.display=f.style.display==="none"?"block":"none";
-}
-async function addFixManual(){
-  const title=document.getElementById("fix-title-m").value.trim();
-  if(!title){alert("修正内容を入力してください");return;}
-  const p=projects.find(x=>x.id===panelId);
-  if(!p.fixes)p.fixes=[];
-  p.fixes.push({id:nextFixId++,title,note:document.getElementById("fix-note-m").value.trim(),date:document.getElementById("fix-date-m").value,done:false});
-  updateFixBadge(p);renderFixes(p);render();
-  await saveProjectToGAS(p);
-}
-
-// チェックボックスのトグル
-async function toggleFix(idx){
-  const p=projects.find(x=>x.id===panelId);
-  p.fixes[idx].done=!p.fixes[idx].done;
-  updateFixBadge(p);renderFixes(p);render();
-  await saveProjectToGAS(p);
-}
-async function deleteFix(idx){
-  const p=projects.find(x=>x.id===panelId);
-  p.fixes.splice(idx,1);updateFixBadge(p);renderFixes(p);render();
-  await saveProjectToGAS(p);
 }
 
 function renderTimeline(p){
   const events=[];
   if(p.revision)events.push({date:p.revision,label:"最終修正締切"});
-  if(p.deadline)events.push({date:p.deadline,label:"最終期日"});
+  if(p.deadline)events.push({date:p.deadline,label:p.section==="completed"?"納品日":"最終期日"});
+  if(p.nextSchedule)events.push({date:p.nextSchedule,label:"次回日程"});
   (p.mtg||[]).forEach(m=>events.push({date:m,label:"MTG"}));
   (p.fixes||[]).filter(f=>f.date).forEach(f=>events.push({date:f.date,label:`修正: ${f.title}`,done:f.done}));
   events.sort((a,b)=>a.date.localeCompare(b.date));
   const t=tod();
   function tlcls(d){const diff=(new Date(d)-t)/(864e5);return diff<0?"past":diff<=14?"soon":"";}
-  const html=events.length?events.map(e=>`
-    <div class="tl-item ${tlcls(e.date)}">
-      <div class="tl-date">${fd(e.date)}</div>
-      <div class="tl-label">${e.label}${e.done!==undefined?` <span style="font-size:11px;padding:1px 6px;border-radius:4px;background:${e.done?"var(--color-ok-bg)":"#EBEBEB"};color:${e.done?"var(--color-ok)":"#555"};font-weight:600">${e.done?"完了":"未完了"}</span>`:""}</div>
-    </div>`).join(""):`<div style="font-size:13px;color:var(--color-text2)">日程未登録</div>`;
-  document.getElementById("panel-body").innerHTML=`
-    <div class="section">
-      <div style="display:flex;gap:14px;font-size:12px;color:var(--color-text2);margin-bottom:1rem;flex-wrap:wrap">
-        <span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#5BAD72;margin-right:4px;vertical-align:1px"></span>過去</span>
-        <span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#B8A060;margin-right:4px;vertical-align:1px"></span>14日以内</span>
-        <span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--color-border2);margin-right:4px;vertical-align:1px"></span>今後</span>
-      </div>
-      <div class="timeline">${html}</div>
-    </div>`;
+  const html=events.length?events.map(e=>`<div class="tl-item ${tlcls(e.date)}"><div class="tl-date">${fd(e.date)}</div><div class="tl-label">${e.label}</div></div>`).join(""):`<div style="font-size:13px;color:var(--color-text2)">日程未登録</div>`;
+  document.getElementById("panel-body").innerHTML=`<div class="section"><div class="timeline">${html}</div></div>`;
 }
 
 function collectInfoFields(){
   const p=projects.find(x=>x.id===panelId);if(!p)return;
   const g=id=>{const el=document.getElementById(id);return el?el.value:null;};
-  if(g("p-person")===null)return;
-  p.person=g("p-person");p.deadline=g("p-deadline");p.revision=g("p-revision");
-  p.amount=Number(g("p-amount"))||0;p.type=g("p-type");
-  p.status=g("p-status");p.progress=Number(g("p-progress"))||0;p.memo=g("p-memo");
+  if(g("p-memo")===null)return;
+  p.memo=g("p-memo");p.person=g("p-person")||p.person;p.type=g("p-type")||p.type;
+  if(p.section==="active"){
+    p.deadline=g("p-deadline");p.revision=g("p-revision");
+    p.amount=Number(g("p-amount"))||0;p.status=g("p-status");
+    p.progress=Number(g("p-progress"))||0;
+  }else if(p.section==="completed"){
+    p.deadline=g("p-deadline");p.amount=Number(g("p-amount"))||0;
+    const mv=g("p-maintenance");p.maintenance=mv==="true"?true:mv==="false"?false:null;
+    p.maintenancePeriod=g("p-maintenancePeriod")||"";p.maintenanceFee=Number(g("p-maintenanceFee"))||0;
+  }else if(p.section==="prospect"){
+    p.prospectAmount=Number(g("p-prospectAmount"))||0;
+    p.demoReady=g("p-demoReady")==="true";
+    p.nextSchedule=g("p-nextSchedule")||"";p.startEstimate=g("p-startEstimate")||"";
+  }
 }
 function addMtg(){
   const v=document.getElementById("mtg-input").value;if(!v)return;
@@ -640,37 +748,90 @@ function addMtg(){
   if(!p.mtg.includes(v)){p.mtg.push(v);p.mtg.sort();}
   renderMtgList(p);document.getElementById("mtg-input").value="";
 }
-function removeMtg(idx){
-  const p=projects.find(x=>x.id===panelId);p.mtg.splice(idx,1);renderMtgList(p);
-}
+function removeMtg(idx){const p=projects.find(x=>x.id===panelId);p.mtg.splice(idx,1);renderMtgList(p);}
 async function savePanel(){
-  collectInfoFields();
-  const p=projects.find(x=>x.id===panelId);
-  render();await saveProjectToGAS(p);renderInfo(p);
+  collectInfoFields();const p=projects.find(x=>x.id===panelId);
+  render();await saveProjectToGAS(p);renderPTab(p);
 }
 function closePanel(){
-  if(currentTab==="info")collectInfoFields();
+  if(currentPTab==="info")collectInfoFields();
   document.getElementById("overlay").classList.remove("open");
   document.getElementById("panel").classList.remove("open");
   panelId=null;render();
 }
-async function confirmDelete(id){
-  if(!confirm("この案件を削除しますか？"))return;
-  await deleteProjectFromGAS(id);
-  projects=projects.filter(p=>p.id!==id);render();
+
+// AI分解
+async function aiParseFixes(){
+  const text=document.getElementById("ai-paste-input").value.trim();
+  if(!text){alert("テキストをペーストしてください");return;}
+  document.getElementById("ai-loading").style.display="block";
+  try{
+    const res=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-4-6",max_tokens:1000,messages:[{role:"user",content:`以下のテキストから修正・対応が必要な項目を抽出し、JSONのみ出力してください。マークダウン不要。\n形式: [{"title":"20字以内","note":"補足or空文字"},...]\n\n${text}`}]})});
+    const data=await res.json();
+    const items=JSON.parse((data.content?.[0]?.text||"[]").replace(/```json|```/g,"").trim());
+    const p=projects.find(x=>x.id===panelId);
+    if(!p.fixes)p.fixes=[];
+    items.forEach(item=>p.fixes.push({id:nextFixId++,title:item.title,note:item.note||"",done:false}));
+    buildPTabs(p);renderFixes(p);render();await saveProjectToGAS(p);
+    showToast(`✓ ${items.length}件追加しました`);
+  }catch(e){showToast("⚠ AI分解失敗。手動で追加してください");}
+  finally{const el=document.getElementById("ai-loading");if(el)el.style.display="none";}
 }
-function openAdd(){document.getElementById("add-modal").classList.add("open")}
+function toggleManualFix(){const f=document.getElementById("fix-manual-form");f.style.display=f.style.display==="none"?"block":"none";}
+async function addFixManual(){
+  const title=document.getElementById("fix-title-m").value.trim();if(!title){alert("修正内容を入力してください");return;}
+  const p=projects.find(x=>x.id===panelId);if(!p.fixes)p.fixes=[];
+  p.fixes.push({id:nextFixId++,title,note:document.getElementById("fix-note-m").value.trim(),done:false});
+  buildPTabs(p);renderFixes(p);render();await saveProjectToGAS(p);
+}
+async function toggleFix(idx){
+  const p=projects.find(x=>x.id===panelId);p.fixes[idx].done=!p.fixes[idx].done;
+  buildPTabs(p);renderFixes(p);render();await saveProjectToGAS(p);
+}
+async function deleteFix(idx){
+  const p=projects.find(x=>x.id===panelId);p.fixes.splice(idx,1);
+  buildPTabs(p);renderFixes(p);render();await saveProjectToGAS(p);
+}
+
+// 追加モーダル
+function openAdd(){
+  const titles={active:"構築中案件を追加",completed:"完了済み案件を追加",prospect:"見込み案件を追加"};
+  document.getElementById("add-modal-title").textContent=titles[currentSection];
+  let body="";
+  if(currentSection==="active"||currentSection==="completed"){
+    body=`<div class="row2"><div class="edit-field"><label>会社名 *</label><input id="a-company"></div><div class="edit-field"><label>種別</label><input id="a-type"></div></div>
+    <div class="row2"><div class="edit-field"><label>担当者</label><input id="a-person"></div><div class="edit-field"><label>金額 (円)</label><input id="a-amount" type="number" value="0"></div></div>
+    <div class="row2"><div class="edit-field"><label>${currentSection==="completed"?"納品日":"最終期日"}</label><input id="a-deadline" type="date"></div><div class="edit-field"><label>ステータス</label><select id="a-status"><option>未着手</option><option>進行中</option><option>完了</option><option>保留</option></select></div></div>
+    ${currentSection==="completed"?`<div class="edit-field"><label>保守</label><select id="a-maintenance"><option value="">未設定</option><option value="true">あり</option><option value="false">なし</option></select></div>`:""}
+    <div class="edit-field"><label>メモ</label><textarea id="a-memo"></textarea></div>`;
+  }else{
+    body=`<div class="row2"><div class="edit-field"><label>会社名 *</label><input id="a-company"></div><div class="edit-field"><label>種別・想定構築</label><input id="a-type"></div></div>
+    <div class="row2"><div class="edit-field"><label>担当者</label><input id="a-person"></div><div class="edit-field"><label>見込み金額 (円)</label><input id="a-prospectAmount" type="number" value="0"></div></div>
+    <div class="row2"><div class="edit-field"><label>次回日程</label><input id="a-nextSchedule" type="date"></div><div class="edit-field"><label>スタート見込み</label><input id="a-startEstimate" placeholder="例: 2026-07"></div></div>
+    <div class="edit-field"><label>デモ完成</label><select id="a-demoReady"><option value="false">未完成</option><option value="true">完成</option></select></div>
+    <div class="edit-field"><label>メモ</label><textarea id="a-memo"></textarea></div>`;
+  }
+  document.getElementById("add-modal-body").innerHTML=body;
+  document.getElementById("add-modal").classList.add("open");
+}
 function closeAdd(){document.getElementById("add-modal").classList.remove("open")}
 async function saveAdd(){
-  const company=document.getElementById("a-company").value.trim();
+  const company=(document.getElementById("a-company")||{value:""}).value.trim();
   if(!company){alert("会社名を入力してください");return;}
-  const newP={id:nextId++,company,type:document.getElementById("a-type").value.trim(),person:document.getElementById("a-person").value.trim(),amount:Number(document.getElementById("a-amount").value)||0,deadline:document.getElementById("a-deadline").value,revision:document.getElementById("a-revision").value,mtg:[],progress:0,status:document.getElementById("a-status").value,memo:document.getElementById("a-memo").value.trim(),fixes:[]};
-  projects.push(newP);closeAdd();render();
-  await saveProjectToGAS(newP);
+  const g=id=>{const el=document.getElementById(id);return el?el.value:""};
+  let newP={id:nextId++,section:currentSection,company,type:g("a-type"),person:g("a-person"),amount:Number(g("a-amount"))||0,deadline:g("a-deadline"),revision:"",mtg:[],progress:0,status:g("a-status")||"未着手",memo:g("a-memo"),fixes:[]};
+  if(currentSection==="completed"){newP.maintenance=g("a-maintenance")==="true"?true:g("a-maintenance")==="false"?false:null;newP.maintenanceFee=0;newP.maintenancePeriod="";}
+  if(currentSection==="prospect"){newP.prospectAmount=Number(g("a-prospectAmount"))||0;newP.demoReady=g("a-demoReady")==="true";newP.nextSchedule=g("a-nextSchedule");newP.startEstimate=g("a-startEstimate");}
+  projects.push(newP);closeAdd();render();await saveProjectToGAS(newP);
 }
-["search","filter-status","filter-person","filter-deadline","filter-fix"].forEach(id=>{
-  document.getElementById(id).addEventListener("change",render);
-  if(id==="search")document.getElementById(id).addEventListener("input",render);
+async function confirmDelete(id){
+  if(!confirm("この案件を削除しますか？"))return;
+  await deleteProjectFromGAS(id);projects=projects.filter(p=>p.id!==id);render();
+}
+
+["search","filter-person","filter-deadline","filter-fix"].forEach(id=>{
+  const el=document.getElementById(id);if(!el)return;
+  el.addEventListener(id==="search"?"input":"change",render);
 });
 document.getElementById("add-modal").addEventListener("click",e=>{if(e.target===e.currentTarget)closeAdd()});
 loadFromGAS();
