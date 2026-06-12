@@ -244,24 +244,30 @@ tr:hover td{background:var(--color-bg2)}
 const GAS_URL="https://script.google.com/macros/s/AKfycbw2TmIA0Cm3_2MI9ziOnZd1_lLP-0EDGE9XxYM0qNsqluprvt9rLME4_8WHHcVMEkUM/exec";
 
 const INITIAL_DATA=[
+  // ===== 構築中案件 =====
   {id:1,section:"active",company:"株式会社T's agency holdings",type:"楽々販売構築",person:"神谷さん",amount:0,deadline:"2026-05-31",revision:"",mtg:[],progress:0,status:"進行中",memo:"神谷さん10日訪問予定",fixes:[]},
-  {id:2,section:"active",company:"アクセルサーブ法律事務所",type:"人脈案件管理",person:"神谷さん/高杉",amount:450000,deadline:"2026-05-30",revision:"",mtg:["2026-06-02"],progress:0,status:"進行中",memo:"6月2日MTG実施。追加要望・修正なし",fixes:[]},
-  {id:3,section:"completed",company:"ケーエーエヌユー株式会社",type:"マイソク自動化",person:"神谷さん/高杉",amount:700000,deadline:"2026-01-31",revision:"",mtg:[],progress:100,status:"完了",memo:"納品済み。経理追加は税理士相談中",fixes:[],maintenance:false,maintenanceFee:0,maintenancePeriod:""},
-  {id:4,section:"active",company:"アールビーライズ株式会社（就業者管理）",type:"就業者管理",person:"岡野さん/関さん",amount:1050000,deadline:"2026-02-28",revision:"",mtg:[],progress:0,status:"進行中",memo:"修正多発。5月末完了見込み。保守移行予定",fixes:[]},
-  {id:5,section:"active",company:"アールビーライズ株式会社（LINE構築）",type:"LINE構築",person:"岡野さん/高杉",amount:1400000,deadline:"2026-07-31",revision:"",mtg:[],progress:0,status:"進行中",memo:"キントーン完了後1週間で構築→1ヶ月完了予定",fixes:[]},
-  {id:6,section:"completed",company:"株式会社リアルト・ハーツ",type:"値決めシート自動化",person:"神谷さん/高杉",amount:900000,deadline:"2026-02-28",revision:"",mtg:[],progress:100,status:"完了",memo:"追加構築¥200,000見積提出・稟議中",fixes:[],maintenance:true,maintenanceFee:0,maintenancePeriod:"保守提案中"},
-  {id:7,section:"active",company:"株式会社ONE REAL ESTATE",type:"不動産物件管理",person:"神谷さん/高杉",amount:1500000,deadline:"2026-06-30",revision:"",mtg:[],progress:0,status:"進行中",memo:"6月中旬まで要望対応→中旬以降修正対応→6月完了",fixes:[]},
-  {id:8,section:"active",company:"株式会社アットランド",type:"LステップCC構築",person:"神谷さん/高杉",amount:1350000,deadline:"2026-05-31",revision:"",mtg:["2026-06-01"],progress:0,status:"進行中",memo:"動作確認後完了。定例6月実施",fixes:[]},
-  {id:9,section:"active",company:"Exstan行政書士法人",type:"案件・タスク・請求管理",person:"岡野さん/高杉",amount:1050000,deadline:"2026-05-31",revision:"",mtg:[],progress:90,status:"進行中",memo:"来週定例し終了予定。保守つき",fixes:[]},
-  {id:10,section:"active",company:"株式会社BigBridge",type:"受注管理",person:"神谷さん/高杉",amount:1050000,deadline:"2026-07-31",revision:"",mtg:["2026-06-02"],progress:0,status:"進行中",memo:"LINE受注システムほぼ完成。6月2日仕様確認MTG",fixes:[]},
-  {id:11,section:"active",company:"株式会社ファルム",type:"レッツ原価連携",person:"岡野さん/高杉",amount:1200000,deadline:"2026-04-30",revision:"",mtg:["2026-06-01"],progress:90,status:"進行中",memo:"構築・動作確認完了。クライアント間すり合わせ待ち",fixes:[]},
-  {id:12,section:"active",company:"株式会社くすのき",type:"顧客管理",person:"神谷さん/高杉",amount:1350000,deadline:"2026-07-31",revision:"",mtg:["2026-06-01"],progress:0,status:"進行中",memo:"次回6月1日MTG",fixes:[]},
-  {id:13,section:"active",company:"ブルーチップ・トランスレーション株式会社",type:"通訳者・請求管理",person:"神谷さん/高杉",amount:1350000,deadline:"2026-07-31",revision:"",mtg:[],progress:0,status:"進行中",memo:"訪問済み。データ・情報提供中",fixes:[]},
-  // 見込み
-  {id:14,section:"prospect",company:"株式会社リアルト・ハーツ（追加）",type:"PDF自動取り込み",person:"神谷さん/高杉",amount:200000,deadline:"",revision:"",mtg:[],progress:0,status:"未着手",memo:"稟議待ち",fixes:[],demoReady:false,nextSchedule:"",startEstimate:"",prospectAmount:200000},
-  {id:15,section:"prospect",company:"株式会社ウェバートン",type:"",person:"",amount:0,deadline:"",revision:"",mtg:[],progress:0,status:"未着手",memo:"6月デモ提示　6月入金",fixes:[],demoReady:false,nextSchedule:"2026-06-01",startEstimate:"2026-06",prospectAmount:1000000},
-  {id:16,section:"prospect",company:"アサヒ冷熱株式会社",type:"",person:"",amount:0,deadline:"",revision:"",mtg:[],progress:0,status:"未着手",memo:"3名受講　7月入金",fixes:[],demoReady:false,nextSchedule:"",startEstimate:"2026-07",prospectAmount:1200000},
-  {id:17,section:"prospect",company:"有限会社船宿あみ達",type:"",person:"",amount:0,deadline:"",revision:"",mtg:[],progress:0,status:"未着手",memo:"6月見積提示　6月入金",fixes:[],demoReady:false,nextSchedule:"2026-06-01",startEstimate:"2026-06",prospectAmount:2000000},
+  {id:2,section:"active",company:"アクセルサーブ法律事務所",type:"人脈案件管理",person:"神谷さん/高杉",amount:450000,deadline:"2026-05-30",revision:"",mtg:["2026-06-02"],progress:0,status:"進行中",memo:"6月2日MTG実施。現時点で追加要望・修正なし",fixes:[]},
+  {id:4,section:"active",company:"アールビーライズ株式会社（就業者管理）",type:"就業者管理",person:"岡野さん/関さん",amount:1050000,deadline:"2026-02-28",revision:"",mtg:[],progress:0,status:"進行中",memo:"修正多発。5月末完了見込み。データ入れ込み後保守移行予定。神谷さんへ状況説明済み",fixes:[]},
+  {id:5,section:"active",company:"アールビーライズ株式会社（LINE構築）",type:"LINE構築（追加開発）",person:"岡野さん/高杉",amount:1400000,deadline:"2026-07-31",revision:"",mtg:[],progress:0,status:"進行中",memo:"キントーン完了後1週間で構築→フィードバック修正1ヶ月で完了予定。リッチメニュー・LIFE画面デザイン・カレンダー連携は先行可",fixes:[]},
+  {id:7,section:"active",company:"株式会社ONE REAL ESTATE",type:"不動産物件管理",person:"神谷さん/高杉",amount:1500000,deadline:"2026-06-30",revision:"",mtg:[],progress:0,status:"進行中",memo:"6月中旬まで要望対応、中旬以降修正対応期間、6月完了スケジュール",fixes:[]},
+  {id:8,section:"active",company:"株式会社アットランド",type:"LステップCC構築",person:"神谷さん/高杉",amount:1350000,deadline:"2026-05-31",revision:"",mtg:["2026-06-01"],progress:0,status:"進行中",memo:"スコープまとめ共有済み。チェックリスト動作確認後完了。定例5月末→6月に延期",fixes:[]},
+  {id:9,section:"active",company:"Exstan行政書士法人",type:"案件・タスク・請求管理",person:"岡野さん/高杉",amount:1050000,deadline:"2026-05-31",revision:"",mtg:[],progress:90,status:"進行中",memo:"各要望実装完了。残2日でデータ入れ込み→来週定例→終了予定。保守つき",fixes:[]},
+  {id:10,section:"active",company:"株式会社BigBridge",type:"受注管理（LINE受注）",person:"神谷さん/高杉",amount:1050000,deadline:"2026-07-31",revision:"",mtg:["2026-06-02"],progress:0,status:"進行中",memo:"LINE受注システムほぼ完成。6月2日仕様確認MTG実施予定",fixes:[]},
+  {id:11,section:"active",company:"株式会社ファルム",type:"レッツ原価連携アプリ",person:"岡野さん/高杉",amount:1200000,deadline:"2026-04-30",revision:"",mtg:["2026-06-01"],progress:90,status:"フィードバック待ち",memo:"構築・動作確認完了。ファルム様とクライアント様ですり合わせ中。6月以降ままよろ・ファルム様でMTG予定",fixes:[]},
+  {id:12,section:"active",company:"株式会社くすのき",type:"顧客管理",person:"神谷さん/高杉",amount:1350000,deadline:"2026-07-31",revision:"",mtg:["2026-06-01"],progress:0,status:"進行中",memo:"神谷さんへデータ共有中。6月1日進捗MTG予定",fixes:[]},
+  {id:13,section:"active",company:"ブルーチップ・トランスレーション株式会社",type:"通訳者・請求管理",person:"神谷さん/高杉",amount:1350000,deadline:"2026-07-31",revision:"",mtg:[],progress:0,status:"進行中",memo:"神谷さん訪問済み。大竹様よりデータ・情報提供中。準備でき次第神谷さんへ連携",fixes:[]},
+  // ===== 完了済み案件 =====
+  {id:3,section:"completed",company:"ケーエーエヌユー株式会社",type:"マイソク自動化",person:"神谷さん/高杉",amount:700000,deadline:"2026-01-31",revision:"",mtg:[],progress:100,status:"構築完了",memo:"納品済み。経理追加は税理士相談中のため長期見込み",fixes:[],maintenance:false,maintenanceFee:0,maintenancePeriod:""},
+  {id:6,section:"completed",company:"株式会社リアルト・ハーツ",type:"値決めシート自動化",person:"神谷さん/高杉",amount:900000,deadline:"2026-02-28",revision:"",mtg:[],progress:100,status:"構築完了",memo:"納品完了。チャットワーク等で連絡あり保守提案中。追加構築¥200,000見積提出・稟議中",fixes:[],maintenance:true,maintenanceFee:0,maintenancePeriod:"保守提案中"},
+  // ===== 見込み案件 =====
+  {id:14,section:"prospect",company:"株式会社リアルト・ハーツ（PDF追加）",type:"PDF自動取り込み",person:"神谷さん/高杉",amount:0,deadline:"",revision:"",mtg:[],progress:0,status:"検討中",memo:"稟議待ち",fixes:[],demoReady:false,nextSchedule:"",startEstimate:"2026-06",prospectAmount:200000},
+  {id:15,section:"prospect",company:"株式会社ウェバートン",type:"",person:"神谷さん",amount:0,deadline:"",revision:"",mtg:[],progress:0,status:"デモ提示予定",memo:"6月デモ提示・6月入金予定",fixes:[],demoReady:false,nextSchedule:"2026-06-01",startEstimate:"2026-06",prospectAmount:1000000},
+  {id:16,section:"prospect",company:"アサヒ冷熱株式会社",type:"",person:"",amount:0,deadline:"",revision:"",mtg:[],progress:0,status:"契約前",memo:"3名受講　7月入金予定",fixes:[],demoReady:false,nextSchedule:"",startEstimate:"2026-07",prospectAmount:1200000},
+  {id:17,section:"prospect",company:"有限会社船宿あみ達",type:"",person:"",amount:0,deadline:"",revision:"",mtg:[],progress:0,status:"契約前",memo:"6月見積提示・6月入金予定",fixes:[],demoReady:false,nextSchedule:"2026-06-01",startEstimate:"2026-06",prospectAmount:2000000},
+  // 神谷さん見込み案件
+  {id:18,section:"prospect",company:"日広",type:"",person:"神谷さん",amount:0,deadline:"",revision:"",mtg:["2026-06-08"],progress:0,status:"デモ提示予定",memo:"6月8日プレゼン予定",fixes:[],demoReady:false,nextSchedule:"2026-06-08",startEstimate:"",prospectAmount:0},
+  {id:19,section:"prospect",company:"村田ボーリング技研",type:"",person:"神谷さん",amount:0,deadline:"",revision:"",mtg:[],progress:0,status:"契約前",memo:"懇親会で名刺交換。訪問予定",fixes:[],demoReady:false,nextSchedule:"",startEstimate:"",prospectAmount:0},
+  {id:20,section:"prospect",company:"なにわ工場",type:"",person:"神谷さん",amount:0,deadline:"",revision:"",mtg:["2026-06-15"],progress:0,status:"契約前",memo:"6月15日訪問・ヒアリング予定",fixes:[],demoReady:false,nextSchedule:"2026-06-15",startEstimate:"",prospectAmount:0},
 ];
 
 let projects=[], nextId=100, nextFixId=1, panelId=null, currentPTab="info";
@@ -290,14 +296,34 @@ const scls={
   "未着手":"b-todo","完了":"b-done","保留":"b-hold","レビュー待ち":"b-review"
 };
 
-function fd(d){if(!d)return"–";const p=d.split("-");return p[0]+"/"+(+p[1])+"/"+(+p[2]||"")}
+// 日付を YYYY-MM-DD 文字列に正規化（どんな形式が来ても対応）
+function normDate(d){
+  if(!d)return"";
+  if(d instanceof Date)return d.toISOString().slice(0,10);
+  const s=String(d).trim();
+  if(!s)return"";
+  // すでに YYYY-MM-DD 形式
+  if(/^\d{4}-\d{2}-\d{2}/.test(s))return s.slice(0,10);
+  // それ以外（"Fri Jul 31 2026..." など）はDateで解釈
+  const dt=new Date(s);
+  if(isNaN(dt))return"";
+  // タイムゾーンずれ防止のためローカル日付で組み立て
+  const y=dt.getFullYear(),m=String(dt.getMonth()+1).padStart(2,"0"),day=String(dt.getDate()).padStart(2,"0");
+  return `${y}-${m}-${day}`;
+}
+function fd(d){
+  const n=normDate(d);
+  if(!n)return"–";
+  const p=n.split("-");
+  return p[0]+"/"+(+p[1])+"/"+(+p[2]);
+}
 function fa(n){return(!n&&n!==0)||n===0?"–":"¥"+Number(n).toLocaleString()}
 function tod(){const d=new Date();d.setHours(0,0,0,0);return d;}
-function dcls(d){if(!d)return"";const diff=(new Date(d)-tod())/(864e5);return diff<0?"deadline-over":diff<=14?"deadline-warn":"";}
+function dcls(d){const n=normDate(d);if(!n)return"";const diff=(new Date(n)-tod())/(864e5);return diff<0?"deadline-over":diff<=14?"deadline-warn":"";}
 function nextMtg(mtg){
   if(!mtg||!mtg.length)return null;
   const t=tod();
-  const future=mtg.map(m=>new Date(m)).filter(d=>d>=t).sort((a,b)=>a-b);
+  const future=mtg.map(m=>normDate(m)).filter(Boolean).map(m=>new Date(m)).filter(d=>!isNaN(d)&&d>=t).sort((a,b)=>a-b);
   return future.length?future[0].toISOString().slice(0,10):null;
 }
 function tryParse(v){try{return JSON.parse(v);}catch{return[];}}
@@ -320,10 +346,13 @@ async function loadFromGAS(){
     if(data&&data.length>0){
       projects=data.map(p=>({
         ...p,section:p.section||"active",
-        mtg:Array.isArray(p.mtg)?p.mtg:tryParse(p.mtg||"[]"),
+        mtg:(Array.isArray(p.mtg)?p.mtg:tryParse(p.mtg||"[]")).map(m=>normDate(m)).filter(Boolean),
         fixes:Array.isArray(p.fixes)?p.fixes:tryParse(p.fixes||"[]"),
         amount:Number(p.amount)||0,progress:Number(p.progress)||0,id:Number(p.id)||0,
         prospectAmount:Number(p.prospectAmount)||0,
+        deadline:normDate(p.deadline),
+        revision:normDate(p.revision),
+        nextSchedule:normDate(p.nextSchedule),
         demoReady:p.demoReady==="true"||p.demoReady===true,
         maintenance:p.maintenance==="true"||p.maintenance===true,
       }));
