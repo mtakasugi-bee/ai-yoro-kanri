@@ -323,8 +323,11 @@ function dcls(d){const n=normDate(d);if(!n)return"";const diff=(new Date(n)-tod(
 function nextMtg(mtg){
   if(!mtg||!mtg.length)return null;
   const t=tod();
-  const future=mtg.map(m=>normDate(m)).filter(Boolean).map(m=>new Date(m)).filter(d=>!isNaN(d)&&d>=t).sort((a,b)=>a-b);
-  return future.length?future[0].toISOString().slice(0,10):null;
+  const dates=mtg.map(m=>normDate(m)).filter(Boolean).map(m=>new Date(m)).filter(d=>!isNaN(d)).sort((a,b)=>a-b);
+  if(!dates.length)return null;
+  const future=dates.filter(d=>d>=t);
+  if(future.length)return {date:future[0].toISOString().slice(0,10),future:true};
+  return {date:dates[dates.length-1].toISOString().slice(0,10),future:false};
 }
 function tryParse(v){try{return JSON.parse(v);}catch{return[];}}
 function setSyncState(s,m){
@@ -510,15 +513,16 @@ function renderActiveTable(list){
     const fixes=p.fixes||[],total=fixes.length,pending=fixes.filter(f=>!f.done).length;
     const fixBadge=total===0?`<span class="fix-none">–</span>`:pending===0?`<span class="fix-all-done">✓全完了${total}</span>`:`<span class="fix-pending">${pending}残り/${total}</span>`;
     const nm=nextMtg(p.mtg||[]);
-    const nmDiff=nm?(new Date(nm)-tod())/(864e5):null;
-    const nmCls=nm?(nmDiff<=7?"soon":nmDiff<0?"past":""):"";
+    const nmDiff=nm?(new Date(nm.date)-tod())/(864e5):null;
+    const nmCls=nm?(!nm.future?"past":nmDiff<=7?"soon":""):"";
+    const nmTxt=nm?`<span class="mtg-next ${nmCls}">${fd(nm.date)}${!nm.future?'<span style="font-size:10px;color:var(--color-text3)"> (済)</span>':''}</span>`:`<span style="color:var(--color-text3);font-size:12px">–</span>`;
     return`<tr>
       <td><span class="company-link" onclick="openPanel(${p.id})">${p.company}</span></td>
       <td style="color:var(--color-text2);font-size:12px">${p.type||"–"}</td>
       <td style="font-weight:500;font-size:12px">${p.person||"–"}</td>
       <td style="white-space:nowrap">${fa(p.amount)}</td>
       <td class="${dcls(p.deadline)}" style="white-space:nowrap">${fd(p.deadline)}</td>
-      <td>${nm?`<span class="mtg-next ${nmCls}">${fd(nm)}</span>`:`<span style="color:var(--color-text3);font-size:12px">–</span>`}</td>
+      <td>${nmTxt}</td>
       <td style="min-width:80px"><div class="prog-wrap"><div class="prog-bar"><div class="prog-fill" style="width:${p.progress}%"></div></div><span class="prog-val">${p.progress}%</span></div></td>
       <td><span class="badge ${scls[p.status]||"b-todo"}">${p.status}</span></td>
       <td>${fixBadge}</td>
@@ -639,8 +643,8 @@ function renderInfoActive(p){
       <div class="edit-field"><label>メモ</label><textarea id="p-memo" style="min-height:100px"></textarea></div>
     </div>`;
   document.getElementById("p-person").value=p.person||"";
-  document.getElementById("p-deadline").value=p.deadline||"";
-  document.getElementById("p-revision").value=p.revision||"";
+  document.getElementById("p-deadline").value=normDate(p.deadline);
+  document.getElementById("p-revision").value=normDate(p.revision);
   document.getElementById("p-amount").value=p.amount??0;
   document.getElementById("p-type").value=p.type||"";
   document.getElementById("p-progress").value=p.progress??0;
@@ -682,7 +686,7 @@ function renderInfoCompleted(p){
   document.getElementById("p-person").value=p.person||"";
   document.getElementById("p-amount").value=p.amount??0;
   document.getElementById("p-type").value=p.type||"";
-  document.getElementById("p-deadline").value=p.deadline||"";
+  document.getElementById("p-deadline").value=normDate(p.deadline);
   document.getElementById("p-maintenance").value=p.maintenance===true?"true":p.maintenance===false?"false":"";
   document.getElementById("p-maintenancePeriod").value=p.maintenancePeriod||"";
   document.getElementById("p-maintenanceFee").value=p.maintenanceFee||0;
@@ -718,7 +722,7 @@ function renderInfoProspect(p){
   document.getElementById("p-type").value=p.type||"";
   document.getElementById("p-prospectAmount").value=p.prospectAmount||0;
   document.getElementById("p-demoReady").value=p.demoReady?"true":"false";
-  document.getElementById("p-nextSchedule").value=p.nextSchedule||"";
+  document.getElementById("p-nextSchedule").value=normDate(p.nextSchedule);
   document.getElementById("p-startEstimate").value=p.startEstimate||"";
   document.getElementById("p-memo").value=p.memo||"";
   renderMtgList(p);
@@ -782,29 +786,40 @@ function renderTimeline(p){
 
 function collectInfoFields(){
   const p=projects.find(x=>x.id===panelId);if(!p)return;
-  const g=id=>{const el=document.getElementById(id);return el?el.value:null;};
-  if(g("p-memo")===null)return;
-  p.memo=g("p-memo");p.person=g("p-person")||p.person;p.type=g("p-type")||p.type;
+  // DOMに該当フィールドが存在する場合のみ値を取得（存在しなければ既存値を保持）
+  const has=id=>document.getElementById(id)!==null;
+  const g=id=>{const el=document.getElementById(id);return el?el.value:undefined;};
+  // infoタブが描画されていない場合は何もしない
+  if(!has("p-memo"))return;
+
+  if(has("p-memo"))p.memo=g("p-memo");
+  if(has("p-person"))p.person=g("p-person");
+  if(has("p-type"))p.type=g("p-type");
+
   if(p.section==="active"){
-    p.deadline=g("p-deadline");p.revision=g("p-revision");
-    p.amount=Number(g("p-amount"))||0;p.status=g("p-status");
-    p.progress=Number(g("p-progress"))||0;
+    if(has("p-deadline"))p.deadline=g("p-deadline");
+    if(has("p-revision"))p.revision=g("p-revision");
+    if(has("p-amount"))p.amount=Number(g("p-amount"))||0;
+    if(has("p-status"))p.status=g("p-status");
+    if(has("p-progress"))p.progress=Number(g("p-progress"))||0;
   }else if(p.section==="completed"){
-    p.deadline=g("p-deadline");p.amount=Number(g("p-amount"))||0;
-    const mv=g("p-maintenance");p.maintenance=mv==="true"?true:mv==="false"?false:null;
-    p.maintenancePeriod=g("p-maintenancePeriod")||"";p.maintenanceFee=Number(g("p-maintenanceFee"))||0;
-    p.status=g("p-status")||"構築完了";
+    if(has("p-deadline"))p.deadline=g("p-deadline");
+    if(has("p-amount"))p.amount=Number(g("p-amount"))||0;
+    if(has("p-maintenance")){const mv=g("p-maintenance");p.maintenance=mv==="true"?true:mv==="false"?false:null;}
+    if(has("p-maintenancePeriod"))p.maintenancePeriod=g("p-maintenancePeriod")||"";
+    if(has("p-maintenanceFee"))p.maintenanceFee=Number(g("p-maintenanceFee"))||0;
+    if(has("p-status"))p.status=g("p-status")||"構築完了";
   }else if(p.section==="prospect"){
-    p.prospectAmount=Number(g("p-prospectAmount"))||0;
-    p.demoReady=g("p-demoReady")==="true";
-    p.nextSchedule=g("p-nextSchedule")||"";p.startEstimate=g("p-startEstimate")||"";
-    p.status=g("p-status")||"契約前";
+    if(has("p-prospectAmount"))p.prospectAmount=Number(g("p-prospectAmount"))||0;
+    if(has("p-demoReady"))p.demoReady=g("p-demoReady")==="true";
+    if(has("p-nextSchedule"))p.nextSchedule=g("p-nextSchedule")||"";
+    if(has("p-startEstimate"))p.startEstimate=g("p-startEstimate")||"";
+    if(has("p-status"))p.status=g("p-status")||"契約前";
   }
   // ステータスに基づいてセクションを自動移動
   const newSection=STATUS_SECTION[p.status];
   if(newSection&&newSection!==p.section){
     p.section=newSection;
-    // 完了済みに移動する場合は必須フィールドを初期化
     if(newSection==="completed"){p.maintenance=p.maintenance??null;p.maintenanceFee=p.maintenanceFee||0;p.maintenancePeriod=p.maintenancePeriod||"";}
     if(newSection==="prospect"){p.prospectAmount=p.prospectAmount||p.amount||0;p.demoReady=p.demoReady||false;p.nextSchedule=p.nextSchedule||"";p.startEstimate=p.startEstimate||"";}
     showToast(`「${p.company}」を${newSection==="active"?"構築中":newSection==="completed"?"完了済み":"見込み"}に移動しました`);
@@ -820,8 +835,12 @@ function addMtg(){
 }
 function removeMtg(idx){const p=projects.find(x=>x.id===panelId);p.mtg.splice(idx,1);renderMtgList(p);}
 async function savePanel(){
-  collectInfoFields();const p=projects.find(x=>x.id===panelId);
-  render();await saveProjectToGAS(p);renderPTab(p);
+  collectInfoFields();
+  const p=projects.find(x=>x.id===panelId);
+  render();
+  buildPTabs(p);
+  renderPTab(p);
+  await saveProjectToGAS(p);
 }
 function closePanel(){
   if(currentPTab==="info")collectInfoFields();
