@@ -163,15 +163,113 @@ tr:hover td{background:var(--color-bg2)}
 .toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);background:var(--color-primary-d);color:#fff;padding:10px 22px;border-radius:6px;font-size:13px;z-index:300;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap;box-shadow:0 4px 16px rgba(0,0,0,.2)}
 .toast.show{opacity:1}
 .hint{padding:10px 12px;background:var(--color-primary-p);border-radius:var(--radius-sm);font-size:12px;color:var(--color-text2);border:1px solid var(--color-primary-l)}
+/* ロール切替 */
+.role-switch{display:flex;gap:4px;background:var(--color-bg2);border:1px solid var(--color-border);border-radius:var(--radius);padding:3px}
+.role-btn{font-size:12px;padding:7px 14px;border:none;background:none;color:var(--color-text2);cursor:pointer;border-radius:var(--radius-sm);font-family:var(--font-sans);font-weight:600;display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+.role-btn.active{background:var(--color-primary-d);color:#fff}
+.admin-mode-switch{display:flex;gap:6px;margin-bottom:1.25rem}
+.amode-btn{font-size:13px;padding:8px 16px;border:1px solid var(--color-border);background:var(--color-bg);color:var(--color-text2);cursor:pointer;border-radius:var(--radius-sm);font-family:var(--font-sans);font-weight:500;display:inline-flex;align-items:center;gap:6px}
+.amode-btn.active{background:var(--color-primary-p);color:var(--color-primary-d);border-color:var(--color-primary-l);font-weight:700}
+.worker-select-bar{display:flex;align-items:center;gap:10px;background:var(--color-bg);border:1px solid var(--color-border);border-radius:var(--radius);padding:1rem 1.25rem;margin-bottom:1.25rem;flex-wrap:wrap}
+.worker-select-bar select{font-size:14px;padding:8px 12px;border:1px solid var(--color-border);border-radius:var(--radius-sm);background:var(--color-bg);color:var(--color-text);outline:none;font-family:var(--font-sans);min-width:280px}
+/* 作業者カード */
+.wcard{background:var(--color-bg);border:1px solid var(--color-border);border-radius:var(--radius);padding:1.25rem;margin-bottom:1rem}
+.wcard-head{display:flex;align-items:center;gap:8px;margin-bottom:1rem;padding-bottom:.75rem;border-bottom:1px solid var(--color-border)}
+.wcard-head h3{font-size:15px;font-weight:700;color:var(--color-primary-d);flex:1}
+.wsection{margin-bottom:1.5rem}
+.wsection-title{font-size:12px;font-weight:700;color:var(--color-primary-d);letter-spacing:.05em;margin-bottom:.6rem;display:flex;align-items:center;gap:6px}
+.wsection-title i{font-size:15px}
+/* タスク行 */
+.task-item{display:grid;grid-template-columns:auto 1fr auto auto auto;gap:8px;align-items:center;padding:8px 10px;border:1px solid var(--color-border);border-radius:var(--radius-sm);margin-bottom:6px;font-size:13px}
+.task-item.done{opacity:.55}
+.task-check{width:18px;height:18px;border:2px solid var(--color-border2);border-radius:4px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:var(--color-bg)}
+.task-item.done .task-check{background:var(--color-primary-d);border-color:var(--color-primary-d);color:#fff}
+.task-title{word-break:break-word}
+.task-title.strike{text-decoration:line-through;color:var(--color-text2)}
+.task-date-label{font-size:11px;color:var(--color-text3);white-space:nowrap}
+.task-date-val{font-size:11px;color:var(--color-text2);white-space:nowrap}
+.wfield{margin-bottom:8px}
+.wfield label{display:block;font-size:12px;color:var(--color-text2);margin-bottom:3px;font-weight:500}
+.wfield input,.wfield textarea,.wfield select{width:100%;font-size:13px;padding:7px 10px;border:1px solid var(--color-border);border-radius:var(--radius-sm);background:var(--color-bg);color:var(--color-text);font-family:var(--font-sans);outline:none}
+.wfield textarea{resize:vertical;min-height:50px}
+.task-add-grid{display:grid;grid-template-columns:1fr auto auto auto;gap:6px;align-items:end;margin-top:6px}
+@media(max-width:600px){.task-add-grid{grid-template-columns:1fr}.task-item{grid-template-columns:auto 1fr}}
+/* ログイン情報 */
+.cred-locked{text-align:center;padding:2rem;background:var(--color-bg2);border:1px dashed var(--color-border2);border-radius:var(--radius-sm)}
+.cred-item{border:1px solid var(--color-border);border-radius:var(--radius-sm);padding:10px 12px;margin-bottom:8px}
+.cred-item-head{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.cred-item-head strong{font-size:13px;flex:1}
+.cred-row{display:flex;align-items:center;gap:8px;font-size:13px;margin-bottom:4px}
+.cred-row .ck{font-size:11px;color:var(--color-text3);width:48px;flex-shrink:0}
+.cred-row .cv{font-family:monospace;background:var(--color-bg2);padding:2px 8px;border-radius:4px;flex:1;word-break:break-all}
+.copy-btn{background:none;border:1px solid var(--color-border);border-radius:4px;cursor:pointer;color:var(--color-text2);padding:2px 6px;font-size:11px}
+.copy-btn:hover{background:var(--color-primary-p)}
+.task-badge{font-size:10px;padding:1px 6px;border-radius:3px;font-weight:600}
+.tb-todo{background:#EBEBEB;color:#666}
+.tb-doing{background:var(--color-warn-bg);color:var(--color-warn)}
+.tb-done{background:var(--color-ok-bg);color:var(--color-ok)}
+.tb-carry{background:#EAE8F0;color:#3A3070}
+.mtg-block-head .mtg-type{font-size:10px;padding:2px 8px;border-radius:4px;font-weight:700;white-space:nowrap}
+.mtg-type-customer{background:#E3EEF7;color:#1F5C8B}
+.mtg-type-internal{background:#F3EDE0;color:#7A5C1F}
+/* 定例日程ブロック */
+.mtg-block{border:1px solid var(--color-border);border-radius:var(--radius-sm);margin-bottom:10px;overflow:hidden}
+.mtg-block-head{display:flex;align-items:center;gap:8px;padding:10px 12px;background:var(--color-primary-p);border-bottom:1px solid var(--color-border)}
+.mtg-block-head .mtg-date{font-size:13px;font-weight:700;color:var(--color-primary-d)}
+.mtg-block-head .mtg-count{font-size:11px;color:var(--color-text2)}
+.mtg-block-body{padding:10px 12px}
+.mtg-task-add{display:flex;gap:6px;margin-top:8px}
+.mtg-task-add input{flex:1;font-size:13px;padding:6px 9px;border:1px solid var(--color-border);border-radius:var(--radius-sm);background:var(--color-bg);color:var(--color-text);font-family:var(--font-sans);outline:none}
+.mtg-task-item{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--color-bg3);font-size:13px}
+.mtg-task-item:last-child{border-bottom:none}
+.mtg-task-item .tt{flex:1;word-break:break-word}
+.mtg-task-item.done .tt{text-decoration:line-through;color:var(--color-text2)}
+.task-status-btn{font-size:11px;padding:2px 9px;border-radius:4px;font-weight:600;cursor:pointer;border:none;font-family:var(--font-sans);white-space:nowrap}
+.mtg-add-bar{display:flex;gap:6px;margin-bottom:12px;padding:10px;background:var(--color-bg2);border-radius:var(--radius-sm);border:1px dashed var(--color-border2)}
+.mtg-add-bar input{font-size:13px;padding:7px 10px;border:1px solid var(--color-border);border-radius:var(--radius-sm);background:var(--color-bg);outline:none;font-family:var(--font-sans)}
+/* アコーディオン */
+.acc-item{background:var(--color-bg);border:1px solid var(--color-border);border-radius:var(--radius);margin-bottom:10px;overflow:hidden}
+.acc-head{display:flex;align-items:center;gap:10px;padding:14px 16px;cursor:pointer;user-select:none}
+.acc-head:hover{background:var(--color-bg2)}
+.acc-head .acc-chevron{transition:transform .2s;color:var(--color-text3);font-size:16px}
+.acc-item.open .acc-chevron{transform:rotate(90deg)}
+.acc-title{font-size:15px;font-weight:700;color:var(--color-primary-d);flex:1}
+.acc-meta{font-size:11px;color:var(--color-text2);display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.acc-body{display:none;padding:0 16px 16px;border-top:1px solid var(--color-border)}
+.acc-item.open .acc-body{display:block}
+.acc-summary-badge{font-size:11px;padding:2px 8px;border-radius:10px;font-weight:600}
+.asb-pending{background:var(--color-warn-bg);color:var(--color-warn)}
+.asb-clear{background:var(--color-ok-bg);color:var(--color-ok)}
+/* 作業者：左会社名・右タスク横並び */
+.wrow{display:grid;grid-template-columns:200px 1fr;gap:0;background:var(--color-bg);border:1px solid var(--color-border);border-radius:var(--radius);margin-bottom:10px;overflow:hidden}
+.wrow-left{background:var(--color-primary-p);border-right:1px solid var(--color-border);padding:14px;display:flex;flex-direction:column;gap:8px}
+.wrow-company{font-size:14px;font-weight:700;color:var(--color-primary-d);line-height:1.4;word-break:break-word}
+.wrow-meta{font-size:11px;color:var(--color-text2);display:flex;flex-direction:column;gap:3px}
+.wrow-right{padding:14px;min-width:0}
+.wrow-cred-btn{font-size:11px;padding:4px 8px;border:1px solid var(--color-border);border-radius:var(--radius-sm);background:var(--color-bg);color:var(--color-text2);cursor:pointer;display:inline-flex;align-items:center;gap:4px;font-family:var(--font-sans);margin-top:4px}
+.wrow-cred-btn:hover{background:var(--color-bg)}
+.wcol-title{font-size:11px;font-weight:700;color:var(--color-primary-d);letter-spacing:.04em;margin-bottom:6px;display:flex;align-items:center;gap:5px}
+.wcol-title i{font-size:14px}
+@media(max-width:680px){.wrow{grid-template-columns:1fr}.wrow-left{border-right:none;border-bottom:1px solid var(--color-border);flex-direction:row;align-items:center;flex-wrap:wrap}}
+/* 横並び時の右側2カラム */
+.wrow-cols{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+/* 社内PDCA一括バー */
+.internal-pdca-bar{display:flex;align-items:center;gap:10px;background:#FBF6EA;border:1px solid #E5D5B0;border-radius:var(--radius);padding:12px 16px;margin-bottom:1rem;flex-wrap:wrap}
+.internal-mtg-tag{display:inline-flex;align-items:center;gap:4px;background:#F3EDE0;color:#7A5C1F;font-size:12px;padding:3px 9px;border-radius:4px;font-weight:600;border:1px solid #E5D5B0}
+.internal-mtg-tag button{background:none;border:none;cursor:pointer;color:#7A5C1F;font-size:13px;padding:0;line-height:1}
 </style>
 </head>
 <body>
 <div class="app">
   <div class="app-header">
     <div class="logo-mark">Ai</div>
-    <div>
+    <div style="flex:1">
       <h1>Ai・よろ 案件進捗管理</h1>
       <div class="subtitle">Googleスプレッドシートとリアルタイム同期</div>
+    </div>
+    <div class="role-switch">
+      <button class="role-btn active" id="role-admin" onclick="switchRole('admin')"><i class="ti ti-shield"></i> 管理者（本部）</button>
+      <button class="role-btn" id="role-worker" onclick="switchRole('worker')"><i class="ti ti-user-cog"></i> 作業者</button>
     </div>
   </div>
   <div class="sync-bar">
@@ -179,6 +277,15 @@ tr:hover td{background:var(--color-bg2)}
     <span id="sync-label">接続中…</span>
     <button class="btn btn-sm" onclick="loadFromGAS()" style="margin-left:auto"><i class="ti ti-refresh"></i> 再読み込み</button>
   </div>
+
+  <!-- ===== 管理者ビュー ===== -->
+  <div id="admin-view">
+  <div class="admin-mode-switch">
+    <button class="amode-btn active" id="amode-progress" onclick="switchAdminMode('progress')"><i class="ti ti-layout-dashboard"></i> 進捗シート</button>
+    <button class="amode-btn" id="amode-worker-input" onclick="switchAdminMode('worker-input')"><i class="ti ti-clipboard-text"></i> 作業者の入力を見る</button>
+  </div>
+
+  <div id="admin-progress-area">
   <div class="summary" id="summary"></div>
   <div id="person-summary" style="margin-bottom:1.25rem"></div>
 
@@ -207,6 +314,26 @@ tr:hover td{background:var(--color-bg2)}
 
   <!-- テーブルエリア -->
   <div id="table-area"></div>
+  </div><!-- /admin-progress-area -->
+
+  <!-- 作業者の入力を見る（管理者用集約ビュー） -->
+  <div id="admin-worker-input-area" style="display:none"></div>
+  </div><!-- /admin-view -->
+
+  <!-- ===== 作業者ビュー ===== -->
+  <div id="worker-view" style="display:none">
+    <div class="internal-pdca-bar">
+      <div style="font-size:13px;font-weight:700;color:#7A5C1F;display:flex;align-items:center;gap:6px"><i class="ti ti-calendar-stats"></i> 社内PDCA定例（全案件共通）</div>
+      <div id="internal-mtg-list" style="display:flex;gap:6px;flex-wrap:wrap;flex:1"></div>
+      <input type="date" id="internal-mtg-date" style="font-size:13px;padding:6px 9px;border:1px solid var(--color-border);border-radius:var(--radius-sm);background:var(--color-bg);outline:none;font-family:var(--font-sans)">
+      <button class="btn btn-sm btn-primary" onclick="addInternalMeetingAll()"><i class="ti ti-plus"></i> 全案件に追加</button>
+    </div>
+    <div class="filter-row" style="margin-bottom:1rem">
+      <input type="text" id="worker-search" placeholder="🔍 会社名・担当者で検索…" oninput="renderWorkerAll()">
+      <select id="worker-filter-person" onchange="renderWorkerAll()"><option value="">すべての担当者</option></select>
+    </div>
+    <div id="worker-all-area"></div>
+  </div>
 </div>
 
 <!-- パネル -->
@@ -221,6 +348,22 @@ tr:hover td{background:var(--color-bg2)}
   <div class="save-bar">
     <button class="btn" onclick="closePanel()">閉じる</button>
     <button class="btn btn-primary" id="save-btn" onclick="savePanel()"><i class="ti ti-check"></i> 保存してシート反映</button>
+  </div>
+</div>
+
+<!-- パスコードモーダル -->
+<div class="modal-bg" id="passcode-modal">
+  <div class="modal" style="max-width:380px">
+    <div class="modal-header">
+      <h2><i class="ti ti-lock"></i> ログイン情報の閲覧</h2>
+    </div>
+    <p style="font-size:13px;color:var(--color-text2);margin-bottom:12px">この案件のログイン情報を表示するにはパスコードを入力してください。</p>
+    <input type="password" id="passcode-input" placeholder="パスコード" style="width:100%;font-size:14px;padding:9px 12px;border:1px solid var(--color-border);border-radius:var(--radius-sm);outline:none;font-family:var(--font-sans)" onkeydown="if(event.key==='Enter')checkPasscode()">
+    <div id="passcode-error" style="display:none;color:#B05050;font-size:12px;margin-top:6px">パスコードが違います</div>
+    <div class="modal-footer">
+      <button class="btn" onclick="document.getElementById('passcode-modal').classList.remove('open')">キャンセル</button>
+      <button class="btn btn-primary" onclick="checkPasscode()">表示</button>
+    </div>
   </div>
 </div>
 
@@ -245,33 +388,49 @@ const GAS_URL="https://script.google.com/macros/s/AKfycbw2TmIA0Cm3_2MI9ziOnZd1_l
 
 const INITIAL_DATA=[
   // ===== 構築中案件 =====
-  {id:1,section:"active",company:"株式会社T's agency holdings",type:"楽々販売構築",person:"神谷さん",amount:0,deadline:"2026-05-31",revision:"",mtg:[],progress:0,status:"進行中",memo:"神谷さん10日訪問予定",fixes:[]},
-  {id:2,section:"active",company:"アクセルサーブ法律事務所",type:"人脈案件管理",person:"神谷さん/高杉",amount:450000,deadline:"2026-05-30",revision:"",mtg:["2026-06-02"],progress:0,status:"進行中",memo:"6月2日MTG実施。現時点で追加要望・修正なし",fixes:[]},
-  {id:4,section:"active",company:"アールビーライズ株式会社（就業者管理）",type:"就業者管理",person:"岡野さん/関さん",amount:1050000,deadline:"2026-02-28",revision:"",mtg:[],progress:0,status:"進行中",memo:"修正多発。5月末完了見込み。データ入れ込み後保守移行予定。神谷さんへ状況説明済み",fixes:[]},
-  {id:5,section:"active",company:"アールビーライズ株式会社（LINE構築）",type:"LINE構築（追加開発）",person:"岡野さん/高杉",amount:1400000,deadline:"2026-07-31",revision:"",mtg:[],progress:0,status:"進行中",memo:"キントーン完了後1週間で構築→フィードバック修正1ヶ月で完了予定。リッチメニュー・LIFE画面デザイン・カレンダー連携は先行可",fixes:[]},
-  {id:7,section:"active",company:"株式会社ONE REAL ESTATE",type:"不動産物件管理",person:"神谷さん/高杉",amount:1500000,deadline:"2026-06-30",revision:"",mtg:[],progress:0,status:"進行中",memo:"6月中旬まで要望対応、中旬以降修正対応期間、6月完了スケジュール",fixes:[]},
-  {id:8,section:"active",company:"株式会社アットランド",type:"LステップCC構築",person:"神谷さん/高杉",amount:1350000,deadline:"2026-05-31",revision:"",mtg:["2026-06-01"],progress:0,status:"進行中",memo:"スコープまとめ共有済み。チェックリスト動作確認後完了。定例5月末→6月に延期",fixes:[]},
-  {id:9,section:"active",company:"Exstan行政書士法人",type:"案件・タスク・請求管理",person:"岡野さん/高杉",amount:1050000,deadline:"2026-05-31",revision:"",mtg:[],progress:90,status:"進行中",memo:"各要望実装完了。残2日でデータ入れ込み→来週定例→終了予定。保守つき",fixes:[]},
-  {id:10,section:"active",company:"株式会社BigBridge",type:"受注管理（LINE受注）",person:"神谷さん/高杉",amount:1050000,deadline:"2026-07-31",revision:"",mtg:["2026-06-02"],progress:0,status:"進行中",memo:"LINE受注システムほぼ完成。6月2日仕様確認MTG実施予定",fixes:[]},
-  {id:11,section:"active",company:"株式会社ファルム",type:"レッツ原価連携アプリ",person:"岡野さん/高杉",amount:1200000,deadline:"2026-04-30",revision:"",mtg:["2026-06-01"],progress:90,status:"フィードバック待ち",memo:"構築・動作確認完了。ファルム様とクライアント様ですり合わせ中。6月以降ままよろ・ファルム様でMTG予定",fixes:[]},
-  {id:12,section:"active",company:"株式会社くすのき",type:"顧客管理",person:"神谷さん/高杉",amount:1350000,deadline:"2026-07-31",revision:"",mtg:["2026-06-01"],progress:0,status:"進行中",memo:"神谷さんへデータ共有中。6月1日進捗MTG予定",fixes:[]},
-  {id:13,section:"active",company:"ブルーチップ・トランスレーション株式会社",type:"通訳者・請求管理",person:"神谷さん/高杉",amount:1350000,deadline:"2026-07-31",revision:"",mtg:[],progress:0,status:"進行中",memo:"神谷さん訪問済み。大竹様よりデータ・情報提供中。準備でき次第神谷さんへ連携",fixes:[]},
+  {id:1,section:"active",company:"株式会社T's agency holdings",type:"楽々販売構築",person:"神谷さん",amount:0,deadline:"2026-05-31",revision:"",mtg:[],progress:0,status:"進行中",memo:"神谷さん10日訪問予定。小国さんとのMTG。",fixes:[],meetings:[],credentials:[]},
+  {id:2,section:"active",company:"アクセルサーブ法律事務所",type:"人脈案件管理",person:"神谷さん",amount:450000,deadline:"2026-06-30",revision:"",mtg:["2026-06-02"],progress:83,status:"進行中",memo:"6月2日MTG実施。現時点で追加要望・修正なし",fixes:[],meetings:[],credentials:[]},
+  {id:4,section:"active",company:"アールビーライズ株式会社（就業者管理）",type:"就業者管理",person:"岡野さん",amount:1050000,deadline:"2026-06-19",revision:"2026-06-16",mtg:[],progress:79,status:"進行中",memo:"修正多発。5月末完了→6月末へ。",fixes:[],meetings:[],credentials:[]},
+  {id:5,section:"active",company:"アールビーライズ株式会社（LINE構築）",type:"LINE構築（追加開発）",person:"岡野さん",amount:1400000,deadline:"2026-07-31",revision:"",mtg:[],progress:0,status:"進行中",memo:"キントーン完了後1週間で構築→フィードバック修正1ヶ月で完了予定。リッチメニュー・LIFE画面デザイン・カレンダー連携は先行可",fixes:[],meetings:[],credentials:[]},
+  {id:7,section:"active",company:"株式会社ONE REAL ESTATE",type:"不動産物件管理",person:"神谷さん",amount:1500000,deadline:"2026-06-30",revision:"",mtg:[],progress:85,status:"進行中",memo:"保守ご案内済み。次回MTGで保守について確認。",fixes:[],meetings:[],credentials:[]},
+  {id:9,section:"active",company:"Exstan行政書士法人",type:"案件・タスク・請求管理",person:"岡野さん",amount:1050000,deadline:"2026-06-30",revision:"2026-06-15",mtg:[],progress:90,status:"進行中",memo:"各要望実装完了。来月より保守フェーズ。今月中に保守契約書等完了させる。",fixes:[],meetings:[],credentials:[]},
+  {id:10,section:"active",company:"ソウルシンクス",type:"経理システム",person:"神谷さん",amount:3000000,deadline:"",revision:"",mtg:[],progress:0,status:"進行中",memo:"顧客管理の相談もあり1カ月更新で対応",fixes:[],meetings:[],credentials:[]},
+  {id:11,section:"active",company:"株式会社くすのき",type:"顧客管理",person:"神谷さん",amount:1350000,deadline:"2026-07-31",revision:"",mtg:[],progress:0,status:"進行中",memo:"",fixes:[],meetings:[],credentials:[]},
+  {id:12,section:"active",company:"ブルーチップ・トランスレーション株式会社",type:"通訳案件管理システム構築",person:"仲野さん",amount:1350000,deadline:"",revision:"",mtg:[],progress:0,status:"進行中",memo:"",fixes:[],meetings:[],credentials:[]},
+  {id:13,section:"active",company:"株式会社ファルムコンサルティング",type:"レッツ原価・キントーン構築",person:"岡野さん",amount:1200000,deadline:"2026-05-31",revision:"",mtg:[],progress:100,status:"進行中",memo:"",fixes:[],meetings:[],credentials:[]},
+  {id:20,section:"active",company:"カネダイ",type:"顧客管理システム",person:"神谷さん",amount:1050000,deadline:"2026-07-31",revision:"",mtg:[],progress:0,status:"進行中",memo:"",fixes:[],meetings:[],credentials:[]},
+  {id:21,section:"active",company:"港製器工業株式会社",type:"キントーン構築",person:"神谷さん",amount:2700000,deadline:"2026-07-31",revision:"",mtg:[],progress:0,status:"進行中",memo:"",fixes:[],meetings:[],credentials:[]},
   // ===== 完了済み案件 =====
-  {id:3,section:"completed",company:"ケーエーエヌユー株式会社",type:"マイソク自動化",person:"神谷さん/高杉",amount:700000,deadline:"2026-01-31",revision:"",mtg:[],progress:100,status:"構築完了",memo:"納品済み。経理追加は税理士相談中のため長期見込み",fixes:[],maintenance:false,maintenanceFee:0,maintenancePeriod:""},
-  {id:6,section:"completed",company:"株式会社リアルト・ハーツ",type:"値決めシート自動化",person:"神谷さん/高杉",amount:900000,deadline:"2026-02-28",revision:"",mtg:[],progress:100,status:"構築完了",memo:"納品完了。チャットワーク等で連絡あり保守提案中。追加構築¥200,000見積提出・稟議中",fixes:[],maintenance:true,maintenanceFee:0,maintenancePeriod:"保守提案中"},
+  {id:8,section:"completed",company:"株式会社アットランド",type:"LステップCC構築",person:"神谷さん",amount:1350000,deadline:"2026-06-30",revision:"2026-06-23",mtg:["2026-06-23"],progress:100,status:"構築完了",memo:"スコープまとめ共有済み。チェックリスト動作確認後完了。23日の定例で納品完了。",fixes:[],meetings:[],credentials:[],maintenance:false,maintenanceFee:0,maintenancePeriod:""},
+  {id:18,section:"completed",company:"ケーエーエヌユー株式会社",type:"マイソク作成",person:"神谷さん",amount:700000,deadline:"2026-02-28",revision:"",mtg:[],progress:100,status:"構築完了",memo:"",fixes:[],meetings:[],credentials:[],maintenance:false,maintenanceFee:0,maintenancePeriod:""},
+  {id:19,section:"completed",company:"リアルトハーツ（値決めシート）",type:"値決めシート",person:"神谷さん",amount:900000,deadline:"2026-03-31",revision:"",mtg:[],progress:100,status:"構築完了",memo:"保守案内中",fixes:[],meetings:[],credentials:[],maintenance:false,maintenanceFee:0,maintenancePeriod:""},
   // ===== 見込み案件 =====
-  {id:14,section:"prospect",company:"株式会社リアルト・ハーツ（PDF追加）",type:"PDF自動取り込み",person:"神谷さん/高杉",amount:0,deadline:"",revision:"",mtg:[],progress:0,status:"検討中",memo:"稟議待ち",fixes:[],demoReady:false,nextSchedule:"",startEstimate:"2026-06",prospectAmount:200000},
-  {id:15,section:"prospect",company:"株式会社ウェバートン",type:"",person:"神谷さん",amount:0,deadline:"",revision:"",mtg:[],progress:0,status:"デモ提示予定",memo:"6月デモ提示・6月入金予定",fixes:[],demoReady:false,nextSchedule:"2026-06-01",startEstimate:"2026-06",prospectAmount:1000000},
-  {id:16,section:"prospect",company:"アサヒ冷熱株式会社",type:"",person:"",amount:0,deadline:"",revision:"",mtg:[],progress:0,status:"契約前",memo:"3名受講　7月入金予定",fixes:[],demoReady:false,nextSchedule:"",startEstimate:"2026-07",prospectAmount:1200000},
-  {id:17,section:"prospect",company:"有限会社船宿あみ達",type:"",person:"",amount:0,deadline:"",revision:"",mtg:[],progress:0,status:"契約前",memo:"6月見積提示・6月入金予定",fixes:[],demoReady:false,nextSchedule:"2026-06-01",startEstimate:"2026-06",prospectAmount:2000000},
-  // 神谷さん見込み案件
-  {id:18,section:"prospect",company:"日広",type:"",person:"神谷さん",amount:0,deadline:"",revision:"",mtg:["2026-06-08"],progress:0,status:"デモ提示予定",memo:"6月8日プレゼン予定",fixes:[],demoReady:false,nextSchedule:"2026-06-08",startEstimate:"",prospectAmount:0},
-  {id:19,section:"prospect",company:"村田ボーリング技研",type:"",person:"神谷さん",amount:0,deadline:"",revision:"",mtg:[],progress:0,status:"契約前",memo:"懇親会で名刺交換。訪問予定",fixes:[],demoReady:false,nextSchedule:"",startEstimate:"",prospectAmount:0},
-  {id:20,section:"prospect",company:"なにわ工場",type:"",person:"神谷さん",amount:0,deadline:"",revision:"",mtg:["2026-06-15"],progress:0,status:"契約前",memo:"6月15日訪問・ヒアリング予定",fixes:[],demoReady:false,nextSchedule:"2026-06-15",startEstimate:"",prospectAmount:0},
+  {id:14,section:"prospect",company:"ウェバートン",type:"",person:"",amount:0,deadline:"",revision:"",mtg:[],progress:0,status:"契約前",memo:"",fixes:[],meetings:[],credentials:[],demoReady:true,nextSchedule:"",startEstimate:"2026-07",prospectAmount:900000},
+  {id:15,section:"prospect",company:"アサヒ冷熱株式会社",type:"積算システム",person:"",amount:0,deadline:"",revision:"",mtg:[],progress:0,status:"契約前",memo:"",fixes:[],meetings:[],credentials:[],demoReady:false,nextSchedule:"",startEstimate:"",prospectAmount:1200000},
+  {id:16,section:"prospect",company:"有限会社船宿あみ達",type:"",person:"",amount:0,deadline:"",revision:"",mtg:[],progress:0,status:"契約前",memo:"",fixes:[],meetings:[],credentials:[],demoReady:true,nextSchedule:"",startEstimate:"2026-07",prospectAmount:3850000},
+  {id:17,section:"prospect",company:"リアルトハーツ（追加構築）",type:"追加構築",person:"",amount:0,deadline:"",revision:"",mtg:[],progress:0,status:"契約前",memo:"",fixes:[],meetings:[],credentials:[],demoReady:false,nextSchedule:"",startEstimate:"2026-07",prospectAmount:200000},
+  {id:22,section:"prospect",company:"森白製菓（AI講座）",type:"AI講座",person:"",amount:0,deadline:"",revision:"",mtg:[],progress:0,status:"契約前",memo:"5名受講　8月入金　9月受講予定",fixes:[],meetings:[],credentials:[],demoReady:true,nextSchedule:"",startEstimate:"",prospectAmount:2000000},
+  {id:23,section:"prospect",company:"kinari",type:"Ai講座",person:"",amount:0,deadline:"",revision:"",mtg:[],progress:0,status:"契約前",memo:"",fixes:[],meetings:[],credentials:[],demoReady:false,nextSchedule:"",startEstimate:"",prospectAmount:400000},
+  {id:24,section:"prospect",company:"イワイリフォーム",type:"Ai講座",person:"",amount:0,deadline:"",revision:"",mtg:[],progress:0,status:"契約前",memo:"",fixes:[],meetings:[],credentials:[],demoReady:false,nextSchedule:"2026-07-11",startEstimate:"",prospectAmount:800000},
+  {id:25,section:"prospect",company:"浪速工業",type:"",person:"",amount:0,deadline:"",revision:"",mtg:[],progress:0,status:"契約前",memo:"",fixes:[],meetings:[],credentials:[],demoReady:true,nextSchedule:"2026-07-06",startEstimate:"",prospectAmount:0},
+  {id:26,section:"prospect",company:"チアキ機工",type:"Ai講座",person:"",amount:0,deadline:"",revision:"",mtg:[],progress:0,status:"契約前",memo:"",fixes:[],meetings:[],credentials:[],demoReady:false,nextSchedule:"",startEstimate:"",prospectAmount:0},
+  {id:27,section:"prospect",company:"日本シーム",type:"Ai講座",person:"",amount:0,deadline:"",revision:"",mtg:[],progress:0,status:"契約前",memo:"",fixes:[],meetings:[],credentials:[],demoReady:false,nextSchedule:"",startEstimate:"",prospectAmount:0},
+  {id:28,section:"prospect",company:"株式会社五十鈴",type:"システム構築",person:"",amount:0,deadline:"",revision:"",mtg:[],progress:0,status:"契約前",memo:"",fixes:[],meetings:[],credentials:[],demoReady:false,nextSchedule:"2026-07-21",startEstimate:"",prospectAmount:0},
+  {id:29,section:"prospect",company:"Ts（見込み）",type:"システム構築",person:"",amount:0,deadline:"",revision:"",mtg:[],progress:0,status:"契約前",memo:"",fixes:[],meetings:[],credentials:[],demoReady:false,nextSchedule:"2026-06-25",startEstimate:"",prospectAmount:0},
+  {id:30,section:"prospect",company:"森白製菓（システム構築）",type:"システム構築",person:"",amount:0,deadline:"",revision:"",mtg:[],progress:0,status:"契約前",memo:"",fixes:[],meetings:[],credentials:[],demoReady:false,nextSchedule:"2026-07-08",startEstimate:"",prospectAmount:0},
 ];
 
 let projects=[], nextId=100, nextFixId=1, panelId=null, currentPTab="info";
 let currentSection="active", sortKey="deadline", sortDir=1;
+let currentRole="admin", currentAdminMode="progress";
+let pendingCredProjectId=null; // パスコード解除待ちの案件ID
+let unlockedCreds={}; // 一度解除した案件のID集合（セッション内）
+const PASSCODE="mamayoro"; // ログイン情報閲覧パスコード（変更可）
+let nextTaskId=1, nextCredId=1, nextMtgId=1;
+// タスクのステータス（4段階）
+const TASK_STATUSES=["未対応","対応中","完了","次回繰越"];
+const TASK_NEXT={"未対応":"対応中","対応中":"完了","完了":"次回繰越","次回繰越":"未対応"};
+const tcls={"未対応":"tb-todo","対応中":"tb-doing","完了":"tb-done","次回繰越":"tb-carry"};
 
 // ステータス → セクション の定義
 const STATUS_SECTION={
@@ -351,6 +510,9 @@ async function loadFromGAS(){
         ...p,section:p.section||"active",
         mtg:(Array.isArray(p.mtg)?p.mtg:tryParse(p.mtg||"[]")).map(m=>normDate(m)).filter(Boolean),
         fixes:Array.isArray(p.fixes)?p.fixes:tryParse(p.fixes||"[]"),
+        tasks:Array.isArray(p.tasks)?p.tasks:tryParse(p.tasks||"[]"),
+        meetings:Array.isArray(p.meetings)?p.meetings:tryParse(p.meetings||"[]"),
+        credentials:Array.isArray(p.credentials)?p.credentials:tryParse(p.credentials||"[]"),
         amount:Number(p.amount)||0,progress:Number(p.progress)||0,id:Number(p.id)||0,
         prospectAmount:Number(p.prospectAmount)||0,
         deadline:normDate(p.deadline),
@@ -359,18 +521,24 @@ async function loadFromGAS(){
         demoReady:p.demoReady==="true"||p.demoReady===true,
         maintenance:p.maintenance==="true"||p.maintenance===true,
       }));
+      // ID採番の最大値を更新
+      projects.forEach(p=>{
+        (p.tasks||[]).forEach(t=>{if(t.id>=nextTaskId)nextTaskId=t.id+1;});
+        (p.credentials||[]).forEach(c=>{if(c.id>=nextCredId)nextCredId=c.id+1;});
+        (p.meetings||[]).forEach(mt=>{if(mt.id>=nextMtgId)nextMtgId=mt.id+1;(mt.tasks||[]).forEach(t=>{if(t.id>=nextTaskId)nextTaskId=t.id+1;});});
+      });
       nextId=Math.max(...projects.map(p=>p.id))+1;
       setSyncState("ok","同期済み — "+new Date().toLocaleTimeString("ja-JP"));
     }else{
-      projects=INITIAL_DATA.map(p=>({...p}));nextId=20;
+      projects=INITIAL_DATA.map(p=>({...p}));nextId=31;
       setSyncState("ok","初期データ読み込み完了");
       for(const p of projects)await gasRequest({action:"save",project:p});
       showToast("✓ 初期データをスプレッドシートに保存しました");
     }
-    render();
+    refresh();
   }catch(e){
-    projects=INITIAL_DATA.map(p=>({...p}));nextId=20;
-    setSyncState("error","オフライン — ローカルデータで表示");render();
+    projects=INITIAL_DATA.map(p=>({...p}));nextId=31;
+    setSyncState("error","オフライン — ローカルデータで表示");refresh();
   }
 }
 async function saveProjectToGAS(p){
@@ -923,7 +1091,7 @@ async function saveAdd(){
   const company=(document.getElementById("a-company")||{value:""}).value.trim();
   if(!company){alert("会社名を入力してください");return;}
   const g=id=>{const el=document.getElementById(id);return el?el.value:""};
-  let newP={id:nextId++,section:currentSection,company,type:g("a-type"),person:g("a-person"),amount:Number(g("a-amount"))||0,deadline:g("a-deadline"),revision:"",mtg:[],progress:0,status:g("a-status")||"未着手",memo:g("a-memo"),fixes:[]};
+  let newP={id:nextId++,section:currentSection,company,type:g("a-type"),person:g("a-person"),amount:Number(g("a-amount"))||0,deadline:g("a-deadline"),revision:"",mtg:[],progress:0,status:g("a-status")||"未着手",memo:g("a-memo"),fixes:[],tasks:[],meetings:[],credentials:[]};
   if(currentSection==="completed"){newP.maintenance=g("a-maintenance")==="true"?true:g("a-maintenance")==="false"?false:null;newP.maintenanceFee=0;newP.maintenancePeriod="";}
   if(currentSection==="prospect"){newP.prospectAmount=Number(g("a-prospectAmount"))||0;newP.demoReady=g("a-demoReady")==="true";newP.nextSchedule=g("a-nextSchedule");newP.startEstimate=g("a-startEstimate");}
   projects.push(newP);closeAdd();render();await saveProjectToGAS(newP);
@@ -933,11 +1101,496 @@ async function confirmDelete(id){
   await deleteProjectFromGAS(id);projects=projects.filter(p=>p.id!==id);render();
 }
 
+// ============================================================
+//  ロール切替 / ビュー制御
+// ============================================================
+function refresh(){
+  // worker selectを最新に
+  populateWorkerSelect();
+  if(currentRole==="admin"){
+    document.getElementById("admin-view").style.display="";
+    document.getElementById("worker-view").style.display="none";
+    if(currentAdminMode==="progress"){
+      document.getElementById("admin-progress-area").style.display="";
+      document.getElementById("admin-worker-input-area").style.display="none";
+      render();
+    }else{
+      document.getElementById("admin-progress-area").style.display="none";
+      document.getElementById("admin-worker-input-area").style.display="";
+      renderWorkerInputSummary();
+    }
+  }else{
+    document.getElementById("admin-view").style.display="none";
+    document.getElementById("worker-view").style.display="";
+    renderWorkerAll();
+  }
+}
+function switchRole(role){
+  currentRole=role;
+  document.getElementById("role-admin").classList.toggle("active",role==="admin");
+  document.getElementById("role-worker").classList.toggle("active",role==="worker");
+  refresh();
+}
+function switchAdminMode(mode){
+  currentAdminMode=mode;
+  document.getElementById("amode-progress").classList.toggle("active",mode==="progress");
+  document.getElementById("amode-worker-input").classList.toggle("active",mode==="worker-input");
+  refresh();
+}
+
+// ============================================================
+//  作業者ビュー
+// ============================================================
+// 社内PDCA定例（全案件共通）の一覧を集計
+function getInternalMeetingDates(){
+  const set=new Set();
+  projects.forEach(p=>{
+    if(p.section==="active"||p.section==="completed"){
+      (p.meetings||[]).forEach(mt=>{if((mt.mtgType||"customer")==="internal"&&mt.date)set.add(mt.date);});
+    }
+  });
+  return [...set].sort();
+}
+function renderInternalMeetingList(){
+  const el=document.getElementById("internal-mtg-list");
+  if(!el)return;
+  const dates=getInternalMeetingDates();
+  el.innerHTML=dates.length
+    ? dates.map(d=>`<span class="internal-mtg-tag">${fd(d)}<button onclick="removeInternalMeetingAll('${d}')" title="全案件から削除">×</button></span>`).join("")
+    : `<span style="font-size:12px;color:var(--color-text3)">まだ登録がありません</span>`;
+}
+async function addInternalMeetingAll(){
+  const date=document.getElementById("internal-mtg-date").value;
+  if(!date){alert("日程を選択してください");return;}
+  const targets=projects.filter(p=>p.section==="active"||p.section==="completed");
+  let added=0;
+  for(const p of targets){
+    if(!p.meetings)p.meetings=[];
+    if(!p.meetings.some(m=>m.date===date&&(m.mtgType||"customer")==="internal")){
+      p.meetings.push({id:nextMtgId++,date,mtgType:"internal",tasks:[]});
+      if(!p.mtg)p.mtg=[];
+      if(!p.mtg.includes(date)){p.mtg.push(date);p.mtg.sort();}
+      added++;
+    }
+  }
+  document.getElementById("internal-mtg-date").value="";
+  // 全案件を保存
+  setSyncState("syncing","全案件に社内定例を追加中…");
+  for(const p of targets){await gasRequest({action:"save",project:p});}
+  setSyncState("ok","保存完了 — "+new Date().toLocaleTimeString("ja-JP"));
+  showToast(`✓ ${added}件の案件に社内定例（${fd(date)}）を追加しました`);
+  renderInternalMeetingList();
+  renderWorkerAll();
+}
+async function removeInternalMeetingAll(date){
+  if(!confirm(`社内定例（${fd(date)}）を全案件から削除しますか？ぶら下がるタスクも消えます。`))return;
+  const targets=projects.filter(p=>p.section==="active"||p.section==="completed");
+  for(const p of targets){
+    const before=(p.meetings||[]).length;
+    p.meetings=(p.meetings||[]).filter(m=>!(m.date===date&&(m.mtgType||"customer")==="internal"));
+    if(p.meetings.length!==before)await gasRequest({action:"save",project:p});
+  }
+  showToast("社内定例を全案件から削除しました");
+  renderInternalMeetingList();
+  renderWorkerAll();
+}
+
+let workerOpenIds={};
+function populateWorkerSelect(){
+  const sel=document.getElementById("worker-filter-person");
+  if(!sel)return;
+  const cur=sel.value;
+  const ps=[...new Set(projects.filter(p=>p.section==="active"||p.section==="completed").map(p=>p.person).filter(Boolean))].sort();
+  sel.innerHTML='<option value="">すべての担当者</option>'+ps.map(p=>`<option>${p}</option>`).join("");
+  sel.value=cur;
+}
+
+// 作業者：左会社名・右タスク横並び
+function renderWorkerAll(){
+  populateWorkerSelect();
+  renderInternalMeetingList();
+  const q=(document.getElementById("worker-search").value||"").toLowerCase();
+  const fp=document.getElementById("worker-filter-person").value;
+  let list=projects.filter(p=>(p.section==="active"||p.section==="completed"));
+  list=list.filter(p=>{
+    if(q&&!p.company.toLowerCase().includes(q)&&!(p.person||"").toLowerCase().includes(q))return false;
+    if(fp&&p.person!==fp)return false;
+    return true;
+  }).sort((a,b)=>a.company.localeCompare(b.company,"ja"));
+
+  const area=document.getElementById("worker-all-area");
+  if(!list.length){area.innerHTML=`<div class="wcard" style="text-align:center;color:var(--color-text2);font-size:13px;padding:2.5rem">担当案件がありません</div>`;return;}
+
+  area.innerHTML=list.map(p=>{
+    if(!p.meetings)p.meetings=[];if(!p.fixes)p.fixes=[];if(!p.credentials)p.credentials=[];
+    let taskPending=0,taskTotal=0;
+    (p.meetings||[]).forEach(mt=>{(mt.tasks||[]).forEach(t=>{taskTotal++;if(t.status!=="完了")taskPending++;});});
+    const fixPending=(p.fixes||[]).filter(f=>!f.done).length;
+    const nm=nextMtg(p.mtg||[]);
+    const pendBadge=(taskPending+fixPending)>0
+      ? `<span class="acc-summary-badge asb-pending">残${taskPending+fixPending}件</span>`
+      : `<span class="acc-summary-badge asb-clear">✓完了</span>`;
+    return `<div class="wrow">
+      <div class="wrow-left">
+        <div class="wrow-company">${p.company}</div>
+        <span class="badge ${scls[p.status]||"b-todo"}" style="align-self:flex-start">${p.status}</span>
+        <div class="wrow-meta">
+          ${p.person?`<span>担当：${p.person}</span>`:""}
+          ${nm?`<span>次回MTG：${fd(nm.date)}</span>`:""}
+        </div>
+        <div>${pendBadge}</div>
+        <button class="wrow-cred-btn" onclick="toggleCredPanel(${p.id})"><i class="ti ti-key"></i> ログイン情報</button>
+        <div id="w-creds-${p.id}" style="display:none;margin-top:6px">${renderCredentials(p,p.id)}</div>
+      </div>
+      <div class="wrow-right">
+        <div class="wrow-cols">
+          <div>
+            <div class="wcol-title"><i class="ti ti-calendar-event"></i> 定例日程ごとのタスク</div>
+            <div class="mtg-add-bar" style="margin-bottom:8px">
+              <span style="font-size:11px;color:#1F5C8B;font-weight:600;display:flex;align-items:center">お客様定例</span>
+              <input type="date" id="mtg-new-date-${p.id}" style="font-size:12px">
+              <button class="btn btn-sm btn-primary" onclick="addMeeting(${p.id})"><i class="ti ti-plus"></i></button>
+            </div>
+            <div id="w-meetings-${p.id}">${renderMeetings(p)}</div>
+            <div style="margin-top:10px">
+              <div class="wcol-title"><i class="ti ti-clock-exclamation"></i> 次回繰越</div>
+              <div id="w-carryover-${p.id}">${renderCarryover(p)}</div>
+            </div>
+          </div>
+          <div>
+            <div class="wcol-title"><i class="ti ti-refresh"></i> PDCA・修正項目</div>
+            <div id="w-fixes-${p.id}">${renderWorkerFixes(p)}</div>
+            <div class="task-add-grid" style="margin-top:6px">
+              <input id="wf-title-${p.id}" placeholder="修正項目…" onkeydown="if(event.key==='Enter')addWorkerFix(${p.id})">
+              <button class="btn btn-sm btn-primary" onclick="addWorkerFix(${p.id})" style="grid-column:span 3"><i class="ti ti-plus"></i> 追加</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  }).join("");
+}
+function toggleCredPanel(pid){
+  const el=document.getElementById("w-creds-"+pid);
+  el.style.display=el.style.display==="none"?"block":"none";
+}
+
+// 1社分の入力本体（アコーディオン内）
+function renderWorkerBody(p){
+  if(!p.meetings)p.meetings=[];if(!p.fixes)p.fixes=[];if(!p.credentials)p.credentials=[];
+  return `
+  <div class="wsection" style="margin-top:1rem">
+    <div class="wsection-title"><i class="ti ti-calendar-event"></i> 定例日程ごとのタスク</div>
+    <div class="mtg-add-bar">
+      <select id="mtg-new-type-${p.id}" style="font-size:13px;padding:7px 10px;border:1px solid var(--color-border);border-radius:var(--radius-sm);background:var(--color-bg);outline:none;font-family:var(--font-sans)">
+        <option value="customer">お客様定例</option>
+        <option value="internal">社内定例</option>
+      </select>
+      <input type="date" id="mtg-new-date-${p.id}">
+      <button class="btn btn-sm btn-primary" onclick="addMeeting(${p.id})"><i class="ti ti-plus"></i> 定例追加</button>
+    </div>
+    <div id="w-meetings-${p.id}">${renderMeetings(p)}</div>
+  </div>
+
+  <div class="wsection">
+    <div class="wsection-title"><i class="ti ti-refresh"></i> PDCA・修正項目</div>
+    <div id="w-fixes-${p.id}">${renderWorkerFixes(p)}</div>
+    <div class="task-add-grid">
+      <input id="wf-title-${p.id}" placeholder="修正項目…" onkeydown="if(event.key==='Enter')addWorkerFix(${p.id})">
+      <button class="btn btn-sm btn-primary" onclick="addWorkerFix(${p.id})" style="grid-column:span 3"><i class="ti ti-plus"></i> 追加</button>
+    </div>
+  </div>
+
+  <div class="wsection">
+    <div class="wsection-title"><i class="ti ti-clock-exclamation"></i> 次回繰越タスク一覧</div>
+    <div id="w-carryover-${p.id}">${renderCarryover(p)}</div>
+  </div>
+
+  <div class="wsection" style="margin-bottom:0">
+    <div class="wsection-title"><i class="ti ti-key"></i> システムのログイン情報 <span style="font-size:10px;color:var(--color-text3);font-weight:400">（管理者・担当者のみ閲覧）</span></div>
+    <div id="w-creds-${p.id}">${renderCredentials(p,p.id)}</div>
+  </div>`;
+}
+
+// --- 定例日程ごとのタスク ---
+function renderMeetings(p){
+  const typeLabel={customer:"お客様定例",internal:"社内定例"};
+  const typeCls={customer:"mtg-type-customer",internal:"mtg-type-internal"};
+  const meetings=(p.meetings||[]).slice().sort((a,b)=>{
+    // お客様定例を先、その中で日付降順
+    if((a.mtgType||"customer")!==(b.mtgType||"customer"))return (a.mtgType==="internal")?1:-1;
+    return (b.date||"").localeCompare(a.date||"");
+  });
+  if(!meetings.length)return `<div style="font-size:13px;color:var(--color-text3);text-align:center;padding:1rem">定例日程がありません。上の欄から追加してください。</div>`;
+  return meetings.map(mt=>{
+    const tp=mt.mtgType||"customer";
+    const tasks=mt.tasks||[];
+    const pending=tasks.filter(t=>t.status!=="完了").length;
+    const taskRows=tasks.length?tasks.map(t=>`
+      <div class="mtg-task-item ${t.status==="完了"?"done":""}">
+        <span class="tt">${t.title}</span>
+        <button class="task-status-btn ${tcls[t.status]||"tb-todo"}" onclick="cycleTaskStatus(${p.id},${mt.id},${t.id})">${t.status}</button>
+        <button class="ico-btn" onclick="deleteMtgTask(${p.id},${mt.id},${t.id})"><i class="ti ti-x"></i></button>
+      </div>`).join(""):`<div style="font-size:12px;color:var(--color-text3);padding:6px 0">タスクなし</div>`;
+    return `<div class="mtg-block">
+      <div class="mtg-block-head">
+        <span class="mtg-type ${typeCls[tp]}">${typeLabel[tp]}</span>
+        <span class="mtg-date">${fd(mt.date)}</span>
+        <span class="mtg-count">${tasks.length?`${pending}件残り / ${tasks.length}件`:"タスクなし"}</span>
+        <button class="ico-btn" style="margin-left:auto" onclick="deleteMeeting(${p.id},${mt.id})"><i class="ti ti-trash"></i></button>
+      </div>
+      <div class="mtg-block-body">
+        ${taskRows}
+        <div class="mtg-task-add">
+          <input id="mt-task-${mt.id}" placeholder="この定例で発生したタスク…" onkeydown="if(event.key==='Enter')addMtgTask(${p.id},${mt.id})">
+          <button class="btn btn-sm" onclick="addMtgTask(${p.id},${mt.id})"><i class="ti ti-plus"></i> 追加</button>
+        </div>
+      </div>
+    </div>`;
+  }).join("");
+}
+async function addMeeting(pid){
+  const p=projects.find(x=>x.id===pid);
+  const date=document.getElementById("mtg-new-date-"+pid).value;
+  const mtgType="customer"; // 個別追加はお客様定例のみ（社内は上部一括）
+  if(!date){alert("日程を選択してください");return;}
+  if(!p.meetings)p.meetings=[];
+  if(p.meetings.some(m=>m.date===date&&(m.mtgType||"customer")===mtgType)){alert("同じ日程がすでにあります");return;}
+  p.meetings.push({id:nextMtgId++,date,mtgType,tasks:[]});
+  if(!p.mtg)p.mtg=[];
+  if(!p.mtg.includes(date)){p.mtg.push(date);p.mtg.sort();}
+  document.getElementById("mtg-new-date-"+pid).value="";
+  document.getElementById("w-meetings-"+pid).innerHTML=renderMeetings(p);
+  await saveProjectToGAS(p);
+}
+async function deleteMeeting(pid,mid){
+  if(!confirm("この定例日程とぶら下がるタスクを削除しますか？"))return;
+  const p=projects.find(x=>x.id===pid);
+  const mt=p.meetings.find(m=>m.id===mid);
+  p.meetings=p.meetings.filter(m=>m.id!==mid);
+  if(mt&&p.mtg)p.mtg=p.mtg.filter(d=>d!==mt.date);
+  document.getElementById("w-meetings-"+pid).innerHTML=renderMeetings(p);
+  await saveProjectToGAS(p);
+}
+async function addMtgTask(pid,mid){
+  const p=projects.find(x=>x.id===pid);
+  const mt=p.meetings.find(m=>m.id===mid);
+  const input=document.getElementById("mt-task-"+mid);
+  const title=input.value.trim();if(!title)return;
+  if(!mt.tasks)mt.tasks=[];
+  mt.tasks.push({id:nextTaskId++,title,status:"未対応"});
+  document.getElementById("w-meetings-"+pid).innerHTML=renderMeetings(p);
+  await saveProjectToGAS(p);
+}
+async function cycleTaskStatus(pid,mid,tid){
+  const p=projects.find(x=>x.id===pid);
+  const mt=p.meetings.find(m=>m.id===mid);
+  const t=mt.tasks.find(x=>x.id===tid);
+  t.status=TASK_NEXT[t.status]||"未対応";
+  document.getElementById("w-meetings-"+pid).innerHTML=renderMeetings(p);
+  const co=document.getElementById("w-carryover-"+pid);if(co)co.innerHTML=renderCarryover(p);
+  await saveProjectToGAS(p);
+}
+async function deleteMtgTask(pid,mid,tid){
+  const p=projects.find(x=>x.id===pid);
+  const mt=p.meetings.find(m=>m.id===mid);
+  mt.tasks=mt.tasks.filter(x=>x.id!==tid);
+  document.getElementById("w-meetings-"+pid).innerHTML=renderMeetings(p);
+  await saveProjectToGAS(p);
+}
+// 次回繰越タスク一覧（全定例から status==="次回繰越" を集約）
+function renderCarryover(p){
+  const typeLabel={customer:"お客様定例",internal:"社内定例"};
+  const items=[];
+  (p.meetings||[]).forEach(mt=>{
+    (mt.tasks||[]).forEach(t=>{if(t.status==="次回繰越")items.push({date:mt.date,title:t.title,mtgType:mt.mtgType||"customer"});});
+  });
+  if(!items.length)return `<div style="font-size:13px;color:var(--color-text3);text-align:center;padding:1rem">次回繰越のタスクはありません</div>`;
+  items.sort((a,b)=>(a.date||"").localeCompare(b.date||""));
+  return items.map(it=>`<div class="mtg-task-item">
+    <span class="tt">${it.title}</span>
+    <span class="task-status-btn tb-carry">次回繰越</span>
+    <span class="task-date-val">${typeLabel[it.mtgType]} ${fd(it.date)}</span>
+  </div>`).join("");
+}
+
+// --- 作業者の修正項目（既存fixesと共通） ---
+function renderWorkerFixes(p){
+  const fixes=p.fixes||[];
+  if(!fixes.length)return `<div style="font-size:13px;color:var(--color-text3);text-align:center;padding:1rem">修正項目はありません</div>`;
+  return fixes.map((f,i)=>`<div class="task-item ${f.done?"done":""}" style="grid-template-columns:auto 1fr auto">
+    <div class="task-check" onclick="toggleWorkerFix(${p.id},${i})">${f.done?'<i class="ti ti-check" style="font-size:12px"></i>':''}</div>
+    <div class="task-title ${f.done?"strike":""}">${f.title}</div>
+    <button class="ico-btn" onclick="deleteWorkerFix(${p.id},${i})"><i class="ti ti-x"></i></button>
+  </div>`).join("");
+}
+async function addWorkerFix(pid){
+  const p=projects.find(x=>x.id===pid);
+  const title=document.getElementById("wf-title-"+pid).value.trim();if(!title)return;
+  if(!p.fixes)p.fixes=[];
+  p.fixes.push({id:nextFixId++,title,note:"",done:false});
+  document.getElementById("wf-title-"+pid).value="";
+  document.getElementById("w-fixes-"+pid).innerHTML=renderWorkerFixes(p);
+  await saveProjectToGAS(p);
+}
+async function toggleWorkerFix(pid,idx){
+  const p=projects.find(x=>x.id===pid);p.fixes[idx].done=!p.fixes[idx].done;
+  document.getElementById("w-fixes-"+pid).innerHTML=renderWorkerFixes(p);
+  await saveProjectToGAS(p);
+}
+async function deleteWorkerFix(pid,idx){
+  const p=projects.find(x=>x.id===pid);p.fixes.splice(idx,1);
+  document.getElementById("w-fixes-"+pid).innerHTML=renderWorkerFixes(p);
+  await saveProjectToGAS(p);
+}
+
+// --- 未対応繰越（dueがあって未完了のtask/fix） ---
+// --- ログイン情報（パスコード保護） ---
+function renderCredentials(p,pid){
+  if(!unlockedCreds[pid]){
+    return `<div class="cred-locked">
+      <i class="ti ti-lock" style="font-size:28px;color:var(--color-text3);display:block;margin-bottom:8px"></i>
+      <div style="font-size:13px;color:var(--color-text2);margin-bottom:12px">ログイン情報は保護されています</div>
+      <button class="btn btn-primary btn-sm" onclick="requestPasscode(${pid})"><i class="ti ti-lock-open"></i> パスコードで表示</button>
+    </div>`;
+  }
+  const creds=p.credentials||[];
+  const list=creds.length?creds.map((c,i)=>`
+    <div class="cred-item">
+      <div class="cred-item-head">
+        <i class="ti ti-server" style="color:var(--color-primary-m)"></i>
+        <strong>${c.system||"(システム名未設定)"}</strong>
+        <button class="ico-btn" onclick="deleteCred(${pid},${i})"><i class="ti ti-x"></i></button>
+      </div>
+      ${c.url?`<div class="cred-row"><span class="ck">URL</span><span class="cv">${c.url}</span><button class="copy-btn" onclick="copyText('${escq(c.url)}')">コピー</button></div>`:""}
+      <div class="cred-row"><span class="ck">ID</span><span class="cv">${c.username||"–"}</span>${c.username?`<button class="copy-btn" onclick="copyText('${escq(c.username)}')">コピー</button>`:""}</div>
+      <div class="cred-row"><span class="ck">PW</span><span class="cv">${c.password||"–"}</span>${c.password?`<button class="copy-btn" onclick="copyText('${escq(c.password)}')">コピー</button>`:""}</div>
+      ${c.note?`<div style="font-size:11px;color:var(--color-text2);margin-top:4px">${c.note}</div>`:""}
+    </div>`).join(""):`<div style="font-size:13px;color:var(--color-text3);text-align:center;padding:1rem">ログイン情報は未登録です</div>`;
+  return `${list}
+    <div style="border:1px dashed var(--color-border2);border-radius:var(--radius-sm);padding:10px;margin-top:8px">
+      <div class="wfield"><input id="cr-system-${pid}" placeholder="システム名（例: kintone）"></div>
+      <div class="wfield"><input id="cr-url-${pid}" placeholder="URL（任意）"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+        <div class="wfield"><input id="cr-user-${pid}" placeholder="ID"></div>
+        <div class="wfield"><input id="cr-pass-${pid}" placeholder="パスワード"></div>
+      </div>
+      <div class="wfield"><input id="cr-note-${pid}" placeholder="備考（任意）"></div>
+      <button class="btn btn-sm btn-primary" onclick="addCred(${pid})"><i class="ti ti-plus"></i> ログイン情報を追加</button>
+    </div>`;
+}
+function escq(s){return String(s).replace(/'/g,"\\'").replace(/"/g,'&quot;');}
+function copyText(t){navigator.clipboard.writeText(t).then(()=>showToast("コピーしました"));}
+function requestPasscode(pid){
+  pendingCredProjectId=pid;
+  document.getElementById("passcode-input").value="";
+  document.getElementById("passcode-error").style.display="none";
+  document.getElementById("passcode-modal").classList.add("open");
+  setTimeout(()=>document.getElementById("passcode-input").focus(),100);
+}
+function checkPasscode(){
+  const v=document.getElementById("passcode-input").value;
+  if(v===PASSCODE){
+    unlockedCreds[pendingCredProjectId]=true;
+    document.getElementById("passcode-modal").classList.remove("open");
+    const p=projects.find(x=>x.id===pendingCredProjectId);
+    const el=document.getElementById("w-creds-"+pendingCredProjectId);
+    if(el&&p){el.innerHTML=renderCredentials(p,pendingCredProjectId);el.style.display="block";}
+  }else{
+    document.getElementById("passcode-error").style.display="block";
+  }
+}
+async function addCred(pid){
+  const p=projects.find(x=>x.id===pid);
+  const system=document.getElementById("cr-system-"+pid).value.trim();
+  if(!system){alert("システム名を入力してください");return;}
+  if(!p.credentials)p.credentials=[];
+  p.credentials.push({id:nextCredId++,system,url:document.getElementById("cr-url-"+pid).value.trim(),username:document.getElementById("cr-user-"+pid).value.trim(),password:document.getElementById("cr-pass-"+pid).value.trim(),note:document.getElementById("cr-note-"+pid).value.trim()});
+  document.getElementById("w-creds-"+pid).innerHTML=renderCredentials(p,pid);
+  await saveProjectToGAS(p);
+  showToast("✓ ログイン情報を追加しました");
+}
+async function deleteCred(pid,idx){
+  if(!confirm("このログイン情報を削除しますか？"))return;
+  const p=projects.find(x=>x.id===pid);p.credentials.splice(idx,1);
+  document.getElementById("w-creds-"+pid).innerHTML=renderCredentials(p,pid);
+  await saveProjectToGAS(p);
+}
+
+// ============================================================
+//  管理者：作業者の入力を見る（集約ビュー）
+// ============================================================
+function renderWorkerInputSummary(){
+  const area=document.getElementById("admin-worker-input-area");
+  const targets=projects.filter(p=>(p.section==="active"||p.section==="completed"));
+  const withInput=targets.filter(p=>(p.meetings&&p.meetings.length)||(p.fixes&&p.fixes.length));
+  if(!withInput.length){
+    area.innerHTML=`<div class="wcard" style="text-align:center;color:var(--color-text2);font-size:13px;padding:2.5rem">作業者からの入力はまだありません</div>`;
+    return;
+  }
+  area.innerHTML=withInput.map(p=>{
+    const meetings=(p.meetings||[]).slice().sort((a,b)=>(b.date||"").localeCompare(a.date||""));
+    const fixes=p.fixes||[];
+    const fixDone=fixes.filter(f=>f.done).length;
+    // 定例ごとのブロック（閲覧専用）
+    const mtgBlocks=meetings.length?meetings.map(mt=>{
+      const tp=mt.mtgType||"customer";
+      const typeLabel={customer:"お客様定例",internal:"社内定例"};
+      const typeCls={customer:"mtg-type-customer",internal:"mtg-type-internal"};
+      const tasks=mt.tasks||[];
+      const pending=tasks.filter(t=>t.status!=="完了").length;
+      const taskRows=tasks.length?tasks.map(t=>`
+        <div class="mtg-task-item ${t.status==="完了"?"done":""}">
+          <span class="tt">${t.title}</span>
+          <span class="task-status-btn ${tcls[t.status]||"tb-todo"}">${t.status}</span>
+        </div>`).join(""):`<div style="font-size:12px;color:var(--color-text3);padding:6px 0">タスクなし</div>`;
+      return `<div class="mtg-block">
+        <div class="mtg-block-head">
+          <span class="mtg-type ${typeCls[tp]}">${typeLabel[tp]}</span>
+          <span class="mtg-date">${fd(mt.date)}</span>
+          <span class="mtg-count">${tasks.length?`${pending}件残り / ${tasks.length}件`:"タスクなし"}</span>
+        </div>
+        <div class="mtg-block-body">${taskRows}</div>
+      </div>`;
+    }).join(""):`<div style="font-size:12px;color:var(--color-text3);padding:6px">定例日程なし</div>`;
+    const fixRows=fixes.length?fixes.map(f=>`
+      <div class="mtg-task-item ${f.done?"done":""}">
+        <span class="tt">${f.title}</span>
+        <span class="task-status-btn ${f.done?"tb-done":"tb-todo"}">${f.done?"完了":"未完了"}</span>
+      </div>`).join(""):`<div style="font-size:12px;color:var(--color-text3);padding:6px">修正項目なし</div>`;
+    return `<div class="wcard">
+      <div class="wcard-head">
+        <i class="ti ti-building" style="color:var(--color-primary-m)"></i>
+        <h3>${p.company}</h3>
+        <span style="font-size:12px;color:var(--color-text2)">${p.person||""}</span>
+      </div>
+      <div class="wsection">
+        <div class="wsection-title"><i class="ti ti-calendar-event"></i> 定例日程ごとのタスク</div>
+        ${mtgBlocks}
+      </div>
+      <div class="wsection" style="margin-bottom:0">
+        <div class="wsection-title"><i class="ti ti-refresh"></i> PDCA・修正項目 <span style="font-size:11px;font-weight:400;color:var(--color-text2)">(${fixDone}/${fixes.length}完了)</span></div>
+        ${fixRows}
+      </div>
+    </div>`;
+  }).join("");
+}
+
 ["search","filter-person","filter-deadline","filter-fix"].forEach(id=>{
   const el=document.getElementById(id);if(!el)return;
   el.addEventListener(id==="search"?"input":"change",render);
 });
 document.getElementById("add-modal").addEventListener("click",e=>{if(e.target===e.currentTarget)closeAdd()});
+document.getElementById("passcode-modal").addEventListener("click",e=>{if(e.target===e.currentTarget)e.currentTarget.classList.remove("open")});
+
+// URL末尾(#worker)で初期ロールを決定
+if(location.hash==="#worker"){
+  currentRole="worker";
+  document.getElementById("role-admin").classList.remove("active");
+  document.getElementById("role-worker").classList.add("active");
+  // 作業者ビュー時は管理者切替ボタンを隠す（手軽な制限）
+  document.getElementById("role-admin").style.display="none";
+}
 loadFromGAS();
 </script>
 </body>
