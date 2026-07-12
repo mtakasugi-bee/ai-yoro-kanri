@@ -257,6 +257,21 @@ tr:hover td{background:var(--color-bg2)}
 .internal-pdca-bar{display:flex;align-items:center;gap:10px;background:#FBF6EA;border:1px solid #E5D5B0;border-radius:var(--radius);padding:12px 16px;margin-bottom:1rem;flex-wrap:wrap}
 .internal-mtg-tag{display:inline-flex;align-items:center;gap:4px;background:#F3EDE0;color:#7A5C1F;font-size:12px;padding:3px 9px;border-radius:4px;font-weight:600;border:1px solid #E5D5B0}
 .internal-mtg-tag button{background:none;border:none;cursor:pointer;color:#7A5C1F;font-size:13px;padding:0;line-height:1}
+/* 自分は誰か バー */
+.worker-identity-bar{display:flex;align-items:center;gap:10px;background:var(--color-primary-p);border:1px solid var(--color-primary-l);border-radius:var(--radius);padding:12px 16px;margin-bottom:1rem;flex-wrap:wrap}
+/* MTG横並び */
+.mtg-scroll{display:flex;gap:10px;overflow-x:auto;padding-bottom:6px}
+.mtg-scroll .mtg-block{min-width:260px;max-width:300px;flex-shrink:0;margin-bottom:0}
+/* タスク＋メモ */
+.mtg-task-wrap{border-bottom:1px solid var(--color-bg3);padding:7px 0}
+.mtg-task-wrap:last-child{border-bottom:none}
+.mtg-task-row{display:flex;align-items:center;gap:8px;font-size:13px}
+.mtg-task-row .tt{flex:1;word-break:break-word}
+.mtg-task-row.done .tt{text-decoration:line-through;color:var(--color-text2)}
+.task-memo{width:100%;font-size:11px;padding:4px 8px;border:1px solid var(--color-border);border-radius:4px;background:var(--color-bg2);color:var(--color-text2);font-family:var(--font-sans);resize:vertical;min-height:0;height:26px;outline:none;margin-top:4px}
+.task-memo:focus{border-color:var(--color-primary);background:var(--color-bg)}
+.task-memo-toggle{font-size:10px;color:var(--color-text3);cursor:pointer;background:none;border:none;padding:0;font-family:var(--font-sans)}
+.task-memo-toggle:hover{color:var(--color-primary)}
 </style>
 </head>
 <body>
@@ -322,6 +337,14 @@ tr:hover td{background:var(--color-bg2)}
 
   <!-- ===== 作業者ビュー ===== -->
   <div id="worker-view" style="display:none">
+    <div class="worker-identity-bar">
+      <i class="ti ti-user-circle" style="font-size:20px;color:var(--color-primary-m)"></i>
+      <span style="font-size:13px;font-weight:600;color:var(--color-primary-d)">あなたは誰ですか？</span>
+      <select id="worker-identity" onchange="onWorkerIdentityChange()" style="font-size:13px;padding:7px 12px;border:1px solid var(--color-border);border-radius:var(--radius-sm);background:var(--color-bg);outline:none;font-family:var(--font-sans);min-width:160px">
+        <option value="">選択してください</option>
+      </select>
+      <span style="font-size:11px;color:var(--color-text3)">※選ぶと担当案件のログイン情報が見られます</span>
+    </div>
     <div class="internal-pdca-bar">
       <div style="font-size:13px;font-weight:700;color:#7A5C1F;display:flex;align-items:center;gap:6px"><i class="ti ti-calendar-stats"></i> 社内PDCA定例（全案件共通）</div>
       <div id="internal-mtg-list" style="display:flex;gap:6px;flex-wrap:wrap;flex:1"></div>
@@ -423,6 +446,7 @@ const INITIAL_DATA=[
 let projects=[], nextId=100, nextFixId=1, panelId=null, currentPTab="info";
 let currentSection="active", sortKey="deadline", sortDir=1;
 let currentRole="admin", currentAdminMode="progress";
+let workerIdentity=""; // 作業者ビューで選んだ「自分」
 let pendingCredProjectId=null; // パスコード解除待ちの案件ID
 let unlockedCreds={}; // 一度解除した案件のID集合（セッション内）
 const PASSCODE="mamayoro"; // ログイン情報閲覧パスコード（変更可）
@@ -1198,11 +1222,26 @@ async function removeInternalMeetingAll(date){
 let workerOpenIds={};
 function populateWorkerSelect(){
   const sel=document.getElementById("worker-filter-person");
-  if(!sel)return;
-  const cur=sel.value;
-  const ps=[...new Set(projects.filter(p=>p.section==="active"||p.section==="completed").map(p=>p.person).filter(Boolean))].sort();
-  sel.innerHTML='<option value="">すべての担当者</option>'+ps.map(p=>`<option>${p}</option>`).join("");
-  sel.value=cur;
+  if(sel){
+    const cur=sel.value;
+    const ps=[...new Set(projects.filter(p=>p.section==="active"||p.section==="completed").map(p=>p.person).filter(Boolean))].sort();
+    sel.innerHTML='<option value="">すべての担当者</option>'+ps.map(p=>`<option>${p}</option>`).join("");
+    sel.value=cur;
+  }
+  // 「自分は誰か」セレクト
+  const idSel=document.getElementById("worker-identity");
+  if(idSel){
+    const cur=idSel.value;
+    const persons=[...new Set(projects.map(p=>p.person).filter(Boolean))].sort();
+    idSel.innerHTML='<option value="">選択してください</option>'+persons.map(p=>`<option${p===workerIdentity?" selected":""}>${p}</option>`).join("");
+    idSel.value=workerIdentity;
+  }
+}
+function onWorkerIdentityChange(){
+  workerIdentity=document.getElementById("worker-identity").value;
+  // 自分が変わったら解除済みログイン情報をリセット
+  unlockedCreds={};
+  renderWorkerAll();
 }
 
 // 作業者：左会社名・右タスク横並び
@@ -1243,20 +1282,16 @@ function renderWorkerAll(){
         <div id="w-creds-${p.id}" style="display:none;margin-top:6px">${renderCredentials(p,p.id)}</div>
       </div>
       <div class="wrow-right">
-        <div class="wrow-cols">
-          <div>
-            <div class="wcol-title"><i class="ti ti-calendar-event"></i> 定例日程ごとのタスク</div>
-            <div class="mtg-add-bar" style="margin-bottom:8px">
-              <span style="font-size:11px;color:#1F5C8B;font-weight:600;display:flex;align-items:center">お客様定例</span>
-              <input type="date" id="mtg-new-date-${p.id}" style="font-size:12px">
-              <button class="btn btn-sm btn-primary" onclick="addMeeting(${p.id})"><i class="ti ti-plus"></i></button>
-            </div>
-            <div id="w-meetings-${p.id}">${renderMeetings(p)}</div>
-            <div style="margin-top:10px">
-              <div class="wcol-title"><i class="ti ti-clock-exclamation"></i> 次回繰越</div>
-              <div id="w-carryover-${p.id}">${renderCarryover(p)}</div>
-            </div>
+        <div>
+          <div class="wcol-title"><i class="ti ti-calendar-event"></i> 定例日程ごとのタスク <span style="font-size:10px;font-weight:400;color:var(--color-text3)">（横スクロール）</span></div>
+          <div class="mtg-add-bar" style="margin-bottom:8px">
+            <span style="font-size:11px;color:#1F5C8B;font-weight:600;display:flex;align-items:center">お客様定例</span>
+            <input type="date" id="mtg-new-date-${p.id}" style="font-size:12px">
+            <button class="btn btn-sm btn-primary" onclick="addMeeting(${p.id})"><i class="ti ti-plus"></i> 追加</button>
           </div>
+          <div id="w-meetings-${p.id}">${renderMeetings(p)}</div>
+        </div>
+        <div class="wrow-cols" style="margin-top:14px">
           <div>
             <div class="wcol-title"><i class="ti ti-refresh"></i> PDCA・修正項目</div>
             <div id="w-fixes-${p.id}">${renderWorkerFixes(p)}</div>
@@ -1264,6 +1299,10 @@ function renderWorkerAll(){
               <input id="wf-title-${p.id}" placeholder="修正項目…" onkeydown="if(event.key==='Enter')addWorkerFix(${p.id})">
               <button class="btn btn-sm btn-primary" onclick="addWorkerFix(${p.id})" style="grid-column:span 3"><i class="ti ti-plus"></i> 追加</button>
             </div>
+          </div>
+          <div>
+            <div class="wcol-title"><i class="ti ti-clock-exclamation"></i> 次回繰越</div>
+            <div id="w-carryover-${p.id}">${renderCarryover(p)}</div>
           </div>
         </div>
       </div>
@@ -1317,37 +1356,57 @@ function renderMeetings(p){
   const typeLabel={customer:"お客様定例",internal:"社内定例"};
   const typeCls={customer:"mtg-type-customer",internal:"mtg-type-internal"};
   const meetings=(p.meetings||[]).slice().sort((a,b)=>{
-    // お客様定例を先、その中で日付降順
     if((a.mtgType||"customer")!==(b.mtgType||"customer"))return (a.mtgType==="internal")?1:-1;
     return (b.date||"").localeCompare(a.date||"");
   });
   if(!meetings.length)return `<div style="font-size:13px;color:var(--color-text3);text-align:center;padding:1rem">定例日程がありません。上の欄から追加してください。</div>`;
-  return meetings.map(mt=>{
+  const blocks=meetings.map(mt=>{
     const tp=mt.mtgType||"customer";
     const tasks=mt.tasks||[];
     const pending=tasks.filter(t=>t.status!=="完了").length;
     const taskRows=tasks.length?tasks.map(t=>`
-      <div class="mtg-task-item ${t.status==="完了"?"done":""}">
-        <span class="tt">${t.title}</span>
-        <button class="task-status-btn ${tcls[t.status]||"tb-todo"}" onclick="cycleTaskStatus(${p.id},${mt.id},${t.id})">${t.status}</button>
-        <button class="ico-btn" onclick="deleteMtgTask(${p.id},${mt.id},${t.id})"><i class="ti ti-x"></i></button>
+      <div class="mtg-task-wrap">
+        <div class="mtg-task-row ${t.status==="完了"?"done":""}">
+          <span class="tt">${t.title}</span>
+          <button class="task-status-btn ${tcls[t.status]||"tb-todo"}" onclick="cycleTaskStatus(${p.id},${mt.id},${t.id})">${t.status}</button>
+          <button class="ico-btn" onclick="deleteMtgTask(${p.id},${mt.id},${t.id})"><i class="ti ti-x"></i></button>
+        </div>
+        <textarea class="task-memo" placeholder="メモ…" onchange="updateTaskMemo(${p.id},${mt.id},${t.id},this.value)">${t.memo||""}</textarea>
       </div>`).join(""):`<div style="font-size:12px;color:var(--color-text3);padding:6px 0">タスクなし</div>`;
     return `<div class="mtg-block">
       <div class="mtg-block-head">
         <span class="mtg-type ${typeCls[tp]}">${typeLabel[tp]}</span>
         <span class="mtg-date">${fd(mt.date)}</span>
-        <span class="mtg-count">${tasks.length?`${pending}件残り / ${tasks.length}件`:"タスクなし"}</span>
         <button class="ico-btn" style="margin-left:auto" onclick="deleteMeeting(${p.id},${mt.id})"><i class="ti ti-trash"></i></button>
       </div>
       <div class="mtg-block-body">
+        <div style="font-size:11px;color:var(--color-text3);margin-bottom:4px">${tasks.length?`${pending}件残り / ${tasks.length}件`:"タスクなし"}</div>
         ${taskRows}
         <div class="mtg-task-add">
-          <input id="mt-task-${mt.id}" placeholder="この定例で発生したタスク…" onkeydown="if(event.key==='Enter')addMtgTask(${p.id},${mt.id})">
-          <button class="btn btn-sm" onclick="addMtgTask(${p.id},${mt.id})"><i class="ti ti-plus"></i> 追加</button>
+          <input id="mt-task-${mt.id}" placeholder="タスク追加…" onkeydown="if(event.key==='Enter')addMtgTask(${p.id},${mt.id})">
+          <button class="btn btn-sm" onclick="addMtgTask(${p.id},${mt.id})"><i class="ti ti-plus"></i></button>
+        </div>
+        <div style="margin-top:6px">
+          <button class="btn btn-sm" style="font-size:11px;padding:3px 8px" onclick="toggleBulkPaste(${mt.id})"><i class="ti ti-clipboard-text"></i> 議事録から一括</button>
+          <div id="bulk-paste-${mt.id}" style="display:none;margin-top:6px">
+            <textarea id="bulk-text-${mt.id}" placeholder="議事録を貼り付け（1行1タスク）" style="width:100%;font-size:12px;padding:7px 9px;border:1px solid var(--color-border);border-radius:var(--radius-sm);background:var(--color-bg);font-family:var(--font-sans);resize:vertical;min-height:70px;outline:none;margin-bottom:6px"></textarea>
+            <div style="display:flex;gap:6px;justify-content:flex-end">
+              <button class="btn btn-sm" style="font-size:11px" onclick="toggleBulkPaste(${mt.id})">キャンセル</button>
+              <button class="btn btn-sm btn-primary" style="font-size:11px" onclick="addBulkTasks(${p.id},${mt.id})">一括追加</button>
+            </div>
+          </div>
         </div>
       </div>
     </div>`;
   }).join("");
+  return `<div class="mtg-scroll">${blocks}</div>`;
+}
+async function updateTaskMemo(pid,mid,tid,val){
+  const p=projects.find(x=>x.id===pid);
+  const mt=p.meetings.find(m=>m.id===mid);
+  const t=mt.tasks.find(x=>x.id===tid);
+  t.memo=val;
+  await saveProjectToGAS(p);
 }
 async function addMeeting(pid){
   const p=projects.find(x=>x.id===pid);
@@ -1381,6 +1440,26 @@ async function addMtgTask(pid,mid){
   mt.tasks.push({id:nextTaskId++,title,status:"未対応"});
   document.getElementById("w-meetings-"+pid).innerHTML=renderMeetings(p);
   await saveProjectToGAS(p);
+}
+function toggleBulkPaste(mid){
+  const el=document.getElementById("bulk-paste-"+mid);
+  el.style.display=el.style.display==="none"?"block":"none";
+  if(el.style.display==="block")document.getElementById("bulk-text-"+mid).focus();
+}
+async function addBulkTasks(pid,mid){
+  const p=projects.find(x=>x.id===pid);
+  const mt=p.meetings.find(m=>m.id===mid);
+  const text=document.getElementById("bulk-text-"+mid).value;
+  // 1行1タスク。行頭の記号（・-•*# 数字.）を除去
+  const items=text.split("\n")
+    .map(l=>l.replace(/^[\s　]*[・\-•*#○◯●▪️\d]+[\.\)、]?[\s　]*/,"").trim())
+    .filter(l=>l.length>0);
+  if(!items.length){alert("タスクを入力してください");return;}
+  if(!mt.tasks)mt.tasks=[];
+  items.forEach(title=>mt.tasks.push({id:nextTaskId++,title:title.slice(0,60),status:"未対応"}));
+  document.getElementById("w-meetings-"+pid).innerHTML=renderMeetings(p);
+  await saveProjectToGAS(p);
+  showToast(`✓ ${items.length}件のタスクを追加しました`);
 }
 async function cycleTaskStatus(pid,mid,tid){
   const p=projects.find(x=>x.id===pid);
@@ -1447,11 +1526,26 @@ async function deleteWorkerFix(pid,idx){
 // --- 未対応繰越（dueがあって未完了のtask/fix） ---
 // --- ログイン情報（パスコード保護） ---
 function renderCredentials(p,pid){
-  if(!unlockedCreds[pid]){
+  // アクセス可否判定
+  // 管理者ビュー：常に表示OK（パスなし）
+  // 作業者ビュー：選んだ「自分」がこの案件の担当者に含まれていれば表示OK
+  let canView=false;
+  if(currentRole==="admin"){
+    canView=true;
+  }else{
+    if(!workerIdentity){
+      return `<div class="cred-locked">
+        <i class="ti ti-user-question" style="font-size:24px;color:var(--color-text3);display:block;margin-bottom:6px"></i>
+        <div style="font-size:12px;color:var(--color-text2)">上部で「あなたは誰か」を選んでください</div>
+      </div>`;
+    }
+    const persons=(p.person||"").split(/[\/・,、]/).map(s=>s.trim());
+    canView=persons.includes(workerIdentity);
+  }
+  if(!canView){
     return `<div class="cred-locked">
-      <i class="ti ti-lock" style="font-size:28px;color:var(--color-text3);display:block;margin-bottom:8px"></i>
-      <div style="font-size:13px;color:var(--color-text2);margin-bottom:12px">ログイン情報は保護されています</div>
-      <button class="btn btn-primary btn-sm" onclick="requestPasscode(${pid})"><i class="ti ti-lock-open"></i> パスコードで表示</button>
+      <i class="ti ti-lock" style="font-size:24px;color:var(--color-text3);display:block;margin-bottom:6px"></i>
+      <div style="font-size:12px;color:var(--color-text2)">担当案件のみ閲覧できます<br>（担当：${p.person||"未設定"}）</div>
     </div>`;
   }
   const creds=p.credentials||[];
