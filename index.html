@@ -272,6 +272,8 @@ tr:hover td{background:var(--color-bg2)}
 .task-memo:focus{border-color:var(--color-primary);background:var(--color-bg)}
 .task-memo-toggle{font-size:10px;color:var(--color-text3);cursor:pointer;background:none;border:none;padding:0;font-family:var(--font-sans)}
 .task-memo-toggle:hover{color:var(--color-primary)}
+.mtg-day-memo{width:100%;font-size:12px;padding:7px 9px;border:1px solid var(--color-border);border-radius:var(--radius-sm);background:#FFFDF5;color:var(--color-text);font-family:var(--font-sans);resize:vertical;min-height:60px;outline:none}
+.mtg-day-memo:focus{border-color:var(--color-primary);background:var(--color-bg)}
 </style>
 </head>
 <body>
@@ -354,6 +356,10 @@ tr:hover td{background:var(--color-bg2)}
     <div class="filter-row" style="margin-bottom:1rem">
       <input type="text" id="worker-search" placeholder="🔍 会社名・担当者で検索…" oninput="renderWorkerAll()">
       <select id="worker-filter-person" onchange="renderWorkerAll()"><option value="">すべての担当者</option></select>
+    </div>
+    <div class="section-tabs" style="margin-bottom:1rem">
+      <button class="section-tab active" id="wtab-active" onclick="switchWorkerTab('active')"><i class="ti ti-building"></i> 進行中 <span class="tab-count" id="wcnt-active">0</span></button>
+      <button class="section-tab" id="wtab-completed" onclick="switchWorkerTab('completed')"><i class="ti ti-circle-check"></i> 完了済み <span class="tab-count" id="wcnt-completed">0</span></button>
     </div>
     <div id="worker-all-area"></div>
   </div>
@@ -447,6 +453,7 @@ let projects=[], nextId=100, nextFixId=1, panelId=null, currentPTab="info";
 let currentSection="active", sortKey="deadline", sortDir=1;
 let currentRole="admin", currentAdminMode="progress";
 let workerIdentity=""; // 作業者ビューで選んだ「自分」
+let workerTab="active"; // 作業者ビューのタブ（進行中/完了済み）
 let pendingCredProjectId=null; // パスコード解除待ちの案件ID
 let unlockedCreds={}; // 一度解除した案件のID集合（セッション内）
 const PASSCODE="mamayoro"; // ログイン情報閲覧パスコード（変更可）
@@ -1243,6 +1250,12 @@ function onWorkerIdentityChange(){
   unlockedCreds={};
   renderWorkerAll();
 }
+function switchWorkerTab(tab){
+  workerTab=tab;
+  document.getElementById("wtab-active").classList.toggle("active",tab==="active");
+  document.getElementById("wtab-completed").classList.toggle("active",tab==="completed");
+  renderWorkerAll();
+}
 
 // 作業者：左会社名・右タスク横並び
 function renderWorkerAll(){
@@ -1250,7 +1263,12 @@ function renderWorkerAll(){
   renderInternalMeetingList();
   const q=(document.getElementById("worker-search").value||"").toLowerCase();
   const fp=document.getElementById("worker-filter-person").value;
-  let list=projects.filter(p=>(p.section==="active"||p.section==="completed"));
+  // タブ別カウント
+  const allTargets=projects.filter(p=>p.section==="active"||p.section==="completed");
+  document.getElementById("wcnt-active").textContent=allTargets.filter(p=>p.section==="active").length;
+  document.getElementById("wcnt-completed").textContent=allTargets.filter(p=>p.section==="completed").length;
+
+  let list=projects.filter(p=>p.section===workerTab);
   list=list.filter(p=>{
     if(q&&!p.company.toLowerCase().includes(q)&&!(p.person||"").toLowerCase().includes(q))return false;
     if(fp&&p.person!==fp)return false;
@@ -1258,7 +1276,7 @@ function renderWorkerAll(){
   }).sort((a,b)=>a.company.localeCompare(b.company,"ja"));
 
   const area=document.getElementById("worker-all-area");
-  if(!list.length){area.innerHTML=`<div class="wcard" style="text-align:center;color:var(--color-text2);font-size:13px;padding:2.5rem">担当案件がありません</div>`;return;}
+  if(!list.length){area.innerHTML=`<div class="wcard" style="text-align:center;color:var(--color-text2);font-size:13px;padding:2.5rem">${workerTab==="completed"?"完了済みの案件はありません":"担当案件がありません"}</div>`;return;}
 
   area.innerHTML=list.map(p=>{
     if(!p.meetings)p.meetings=[];if(!p.fixes)p.fixes=[];if(!p.credentials)p.credentials=[];
@@ -1365,13 +1383,10 @@ function renderMeetings(p){
     const tasks=mt.tasks||[];
     const pending=tasks.filter(t=>t.status!=="完了").length;
     const taskRows=tasks.length?tasks.map(t=>`
-      <div class="mtg-task-wrap">
-        <div class="mtg-task-row ${t.status==="完了"?"done":""}">
-          <span class="tt">${t.title}</span>
-          <button class="task-status-btn ${tcls[t.status]||"tb-todo"}" onclick="cycleTaskStatus(${p.id},${mt.id},${t.id})">${t.status}</button>
-          <button class="ico-btn" onclick="deleteMtgTask(${p.id},${mt.id},${t.id})"><i class="ti ti-x"></i></button>
-        </div>
-        <textarea class="task-memo" placeholder="メモ…" onchange="updateTaskMemo(${p.id},${mt.id},${t.id},this.value)">${t.memo||""}</textarea>
+      <div class="mtg-task-row ${t.status==="完了"?"done":""}" style="padding:5px 0;border-bottom:1px solid var(--color-bg3)">
+        <span class="tt">${t.title}</span>
+        <button class="task-status-btn ${tcls[t.status]||"tb-todo"}" onclick="cycleTaskStatus(${p.id},${mt.id},${t.id})">${t.status}</button>
+        <button class="ico-btn" onclick="deleteMtgTask(${p.id},${mt.id},${t.id})"><i class="ti ti-x"></i></button>
       </div>`).join(""):`<div style="font-size:12px;color:var(--color-text3);padding:6px 0">タスクなし</div>`;
     return `<div class="mtg-block">
       <div class="mtg-block-head">
@@ -1382,7 +1397,7 @@ function renderMeetings(p){
       <div class="mtg-block-body">
         <div style="font-size:11px;color:var(--color-text3);margin-bottom:4px">${tasks.length?`${pending}件残り / ${tasks.length}件`:"タスクなし"}</div>
         ${taskRows}
-        <div class="mtg-task-add">
+        <div class="mtg-task-add" style="margin-top:6px">
           <input id="mt-task-${mt.id}" placeholder="タスク追加…" onkeydown="if(event.key==='Enter')addMtgTask(${p.id},${mt.id})">
           <button class="btn btn-sm" onclick="addMtgTask(${p.id},${mt.id})"><i class="ti ti-plus"></i></button>
         </div>
@@ -1396,16 +1411,19 @@ function renderMeetings(p){
             </div>
           </div>
         </div>
+        <div style="margin-top:8px;padding-top:8px;border-top:1px dashed var(--color-border)">
+          <div style="font-size:10px;color:var(--color-text3);margin-bottom:3px;font-weight:600"><i class="ti ti-note" style="font-size:11px;vertical-align:-1px"></i> この定例のメモ</div>
+          <textarea class="mtg-day-memo" placeholder="この日のメモをまとめて記入…" onchange="updateMeetingMemo(${p.id},${mt.id},this.value)">${mt.memo||""}</textarea>
+        </div>
       </div>
     </div>`;
   }).join("");
   return `<div class="mtg-scroll">${blocks}</div>`;
 }
-async function updateTaskMemo(pid,mid,tid,val){
+async function updateMeetingMemo(pid,mid,val){
   const p=projects.find(x=>x.id===pid);
   const mt=p.meetings.find(m=>m.id===mid);
-  const t=mt.tasks.find(x=>x.id===tid);
-  t.memo=val;
+  mt.memo=val;
   await saveProjectToGAS(p);
 }
 async function addMeeting(pid){
