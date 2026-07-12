@@ -1,0 +1,1691 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI案件進捗管理 | Ai・よろ</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<style>
+:root{
+  --font-sans:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic UI",sans-serif;
+  --color-primary:#4A4A4A;--color-primary-d:#2B2B2B;--color-primary-m:#6B6B6B;
+  --color-primary-l:#E8E8E8;--color-primary-p:#F4F4F4;
+  --color-bg:#FFFFFF;--color-bg2:#F7F7F7;--color-bg3:#EEEEEE;
+  --color-text:#1E1E1E;--color-text2:#6B6B6B;--color-text3:#AAAAAA;
+  --color-border:#E0E0E0;--color-border2:#CCCCCC;
+  --color-warn:#7A6A3A;--color-warn-bg:#F5F0E0;
+  --color-ok-bg:#EAF2EA;--color-ok:#2A5E2A;
+  --radius:9px;--radius-sm:6px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans);background:var(--color-bg2);color:var(--color-text);min-height:100vh}
+.app{max-width:1380px;margin:0 auto;padding:1.5rem 1rem}
+.app-header{display:flex;align-items:center;gap:16px;margin-bottom:1.5rem;padding-bottom:1.25rem;border-bottom:1px solid var(--color-border)}
+.logo-mark{width:40px;height:40px;border-radius:8px;background:var(--color-primary-d);display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;font-weight:700;flex-shrink:0}
+.app-header h1{font-size:18px;font-weight:700;color:var(--color-primary-d)}
+.app-header .subtitle{font-size:12px;color:var(--color-text2);margin-top:2px}
+.sync-bar{display:flex;align-items:center;gap:8px;margin-bottom:1rem;font-size:12px;color:var(--color-text2);background:var(--color-bg);border:1px solid var(--color-border);border-radius:var(--radius-sm);padding:7px 12px}
+.sync-dot{width:8px;height:8px;border-radius:50%;background:#5BAD72;flex-shrink:0}
+.sync-dot.syncing{background:#B8A060;animation:pulse 1s infinite}
+.sync-dot.error{background:#B05050}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* サマリー */
+.summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(115px,1fr));gap:8px;margin-bottom:1.25rem}
+.metric{background:var(--color-bg);border:1px solid var(--color-border);border-radius:var(--radius);padding:.8rem 1rem}
+.metric .label{font-size:11px;color:var(--color-text2);margin-bottom:4px;font-weight:500}
+.metric .val{font-size:20px;font-weight:700;color:var(--color-primary-d)}
+.metric.hi{background:var(--color-primary-p);border-color:var(--color-primary-l)}
+
+/* タブ */
+.section-tabs{display:flex;gap:0;border-bottom:2px solid var(--color-border);margin-bottom:1rem}
+.section-tab{font-size:14px;padding:10px 22px;cursor:pointer;color:var(--color-text2);border-bottom:3px solid transparent;background:none;border-top:none;border-left:none;border-right:none;font-family:var(--font-sans);font-weight:500;margin-bottom:-2px;transition:.15s;display:flex;align-items:center;gap:6px}
+.section-tab.active{color:var(--color-primary-d);border-bottom-color:var(--color-primary-d);font-weight:700}
+.section-tab:hover:not(.active){color:var(--color-primary-d);background:var(--color-primary-p)}
+.section-tab .tab-count{font-size:11px;padding:1px 7px;border-radius:10px;background:var(--color-primary-l);color:var(--color-primary-m);font-weight:600}
+.section-tab.active .tab-count{background:var(--color-primary-d);color:#fff}
+
+/* フィルター */
+.filter-row{display:flex;gap:8px;margin-bottom:.75rem;flex-wrap:wrap;align-items:center}
+.filter-row input,.filter-row select{font-size:13px;padding:7px 10px;border:1px solid var(--color-border);border-radius:var(--radius-sm);background:var(--color-bg);color:var(--color-text);outline:none;font-family:var(--font-sans)}
+.filter-row input{flex:1;min-width:150px}
+
+/* ボタン */
+.btn{font-size:13px;padding:7px 14px;border:1px solid var(--color-border);border-radius:var(--radius-sm);background:var(--color-bg);color:var(--color-text);cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;gap:5px;font-family:var(--font-sans);font-weight:500;transition:all .15s}
+.btn:hover{background:var(--color-bg2)}
+.btn-primary{background:var(--color-primary-d);color:#fff;border-color:var(--color-primary-d)}
+.btn-primary:hover{background:var(--color-primary)}
+.btn-sm{font-size:12px;padding:4px 10px}
+
+/* テーブル共通 */
+.table-wrap{background:var(--color-bg);border:1px solid var(--color-border);border-radius:var(--radius);overflow:auto;box-shadow:0 1px 4px rgba(0,0,0,.05)}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;padding:9px 11px;font-weight:600;font-size:11px;color:var(--color-text2);border-bottom:1px solid var(--color-border);background:var(--color-primary-p);white-space:nowrap;letter-spacing:.04em;cursor:pointer;user-select:none}
+th:hover{background:var(--color-primary-l)}
+td{padding:9px 11px;border-bottom:1px solid var(--color-border);vertical-align:top}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--color-bg2)}
+.company-link{color:var(--color-primary-d);cursor:pointer;font-weight:600;border-bottom:1px solid var(--color-border2)}
+.company-link:hover{color:var(--color-primary)}
+.badge{display:inline-block;font-size:11px;padding:2px 8px;border-radius:4px;font-weight:600;white-space:nowrap}
+.b-todo{background:#EBEBEB;color:#555}
+.b-wip{background:#E8F0E8;color:#2A5E2A;border:1px solid #C0D8C0}
+.b-review{background:#EAE8F0;color:#3A3070}
+.b-done{background:var(--color-primary-d);color:#fff}
+.b-hold{background:#F0F0F0;color:#888}
+.fix-pending{background:var(--color-warn-bg);color:var(--color-warn);font-size:11px;padding:2px 7px;border-radius:4px;font-weight:600}
+.fix-all-done{background:var(--color-ok-bg);color:var(--color-ok);font-size:11px;padding:2px 7px;border-radius:4px;font-weight:600}
+.fix-none{color:var(--color-text3);font-size:12px}
+.deadline-warn{color:var(--color-warn);font-weight:600}
+.deadline-over{color:#B05050;font-weight:600}
+.prog-wrap{display:flex;align-items:center;gap:6px}
+.prog-bar{flex:1;height:5px;background:var(--color-bg3);border-radius:3px;overflow:hidden;min-width:40px}
+.prog-fill{height:100%;border-radius:3px;background:var(--color-primary)}
+.prog-val{font-size:11px;color:var(--color-text2);min-width:26px}
+.ico-btn{background:none;border:none;cursor:pointer;color:var(--color-text3);padding:3px 5px;border-radius:4px;font-size:15px}
+.ico-btn:hover{color:var(--color-primary-d);background:var(--color-primary-p)}
+.empty{text-align:center;padding:3rem;color:var(--color-text2);font-size:13px}
+/* メモ：省略なし、折り返し表示 */
+.memo-cell{font-size:12px;color:var(--color-text2);max-width:200px;word-break:break-all;white-space:pre-wrap;line-height:1.5}
+.mtg-next{font-size:12px;white-space:nowrap}
+.mtg-next.soon{color:var(--color-warn);font-weight:600}
+.mtg-next.past{color:var(--color-text3)}
+/* 見込みバッジ */
+.prospect-badge{display:inline-block;font-size:11px;padding:2px 8px;border-radius:4px;font-weight:600;white-space:nowrap}
+.pb-demo-ok{background:#E8F0E8;color:#2A5E2A}
+.pb-demo-ng{background:#EBEBEB;color:#666}
+.pb-hot{background:var(--color-warn-bg);color:var(--color-warn)}
+/* 保守バッジ */
+.maintenance-badge{font-size:11px;padding:2px 8px;border-radius:4px;font-weight:600;background:#EAE8F0;color:#3A3070}
+
+/* パネル */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:50}
+.overlay.open{display:block}
+.panel{position:fixed;top:0;right:0;width:min(580px,100vw);height:100vh;background:var(--color-bg);border-left:1px solid var(--color-border);z-index:51;display:flex;flex-direction:column;transform:translateX(100%);transition:transform .25s ease;box-shadow:-4px 0 24px rgba(0,0,0,.08)}
+.panel.open{transform:translateX(0)}
+.panel-header{padding:1.25rem;border-bottom:1px solid var(--color-border);display:flex;align-items:flex-start;gap:8px;flex-shrink:0;background:var(--color-primary-p)}
+.panel-header h2{font-size:16px;font-weight:700;flex:1;line-height:1.4;color:var(--color-primary-d)}
+.panel-close{background:none;border:none;cursor:pointer;color:var(--color-text2);font-size:20px;padding:0}
+.ptabs{display:flex;border-bottom:1px solid var(--color-border);flex-shrink:0;overflow-x:auto}
+.ptab{font-size:13px;padding:9px 15px;cursor:pointer;color:var(--color-text2);border-bottom:2px solid transparent;background:none;border-top:none;border-left:none;border-right:none;font-family:var(--font-sans);font-weight:500;white-space:nowrap}
+.ptab.active{color:var(--color-primary-d);border-bottom-color:var(--color-primary-d);font-weight:700}
+.ptab:hover:not(.active){color:var(--color-primary-d);background:var(--color-primary-p)}
+.panel-body{padding:1.25rem;flex:1;overflow-y:auto}
+.section{margin-bottom:1.5rem}
+.section-title{font-size:11px;font-weight:700;color:var(--color-primary-d);letter-spacing:.07em;text-transform:uppercase;margin-bottom:.75rem;display:flex;align-items:center;gap:6px}
+.section-title::before{content:"";display:block;width:3px;height:13px;background:var(--color-primary);border-radius:2px}
+.edit-field{margin-bottom:10px}
+.edit-field label{display:block;font-size:12px;color:var(--color-text2);margin-bottom:4px;font-weight:500}
+.edit-field input,.edit-field select,.edit-field textarea{width:100%;font-size:13px;padding:7px 10px;border:1px solid var(--color-border);border-radius:var(--radius-sm);background:var(--color-bg);color:var(--color-text);font-family:var(--font-sans);outline:none}
+.edit-field input:focus,.edit-field select:focus,.edit-field textarea:focus{border-color:var(--color-primary);box-shadow:0 0 0 2px var(--color-primary-p)}
+.edit-field textarea{resize:vertical;min-height:70px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.mtg-item{display:inline-flex;align-items:center;gap:4px;background:var(--color-primary-p);color:var(--color-primary-d);font-size:12px;padding:3px 8px;border-radius:4px;margin:2px;font-weight:500;border:1px solid var(--color-primary-l)}
+.mtg-item button{background:none;border:none;cursor:pointer;color:var(--color-primary-m);font-size:13px;padding:0;line-height:1}
+.add-row{display:flex;gap:6px;margin-top:6px}
+.add-row input{flex:1;font-size:13px;padding:6px 9px;border:1px solid var(--color-border);border-radius:var(--radius-sm);background:var(--color-bg);color:var(--color-text);font-family:var(--font-sans);outline:none}
+.timeline{border-left:2px solid var(--color-primary-l);padding-left:1rem;margin-top:.5rem}
+.tl-item{position:relative;margin-bottom:.75rem}
+.tl-item::before{content:"";position:absolute;left:-1.35rem;top:.35rem;width:8px;height:8px;border-radius:50%;background:var(--color-border2)}
+.tl-item.past::before{background:#5BAD72}
+.tl-item.soon::before{background:#B8A060}
+.tl-item.over::before{background:#B05050}
+.tl-date{font-size:11px;color:var(--color-text2)}
+.tl-label{font-size:13px;font-weight:600}
+.save-bar{padding:1rem 1.25rem;border-top:1px solid var(--color-border);display:flex;gap:8px;justify-content:flex-end;background:var(--color-bg);flex-shrink:0}
+
+/* 修正項目 */
+.fix-item{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border:1px solid var(--color-border);border-radius:var(--radius-sm);margin-bottom:6px;transition:.15s;cursor:pointer}
+.fix-item:hover{border-color:var(--color-primary-l);background:var(--color-primary-p)}
+.fix-item.done-item{opacity:.5}
+.fix-check{width:18px;height:18px;border:2px solid var(--color-border2);border-radius:4px;flex-shrink:0;display:flex;align-items:center;justify-content:center;margin-top:1px;background:var(--color-bg)}
+.fix-item.done-item .fix-check{background:var(--color-primary-d);border-color:var(--color-primary-d);color:#fff}
+.fix-item-left{flex:1;min-width:0}
+.fix-item-title{font-size:13px;font-weight:500;margin-bottom:2px;word-break:break-word;line-height:1.5}
+.fix-item-title.strikethrough{text-decoration:line-through;color:var(--color-text2)}
+.fix-note{font-size:12px;color:var(--color-text2);font-style:italic}
+.fix-progress{display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--color-primary-p);border-radius:var(--radius-sm);margin-bottom:10px}
+.fix-progress-bar{flex:1;height:6px;background:var(--color-bg3);border-radius:3px;overflow:hidden}
+.fix-progress-fill{height:100%;border-radius:3px;background:var(--color-primary);transition:width .4s}
+.fix-progress-label{font-size:12px;color:var(--color-text2);white-space:nowrap;font-weight:500}
+.ai-paste-box{border:1.5px dashed var(--color-border2);border-radius:var(--radius-sm);padding:12px;background:var(--color-bg2);margin-bottom:12px}
+.ai-paste-box textarea{width:100%;font-size:13px;padding:8px 10px;border:1px solid var(--color-border);border-radius:var(--radius-sm);background:var(--color-bg);color:var(--color-text);font-family:var(--font-sans);resize:vertical;min-height:70px;outline:none;margin-bottom:8px}
+.ai-hint{font-size:12px;color:var(--color-text2);margin-bottom:8px;line-height:1.6}
+
+/* モーダル */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:200;align-items:center;justify-content:center}
+.modal-bg.open{display:flex}
+.modal{background:var(--color-bg);border-radius:var(--radius);padding:1.5rem;width:min(520px,94vw);border:1px solid var(--color-border);max-height:90vh;overflow-y:auto;box-shadow:0 8px 40px rgba(0,0,0,.12)}
+.modal-header{display:flex;align-items:center;gap:10px;margin-bottom:1rem;padding-bottom:.75rem;border-bottom:1px solid var(--color-border)}
+.modal-header h2{font-size:16px;font-weight:700;color:var(--color-primary-d);flex:1}
+.modal-footer{display:flex;justify-content:flex-end;gap:8px;margin-top:1rem}
+.toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);background:var(--color-primary-d);color:#fff;padding:10px 22px;border-radius:6px;font-size:13px;z-index:300;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap;box-shadow:0 4px 16px rgba(0,0,0,.2)}
+.toast.show{opacity:1}
+.hint{padding:10px 12px;background:var(--color-primary-p);border-radius:var(--radius-sm);font-size:12px;color:var(--color-text2);border:1px solid var(--color-primary-l)}
+/* ロール切替 */
+.role-switch{display:flex;gap:4px;background:var(--color-bg2);border:1px solid var(--color-border);border-radius:var(--radius);padding:3px}
+.role-btn{font-size:12px;padding:7px 14px;border:none;background:none;color:var(--color-text2);cursor:pointer;border-radius:var(--radius-sm);font-family:var(--font-sans);font-weight:600;display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+.role-btn.active{background:var(--color-primary-d);color:#fff}
+.admin-mode-switch{display:flex;gap:6px;margin-bottom:1.25rem}
+.amode-btn{font-size:13px;padding:8px 16px;border:1px solid var(--color-border);background:var(--color-bg);color:var(--color-text2);cursor:pointer;border-radius:var(--radius-sm);font-family:var(--font-sans);font-weight:500;display:inline-flex;align-items:center;gap:6px}
+.amode-btn.active{background:var(--color-primary-p);color:var(--color-primary-d);border-color:var(--color-primary-l);font-weight:700}
+.worker-select-bar{display:flex;align-items:center;gap:10px;background:var(--color-bg);border:1px solid var(--color-border);border-radius:var(--radius);padding:1rem 1.25rem;margin-bottom:1.25rem;flex-wrap:wrap}
+.worker-select-bar select{font-size:14px;padding:8px 12px;border:1px solid var(--color-border);border-radius:var(--radius-sm);background:var(--color-bg);color:var(--color-text);outline:none;font-family:var(--font-sans);min-width:280px}
+/* 作業者カード */
+.wcard{background:var(--color-bg);border:1px solid var(--color-border);border-radius:var(--radius);padding:1.25rem;margin-bottom:1rem}
+.wcard-head{display:flex;align-items:center;gap:8px;margin-bottom:1rem;padding-bottom:.75rem;border-bottom:1px solid var(--color-border)}
+.wcard-head h3{font-size:15px;font-weight:700;color:var(--color-primary-d);flex:1}
+.wsection{margin-bottom:1.5rem}
+.wsection-title{font-size:12px;font-weight:700;color:var(--color-primary-d);letter-spacing:.05em;margin-bottom:.6rem;display:flex;align-items:center;gap:6px}
+.wsection-title i{font-size:15px}
+/* タスク行 */
+.task-item{display:grid;grid-template-columns:auto 1fr auto auto auto;gap:8px;align-items:center;padding:8px 10px;border:1px solid var(--color-border);border-radius:var(--radius-sm);margin-bottom:6px;font-size:13px}
+.task-item.done{opacity:.55}
+.task-check{width:18px;height:18px;border:2px solid var(--color-border2);border-radius:4px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:var(--color-bg)}
+.task-item.done .task-check{background:var(--color-primary-d);border-color:var(--color-primary-d);color:#fff}
+.task-title{word-break:break-word}
+.task-title.strike{text-decoration:line-through;color:var(--color-text2)}
+.task-date-label{font-size:11px;color:var(--color-text3);white-space:nowrap}
+.task-date-val{font-size:11px;color:var(--color-text2);white-space:nowrap}
+.wfield{margin-bottom:8px}
+.wfield label{display:block;font-size:12px;color:var(--color-text2);margin-bottom:3px;font-weight:500}
+.wfield input,.wfield textarea,.wfield select{width:100%;font-size:13px;padding:7px 10px;border:1px solid var(--color-border);border-radius:var(--radius-sm);background:var(--color-bg);color:var(--color-text);font-family:var(--font-sans);outline:none}
+.wfield textarea{resize:vertical;min-height:50px}
+.task-add-grid{display:grid;grid-template-columns:1fr auto auto auto;gap:6px;align-items:end;margin-top:6px}
+@media(max-width:600px){.task-add-grid{grid-template-columns:1fr}.task-item{grid-template-columns:auto 1fr}}
+/* ログイン情報 */
+.cred-locked{text-align:center;padding:2rem;background:var(--color-bg2);border:1px dashed var(--color-border2);border-radius:var(--radius-sm)}
+.cred-item{border:1px solid var(--color-border);border-radius:var(--radius-sm);padding:10px 12px;margin-bottom:8px}
+.cred-item-head{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.cred-item-head strong{font-size:13px;flex:1}
+.cred-row{display:flex;align-items:center;gap:8px;font-size:13px;margin-bottom:4px}
+.cred-row .ck{font-size:11px;color:var(--color-text3);width:48px;flex-shrink:0}
+.cred-row .cv{font-family:monospace;background:var(--color-bg2);padding:2px 8px;border-radius:4px;flex:1;word-break:break-all}
+.copy-btn{background:none;border:1px solid var(--color-border);border-radius:4px;cursor:pointer;color:var(--color-text2);padding:2px 6px;font-size:11px}
+.copy-btn:hover{background:var(--color-primary-p)}
+.task-badge{font-size:10px;padding:1px 6px;border-radius:3px;font-weight:600}
+.tb-todo{background:#EBEBEB;color:#666}
+.tb-doing{background:var(--color-warn-bg);color:var(--color-warn)}
+.tb-done{background:var(--color-ok-bg);color:var(--color-ok)}
+.tb-carry{background:#EAE8F0;color:#3A3070}
+.mtg-block-head .mtg-type{font-size:10px;padding:2px 8px;border-radius:4px;font-weight:700;white-space:nowrap}
+.mtg-type-customer{background:#E3EEF7;color:#1F5C8B}
+.mtg-type-internal{background:#F3EDE0;color:#7A5C1F}
+/* 定例日程ブロック */
+.mtg-block{border:1px solid var(--color-border);border-radius:var(--radius-sm);margin-bottom:10px;overflow:hidden}
+.mtg-block-head{display:flex;align-items:center;gap:8px;padding:10px 12px;background:var(--color-primary-p);border-bottom:1px solid var(--color-border)}
+.mtg-block-head .mtg-date{font-size:13px;font-weight:700;color:var(--color-primary-d)}
+.mtg-block-head .mtg-count{font-size:11px;color:var(--color-text2)}
+.mtg-block-body{padding:10px 12px}
+.mtg-task-add{display:flex;gap:6px;margin-top:8px}
+.mtg-task-add input{flex:1;font-size:13px;padding:6px 9px;border:1px solid var(--color-border);border-radius:var(--radius-sm);background:var(--color-bg);color:var(--color-text);font-family:var(--font-sans);outline:none}
+.mtg-task-item{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--color-bg3);font-size:13px}
+.mtg-task-item:last-child{border-bottom:none}
+.mtg-task-item .tt{flex:1;word-break:break-word}
+.mtg-task-item.done .tt{text-decoration:line-through;color:var(--color-text2)}
+.task-status-btn{font-size:11px;padding:2px 9px;border-radius:4px;font-weight:600;cursor:pointer;border:none;font-family:var(--font-sans);white-space:nowrap}
+.mtg-add-bar{display:flex;gap:6px;margin-bottom:12px;padding:10px;background:var(--color-bg2);border-radius:var(--radius-sm);border:1px dashed var(--color-border2)}
+.mtg-add-bar input{font-size:13px;padding:7px 10px;border:1px solid var(--color-border);border-radius:var(--radius-sm);background:var(--color-bg);outline:none;font-family:var(--font-sans)}
+/* アコーディオン */
+.acc-item{background:var(--color-bg);border:1px solid var(--color-border);border-radius:var(--radius);margin-bottom:10px;overflow:hidden}
+.acc-head{display:flex;align-items:center;gap:10px;padding:14px 16px;cursor:pointer;user-select:none}
+.acc-head:hover{background:var(--color-bg2)}
+.acc-head .acc-chevron{transition:transform .2s;color:var(--color-text3);font-size:16px}
+.acc-item.open .acc-chevron{transform:rotate(90deg)}
+.acc-title{font-size:15px;font-weight:700;color:var(--color-primary-d);flex:1}
+.acc-meta{font-size:11px;color:var(--color-text2);display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.acc-body{display:none;padding:0 16px 16px;border-top:1px solid var(--color-border)}
+.acc-item.open .acc-body{display:block}
+.acc-summary-badge{font-size:11px;padding:2px 8px;border-radius:10px;font-weight:600}
+.asb-pending{background:var(--color-warn-bg);color:var(--color-warn)}
+.asb-clear{background:var(--color-ok-bg);color:var(--color-ok)}
+/* 作業者：左会社名・右タスク横並び */
+.wrow{display:grid;grid-template-columns:200px 1fr;gap:0;background:var(--color-bg);border:1px solid var(--color-border);border-radius:var(--radius);margin-bottom:10px;overflow:hidden}
+.wrow-left{background:var(--color-primary-p);border-right:1px solid var(--color-border);padding:14px;display:flex;flex-direction:column;gap:8px}
+.wrow-company{font-size:14px;font-weight:700;color:var(--color-primary-d);line-height:1.4;word-break:break-word}
+.wrow-meta{font-size:11px;color:var(--color-text2);display:flex;flex-direction:column;gap:3px}
+.wrow-right{padding:14px;min-width:0}
+.wrow-cred-btn{font-size:11px;padding:4px 8px;border:1px solid var(--color-border);border-radius:var(--radius-sm);background:var(--color-bg);color:var(--color-text2);cursor:pointer;display:inline-flex;align-items:center;gap:4px;font-family:var(--font-sans);margin-top:4px}
+.wrow-cred-btn:hover{background:var(--color-bg)}
+.wcol-title{font-size:11px;font-weight:700;color:var(--color-primary-d);letter-spacing:.04em;margin-bottom:6px;display:flex;align-items:center;gap:5px}
+.wcol-title i{font-size:14px}
+@media(max-width:680px){.wrow{grid-template-columns:1fr}.wrow-left{border-right:none;border-bottom:1px solid var(--color-border);flex-direction:row;align-items:center;flex-wrap:wrap}}
+/* 横並び時の右側2カラム */
+.wrow-cols{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+/* 社内PDCA一括バー */
+.internal-pdca-bar{display:flex;align-items:center;gap:10px;background:#FBF6EA;border:1px solid #E5D5B0;border-radius:var(--radius);padding:12px 16px;margin-bottom:1rem;flex-wrap:wrap}
+.internal-mtg-tag{display:inline-flex;align-items:center;gap:4px;background:#F3EDE0;color:#7A5C1F;font-size:12px;padding:3px 9px;border-radius:4px;font-weight:600;border:1px solid #E5D5B0}
+.internal-mtg-tag button{background:none;border:none;cursor:pointer;color:#7A5C1F;font-size:13px;padding:0;line-height:1}
+/* 自分は誰か バー */
+.worker-identity-bar{display:flex;align-items:center;gap:10px;background:var(--color-primary-p);border:1px solid var(--color-primary-l);border-radius:var(--radius);padding:12px 16px;margin-bottom:1rem;flex-wrap:wrap}
+/* MTG横並び */
+.mtg-scroll{display:flex;gap:10px;overflow-x:auto;padding-bottom:6px}
+.mtg-scroll .mtg-block{min-width:260px;max-width:300px;flex-shrink:0;margin-bottom:0}
+/* タスク＋メモ */
+.mtg-task-wrap{border-bottom:1px solid var(--color-bg3);padding:7px 0}
+.mtg-task-wrap:last-child{border-bottom:none}
+.mtg-task-row{display:flex;align-items:center;gap:8px;font-size:13px}
+.mtg-task-row .tt{flex:1;word-break:break-word}
+.mtg-task-row.done .tt{text-decoration:line-through;color:var(--color-text2)}
+.task-memo{width:100%;font-size:11px;padding:4px 8px;border:1px solid var(--color-border);border-radius:4px;background:var(--color-bg2);color:var(--color-text2);font-family:var(--font-sans);resize:vertical;min-height:0;height:26px;outline:none;margin-top:4px}
+.task-memo:focus{border-color:var(--color-primary);background:var(--color-bg)}
+.task-memo-toggle{font-size:10px;color:var(--color-text3);cursor:pointer;background:none;border:none;padding:0;font-family:var(--font-sans)}
+.task-memo-toggle:hover{color:var(--color-primary)}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="app-header">
+    <div class="logo-mark">Ai</div>
+    <div style="flex:1">
+      <h1>Ai・よろ 案件進捗管理</h1>
+      <div class="subtitle">Googleスプレッドシートとリアルタイム同期</div>
+    </div>
+    <div class="role-switch">
+      <button class="role-btn active" id="role-admin" onclick="switchRole('admin')"><i class="ti ti-shield"></i> 管理者（本部）</button>
+      <button class="role-btn" id="role-worker" onclick="switchRole('worker')"><i class="ti ti-user-cog"></i> 作業者</button>
+    </div>
+  </div>
+  <div class="sync-bar">
+    <div class="sync-dot" id="sync-dot"></div>
+    <span id="sync-label">接続中…</span>
+    <button class="btn btn-sm" onclick="loadFromGAS()" style="margin-left:auto"><i class="ti ti-refresh"></i> 再読み込み</button>
+  </div>
+
+  <!-- ===== 管理者ビュー ===== -->
+  <div id="admin-view">
+  <div class="admin-mode-switch">
+    <button class="amode-btn active" id="amode-progress" onclick="switchAdminMode('progress')"><i class="ti ti-layout-dashboard"></i> 進捗シート</button>
+    <button class="amode-btn" id="amode-worker-input" onclick="switchAdminMode('worker-input')"><i class="ti ti-clipboard-text"></i> 作業者の入力を見る</button>
+  </div>
+
+  <div id="admin-progress-area">
+  <div class="summary" id="summary"></div>
+  <div id="person-summary" style="margin-bottom:1.25rem"></div>
+
+  <!-- セクションタブ -->
+  <div class="section-tabs">
+    <button class="section-tab active" onclick="switchSection('active')" id="stab-active">
+      <i class="ti ti-building"></i> 構築中案件 <span class="tab-count" id="cnt-active">0</span>
+    </button>
+    <button class="section-tab" onclick="switchSection('completed')" id="stab-completed">
+      <i class="ti ti-circle-check"></i> 完了済み案件 <span class="tab-count" id="cnt-completed">0</span>
+    </button>
+    <button class="section-tab" onclick="switchSection('prospect')" id="stab-prospect">
+      <i class="ti ti-star"></i> 見込み案件 <span class="tab-count" id="cnt-prospect">0</span>
+    </button>
+  </div>
+
+  <!-- フィルター行 -->
+  <div class="filter-row">
+    <input type="text" id="search" placeholder="🔍 会社名・担当者で検索…">
+    <select id="filter-person"><option value="">すべての担当者</option></select>
+    <select id="filter-deadline"><option value="">期日：すべて</option><option value="over">期日超過</option><option value="week">7日以内</option><option value="month">30日以内</option></select>
+    <select id="filter-fix"><option value="">修正：すべて</option><option value="has">未完了あり</option><option value="done">全完了</option></select>
+    <button class="btn btn-sm" onclick="clearFilters()"><i class="ti ti-x"></i> リセット</button>
+    <button class="btn btn-primary" id="add-btn" onclick="openAdd()"><i class="ti ti-plus"></i> 案件追加</button>
+  </div>
+
+  <!-- テーブルエリア -->
+  <div id="table-area"></div>
+  </div><!-- /admin-progress-area -->
+
+  <!-- 作業者の入力を見る（管理者用集約ビュー） -->
+  <div id="admin-worker-input-area" style="display:none"></div>
+  </div><!-- /admin-view -->
+
+  <!-- ===== 作業者ビュー ===== -->
+  <div id="worker-view" style="display:none">
+    <div class="worker-identity-bar">
+      <i class="ti ti-user-circle" style="font-size:20px;color:var(--color-primary-m)"></i>
+      <span style="font-size:13px;font-weight:600;color:var(--color-primary-d)">あなたは誰ですか？</span>
+      <select id="worker-identity" onchange="onWorkerIdentityChange()" style="font-size:13px;padding:7px 12px;border:1px solid var(--color-border);border-radius:var(--radius-sm);background:var(--color-bg);outline:none;font-family:var(--font-sans);min-width:160px">
+        <option value="">選択してください</option>
+      </select>
+      <span style="font-size:11px;color:var(--color-text3)">※選ぶと担当案件のログイン情報が見られます</span>
+    </div>
+    <div class="internal-pdca-bar">
+      <div style="font-size:13px;font-weight:700;color:#7A5C1F;display:flex;align-items:center;gap:6px"><i class="ti ti-calendar-stats"></i> 社内PDCA定例（全案件共通）</div>
+      <div id="internal-mtg-list" style="display:flex;gap:6px;flex-wrap:wrap;flex:1"></div>
+      <input type="date" id="internal-mtg-date" style="font-size:13px;padding:6px 9px;border:1px solid var(--color-border);border-radius:var(--radius-sm);background:var(--color-bg);outline:none;font-family:var(--font-sans)">
+      <button class="btn btn-sm btn-primary" onclick="addInternalMeetingAll()"><i class="ti ti-plus"></i> 全案件に追加</button>
+    </div>
+    <div class="filter-row" style="margin-bottom:1rem">
+      <input type="text" id="worker-search" placeholder="🔍 会社名・担当者で検索…" oninput="renderWorkerAll()">
+      <select id="worker-filter-person" onchange="renderWorkerAll()"><option value="">すべての担当者</option></select>
+    </div>
+    <div id="worker-all-area"></div>
+  </div>
+</div>
+
+<!-- パネル -->
+<div class="overlay" id="overlay" onclick="closePanel()"></div>
+<div class="panel" id="panel">
+  <div class="panel-header">
+    <h2 id="panel-company"></h2>
+    <button class="panel-close" onclick="closePanel()"><i class="ti ti-x"></i></button>
+  </div>
+  <div class="ptabs" id="ptabs"></div>
+  <div class="panel-body" id="panel-body"></div>
+  <div class="save-bar">
+    <button class="btn" onclick="closePanel()">閉じる</button>
+    <button class="btn btn-primary" id="save-btn" onclick="savePanel()"><i class="ti ti-check"></i> 保存してシート反映</button>
+  </div>
+</div>
+
+<!-- パスコードモーダル -->
+<div class="modal-bg" id="passcode-modal">
+  <div class="modal" style="max-width:380px">
+    <div class="modal-header">
+      <h2><i class="ti ti-lock"></i> ログイン情報の閲覧</h2>
+    </div>
+    <p style="font-size:13px;color:var(--color-text2);margin-bottom:12px">この案件のログイン情報を表示するにはパスコードを入力してください。</p>
+    <input type="password" id="passcode-input" placeholder="パスコード" style="width:100%;font-size:14px;padding:9px 12px;border:1px solid var(--color-border);border-radius:var(--radius-sm);outline:none;font-family:var(--font-sans)" onkeydown="if(event.key==='Enter')checkPasscode()">
+    <div id="passcode-error" style="display:none;color:#B05050;font-size:12px;margin-top:6px">パスコードが違います</div>
+    <div class="modal-footer">
+      <button class="btn" onclick="document.getElementById('passcode-modal').classList.remove('open')">キャンセル</button>
+      <button class="btn btn-primary" onclick="checkPasscode()">表示</button>
+    </div>
+  </div>
+</div>
+
+<!-- 追加モーダル -->
+<div class="modal-bg" id="add-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="logo-mark" style="width:30px;height:30px;font-size:12px">Ai</div>
+      <h2 id="add-modal-title">案件を追加</h2>
+    </div>
+    <div id="add-modal-body"></div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeAdd()">キャンセル</button>
+      <button class="btn btn-primary" onclick="saveAdd()"><i class="ti ti-check"></i> 追加して保存</button>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const GAS_URL="https://script.google.com/macros/s/AKfycbw2TmIA0Cm3_2MI9ziOnZd1_lLP-0EDGE9XxYM0qNsqluprvt9rLME4_8WHHcVMEkUM/exec";
+
+const INITIAL_DATA=[
+  // ===== 構築中案件 =====
+  {id:1,section:"active",company:"株式会社T's agency holdings",type:"楽々販売構築",person:"神谷さん",amount:0,deadline:"2026-05-31",revision:"",mtg:[],progress:0,status:"進行中",memo:"神谷さん10日訪問予定。小国さんとのMTG。",fixes:[],meetings:[],credentials:[]},
+  {id:2,section:"active",company:"アクセルサーブ法律事務所",type:"人脈案件管理",person:"神谷さん",amount:450000,deadline:"2026-06-30",revision:"",mtg:["2026-06-02"],progress:83,status:"進行中",memo:"6月2日MTG実施。現時点で追加要望・修正なし",fixes:[],meetings:[],credentials:[]},
+  {id:4,section:"active",company:"アールビーライズ株式会社（就業者管理）",type:"就業者管理",person:"岡野さん",amount:1050000,deadline:"2026-06-19",revision:"2026-06-16",mtg:[],progress:79,status:"進行中",memo:"修正多発。5月末完了→6月末へ。",fixes:[],meetings:[],credentials:[]},
+  {id:5,section:"active",company:"アールビーライズ株式会社（LINE構築）",type:"LINE構築（追加開発）",person:"岡野さん",amount:1400000,deadline:"2026-07-31",revision:"",mtg:[],progress:0,status:"進行中",memo:"キントーン完了後1週間で構築→フィードバック修正1ヶ月で完了予定。リッチメニュー・LIFE画面デザイン・カレンダー連携は先行可",fixes:[],meetings:[],credentials:[]},
+  {id:7,section:"active",company:"株式会社ONE REAL ESTATE",type:"不動産物件管理",person:"神谷さん",amount:1500000,deadline:"2026-06-30",revision:"",mtg:[],progress:85,status:"進行中",memo:"保守ご案内済み。次回MTGで保守について確認。",fixes:[],meetings:[],credentials:[]},
+  {id:9,section:"active",company:"Exstan行政書士法人",type:"案件・タスク・請求管理",person:"岡野さん",amount:1050000,deadline:"2026-06-30",revision:"2026-06-15",mtg:[],progress:90,status:"進行中",memo:"各要望実装完了。来月より保守フェーズ。今月中に保守契約書等完了させる。",fixes:[],meetings:[],credentials:[]},
+  {id:10,section:"active",company:"ソウルシンクス",type:"経理システム",person:"神谷さん",amount:3000000,deadline:"",revision:"",mtg:[],progress:0,status:"進行中",memo:"顧客管理の相談もあり1カ月更新で対応",fixes:[],meetings:[],credentials:[]},
+  {id:11,section:"active",company:"株式会社くすのき",type:"顧客管理",person:"神谷さん",amount:1350000,deadline:"2026-07-31",revision:"",mtg:[],progress:0,status:"進行中",memo:"",fixes:[],meetings:[],credentials:[]},
+  {id:12,section:"active",company:"ブルーチップ・トランスレーション株式会社",type:"通訳案件管理システム構築",person:"仲野さん",amount:1350000,deadline:"",revision:"",mtg:[],progress:0,status:"進行中",memo:"",fixes:[],meetings:[],credentials:[]},
+  {id:13,section:"active",company:"株式会社ファルムコンサルティング",type:"レッツ原価・キントーン構築",person:"岡野さん",amount:1200000,deadline:"2026-05-31",revision:"",mtg:[],progress:100,status:"進行中",memo:"",fixes:[],meetings:[],credentials:[]},
+  {id:20,section:"active",company:"カネダイ",type:"顧客管理システム",person:"神谷さん",amount:1050000,deadline:"2026-07-31",revision:"",mtg:[],progress:0,status:"進行中",memo:"",fixes:[],meetings:[],credentials:[]},
+  {id:21,section:"active",company:"港製器工業株式会社",type:"キントーン構築",person:"神谷さん",amount:2700000,deadline:"2026-07-31",revision:"",mtg:[],progress:0,status:"進行中",memo:"",fixes:[],meetings:[],credentials:[]},
+  // ===== 完了済み案件 =====
+  {id:8,section:"completed",company:"株式会社アットランド",type:"LステップCC構築",person:"神谷さん",amount:1350000,deadline:"2026-06-30",revision:"2026-06-23",mtg:["2026-06-23"],progress:100,status:"構築完了",memo:"スコープまとめ共有済み。チェックリスト動作確認後完了。23日の定例で納品完了。",fixes:[],meetings:[],credentials:[],maintenance:false,maintenanceFee:0,maintenancePeriod:""},
+  {id:18,section:"completed",company:"ケーエーエヌユー株式会社",type:"マイソク作成",person:"神谷さん",amount:700000,deadline:"2026-02-28",revision:"",mtg:[],progress:100,status:"構築完了",memo:"",fixes:[],meetings:[],credentials:[],maintenance:false,maintenanceFee:0,maintenancePeriod:""},
+  {id:19,section:"completed",company:"リアルトハーツ（値決めシート）",type:"値決めシート",person:"神谷さん",amount:900000,deadline:"2026-03-31",revision:"",mtg:[],progress:100,status:"構築完了",memo:"保守案内中",fixes:[],meetings:[],credentials:[],maintenance:false,maintenanceFee:0,maintenancePeriod:""},
+  // ===== 見込み案件 =====
+  {id:14,section:"prospect",company:"ウェバートン",type:"",person:"",amount:0,deadline:"",revision:"",mtg:[],progress:0,status:"契約前",memo:"",fixes:[],meetings:[],credentials:[],demoReady:true,nextSchedule:"",startEstimate:"2026-07",prospectAmount:900000},
+  {id:15,section:"prospect",company:"アサヒ冷熱株式会社",type:"積算システム",person:"",amount:0,deadline:"",revision:"",mtg:[],progress:0,status:"契約前",memo:"",fixes:[],meetings:[],credentials:[],demoReady:false,nextSchedule:"",startEstimate:"",prospectAmount:1200000},
+  {id:16,section:"prospect",company:"有限会社船宿あみ達",type:"",person:"",amount:0,deadline:"",revision:"",mtg:[],progress:0,status:"契約前",memo:"",fixes:[],meetings:[],credentials:[],demoReady:true,nextSchedule:"",startEstimate:"2026-07",prospectAmount:3850000},
+  {id:17,section:"prospect",company:"リアルトハーツ（追加構築）",type:"追加構築",person:"",amount:0,deadline:"",revision:"",mtg:[],progress:0,status:"契約前",memo:"",fixes:[],meetings:[],credentials:[],demoReady:false,nextSchedule:"",startEstimate:"2026-07",prospectAmount:200000},
+  {id:22,section:"prospect",company:"森白製菓（AI講座）",type:"AI講座",person:"",amount:0,deadline:"",revision:"",mtg:[],progress:0,status:"契約前",memo:"5名受講　8月入金　9月受講予定",fixes:[],meetings:[],credentials:[],demoReady:true,nextSchedule:"",startEstimate:"",prospectAmount:2000000},
+  {id:23,section:"prospect",company:"kinari",type:"Ai講座",person:"",amount:0,deadline:"",revision:"",mtg:[],progress:0,status:"契約前",memo:"",fixes:[],meetings:[],credentials:[],demoReady:false,nextSchedule:"",startEstimate:"",prospectAmount:400000},
+  {id:24,section:"prospect",company:"イワイリフォーム",type:"Ai講座",person:"",amount:0,deadline:"",revision:"",mtg:[],progress:0,status:"契約前",memo:"",fixes:[],meetings:[],credentials:[],demoReady:false,nextSchedule:"2026-07-11",startEstimate:"",prospectAmount:800000},
+  {id:25,section:"prospect",company:"浪速工業",type:"",person:"",amount:0,deadline:"",revision:"",mtg:[],progress:0,status:"契約前",memo:"",fixes:[],meetings:[],credentials:[],demoReady:true,nextSchedule:"2026-07-06",startEstimate:"",prospectAmount:0},
+  {id:26,section:"prospect",company:"チアキ機工",type:"Ai講座",person:"",amount:0,deadline:"",revision:"",mtg:[],progress:0,status:"契約前",memo:"",fixes:[],meetings:[],credentials:[],demoReady:false,nextSchedule:"",startEstimate:"",prospectAmount:0},
+  {id:27,section:"prospect",company:"日本シーム",type:"Ai講座",person:"",amount:0,deadline:"",revision:"",mtg:[],progress:0,status:"契約前",memo:"",fixes:[],meetings:[],credentials:[],demoReady:false,nextSchedule:"",startEstimate:"",prospectAmount:0},
+  {id:28,section:"prospect",company:"株式会社五十鈴",type:"システム構築",person:"",amount:0,deadline:"",revision:"",mtg:[],progress:0,status:"契約前",memo:"",fixes:[],meetings:[],credentials:[],demoReady:false,nextSchedule:"2026-07-21",startEstimate:"",prospectAmount:0},
+  {id:29,section:"prospect",company:"Ts（見込み）",type:"システム構築",person:"",amount:0,deadline:"",revision:"",mtg:[],progress:0,status:"契約前",memo:"",fixes:[],meetings:[],credentials:[],demoReady:false,nextSchedule:"2026-06-25",startEstimate:"",prospectAmount:0},
+  {id:30,section:"prospect",company:"森白製菓（システム構築）",type:"システム構築",person:"",amount:0,deadline:"",revision:"",mtg:[],progress:0,status:"契約前",memo:"",fixes:[],meetings:[],credentials:[],demoReady:false,nextSchedule:"2026-07-08",startEstimate:"",prospectAmount:0},
+];
+
+let projects=[], nextId=100, nextFixId=1, panelId=null, currentPTab="info";
+let currentSection="active", sortKey="deadline", sortDir=1;
+let currentRole="admin", currentAdminMode="progress";
+let workerIdentity=""; // 作業者ビューで選んだ「自分」
+let pendingCredProjectId=null; // パスコード解除待ちの案件ID
+let unlockedCreds={}; // 一度解除した案件のID集合（セッション内）
+const PASSCODE="mamayoro"; // ログイン情報閲覧パスコード（変更可）
+let nextTaskId=1, nextCredId=1, nextMtgId=1;
+// タスクのステータス（4段階）
+const TASK_STATUSES=["未対応","対応中","完了","次回繰越"];
+const TASK_NEXT={"未対応":"対応中","対応中":"完了","完了":"次回繰越","次回繰越":"未対応"};
+const tcls={"未対応":"tb-todo","対応中":"tb-doing","完了":"tb-done","次回繰越":"tb-carry"};
+
+// ステータス → セクション の定義
+const STATUS_SECTION={
+  "契約前":       "prospect",
+  "デモ提示予定": "prospect",
+  "検討中":       "prospect",
+  "進行中":       "active",
+  "フィードバック待ち": "active",
+  "構築完了":     "completed",
+};
+// セクション別ステータス選択肢
+const SECTION_STATUSES={
+  prospect: ["契約前","デモ提示予定","検討中"],
+  active:   ["進行中","フィードバック待ち"],
+  completed:["構築完了"],
+};
+const scls={
+  "契約前":"b-todo","デモ提示予定":"b-todo","検討中":"b-hold",
+  "進行中":"b-wip","フィードバック待ち":"b-review",
+  "構築完了":"b-done",
+  // 旧ステータス後方互換
+  "未着手":"b-todo","完了":"b-done","保留":"b-hold","レビュー待ち":"b-review"
+};
+
+// 日付を YYYY-MM-DD 文字列に正規化（どんな形式が来ても対応）
+function normDate(d){
+  if(!d)return"";
+  if(d instanceof Date)return d.toISOString().slice(0,10);
+  const s=String(d).trim();
+  if(!s)return"";
+  // すでに YYYY-MM-DD 形式
+  if(/^\d{4}-\d{2}-\d{2}/.test(s))return s.slice(0,10);
+  // それ以外（"Fri Jul 31 2026..." など）はDateで解釈
+  const dt=new Date(s);
+  if(isNaN(dt))return"";
+  // タイムゾーンずれ防止のためローカル日付で組み立て
+  const y=dt.getFullYear(),m=String(dt.getMonth()+1).padStart(2,"0"),day=String(dt.getDate()).padStart(2,"0");
+  return `${y}-${m}-${day}`;
+}
+function fd(d){
+  const n=normDate(d);
+  if(!n)return"–";
+  const p=n.split("-");
+  return p[0]+"/"+(+p[1])+"/"+(+p[2]);
+}
+function fa(n){return(!n&&n!==0)||n===0?"–":"¥"+Number(n).toLocaleString()}
+function tod(){const d=new Date();d.setHours(0,0,0,0);return d;}
+function dcls(d){const n=normDate(d);if(!n)return"";const diff=(new Date(n)-tod())/(864e5);return diff<0?"deadline-over":diff<=14?"deadline-warn":"";}
+function nextMtg(mtg){
+  if(!mtg||!mtg.length)return null;
+  const t=tod();
+  const dates=mtg.map(m=>normDate(m)).filter(Boolean).map(m=>new Date(m)).filter(d=>!isNaN(d)).sort((a,b)=>a-b);
+  if(!dates.length)return null;
+  const future=dates.filter(d=>d>=t);
+  if(future.length)return {date:future[0].toISOString().slice(0,10),future:true};
+  return {date:dates[dates.length-1].toISOString().slice(0,10),future:false};
+}
+function tryParse(v){try{return JSON.parse(v);}catch{return[];}}
+function setSyncState(s,m){
+  document.getElementById("sync-dot").className="sync-dot"+(s==="syncing"?" syncing":s==="error"?" error":"");
+  document.getElementById("sync-label").textContent=m;
+}
+function showToast(m){const t=document.getElementById("toast");t.textContent=m;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),2500);}
+
+async function gasRequest(params){
+  const url=GAS_URL+"?"+new URLSearchParams({action:params.action});
+  const opts=params.action==="getAll"?{method:"GET"}:{method:"POST",headers:{"Content-Type":"text/plain"},body:JSON.stringify(params)};
+  const res=await fetch(url,opts);const json=await res.json();
+  if(!json.ok)throw new Error(json.error||"エラー");return json.data;
+}
+async function loadFromGAS(){
+  setSyncState("syncing","スプレッドシートから読み込み中…");
+  try{
+    const data=await gasRequest({action:"getAll"});
+    if(data&&data.length>0){
+      projects=data.map(p=>({
+        ...p,section:p.section||"active",
+        mtg:(Array.isArray(p.mtg)?p.mtg:tryParse(p.mtg||"[]")).map(m=>normDate(m)).filter(Boolean),
+        fixes:Array.isArray(p.fixes)?p.fixes:tryParse(p.fixes||"[]"),
+        tasks:Array.isArray(p.tasks)?p.tasks:tryParse(p.tasks||"[]"),
+        meetings:Array.isArray(p.meetings)?p.meetings:tryParse(p.meetings||"[]"),
+        credentials:Array.isArray(p.credentials)?p.credentials:tryParse(p.credentials||"[]"),
+        amount:Number(p.amount)||0,progress:Number(p.progress)||0,id:Number(p.id)||0,
+        prospectAmount:Number(p.prospectAmount)||0,
+        deadline:normDate(p.deadline),
+        revision:normDate(p.revision),
+        nextSchedule:normDate(p.nextSchedule),
+        demoReady:p.demoReady==="true"||p.demoReady===true,
+        maintenance:p.maintenance==="true"||p.maintenance===true,
+      }));
+      // ID採番の最大値を更新
+      projects.forEach(p=>{
+        (p.tasks||[]).forEach(t=>{if(t.id>=nextTaskId)nextTaskId=t.id+1;});
+        (p.credentials||[]).forEach(c=>{if(c.id>=nextCredId)nextCredId=c.id+1;});
+        (p.meetings||[]).forEach(mt=>{if(mt.id>=nextMtgId)nextMtgId=mt.id+1;(mt.tasks||[]).forEach(t=>{if(t.id>=nextTaskId)nextTaskId=t.id+1;});});
+      });
+      nextId=Math.max(...projects.map(p=>p.id))+1;
+      setSyncState("ok","同期済み — "+new Date().toLocaleTimeString("ja-JP"));
+    }else{
+      projects=INITIAL_DATA.map(p=>({...p}));nextId=31;
+      setSyncState("ok","初期データ読み込み完了");
+      for(const p of projects)await gasRequest({action:"save",project:p});
+      showToast("✓ 初期データをスプレッドシートに保存しました");
+    }
+    refresh();
+  }catch(e){
+    projects=INITIAL_DATA.map(p=>({...p}));nextId=31;
+    setSyncState("error","オフライン — ローカルデータで表示");refresh();
+  }
+}
+async function saveProjectToGAS(p){
+  setSyncState("syncing","保存中…");
+  try{await gasRequest({action:"save",project:p});setSyncState("ok","保存完了 — "+new Date().toLocaleTimeString("ja-JP"));showToast("✓ 保存しました");}
+  catch(e){setSyncState("error","保存エラー: "+e.message);showToast("⚠ 保存失敗");}
+}
+async function deleteProjectFromGAS(id){
+  try{await gasRequest({action:"delete",id});showToast("削除しました");}catch(e){}
+}
+
+function switchSection(s){
+  currentSection=s;
+  ["active","completed","prospect"].forEach(k=>{
+    document.getElementById("stab-"+k).classList.toggle("active",k===s);
+  });
+  // フィルター表示切替
+  document.getElementById("filter-deadline").style.display=s==="prospect"?"none":"";
+  document.getElementById("filter-fix").style.display=s==="prospect"?"none":"";
+  render();
+}
+
+function renderSummary(){
+  const active=projects.filter(p=>p.section==="active");
+  const comp=projects.filter(p=>p.section==="completed");
+  const prosp=projects.filter(p=>p.section==="prospect");
+  // 受注金額 = 構築中 + 完了済み（契約済み）
+  const rev=active.reduce((s,p)=>s+Number(p.amount||0),0)+comp.reduce((s,p)=>s+Number(p.amount||0),0);
+  // 見込み金額 = prospectのみ
+  const prospRev=prosp.reduce((s,p)=>s+Number(p.prospectAmount||0),0);
+  const pf=active.reduce((s,p)=>s+(p.fixes||[]).filter(f=>!f.done).length,0);
+  const near=active.filter(p=>p.deadline&&(new Date(p.deadline)-tod())/(864e5)<=14).length;
+
+  document.getElementById("summary").innerHTML=`
+    <div class="metric"><div class="label">構築中</div><div class="val">${active.length}</div></div>
+    <div class="metric"><div class="label">完了済み</div><div class="val">${comp.length}</div></div>
+    <div class="metric"><div class="label">見込み</div><div class="val">${prosp.length}</div></div>
+    <div class="metric hi"><div class="label">受注金額（契約済み）</div><div class="val" style="font-size:13px">¥${rev.toLocaleString()}</div></div>
+    <div class="metric hi"><div class="label">見込み金額（契約前）</div><div class="val" style="font-size:13px">¥${prospRev.toLocaleString()}</div></div>
+    <div class="metric${near>0?" hi":""}"><div class="label">期日14日以内</div><div class="val" style="color:${near>0?"var(--color-warn)":""}">${near}</div></div>
+    <div class="metric${pf>0?" hi":""}"><div class="label">未完了の修正</div><div class="val" style="color:${pf>0?"var(--color-warn)":""}">${pf}</div></div>`;
+
+  // タブカウント更新
+  document.getElementById("cnt-active").textContent=active.length;
+  document.getElementById("cnt-completed").textContent=comp.length;
+  document.getElementById("cnt-prospect").textContent=prosp.length;
+
+  // ===== 担当者別集計 =====
+  // 担当者を分解（"神谷さん/高杉" → ["神谷さん","高杉"] のように分割）
+  const personMap={};
+  [...active,...comp].forEach(p=>{
+    const persons=(p.person||"").split(/[\/・,、]/).map(s=>s.trim()).filter(Boolean);
+    persons.forEach(name=>{
+      if(!personMap[name])personMap[name]={active:0,completed:0,amount:0};
+      if(p.section==="active"){personMap[name].active++;personMap[name].amount+=Number(p.amount||0);}
+      else{personMap[name].completed++;personMap[name].amount+=Number(p.amount||0);}
+    });
+  });
+  const personEntries=Object.entries(personMap).sort((a,b)=>(b[1].active+b[1].completed)-(a[1].active+a[1].completed));
+  if(personEntries.length>0){
+    const cards=personEntries.map(([name,d])=>`
+      <div style="background:var(--color-bg);border:1px solid var(--color-border);border-radius:var(--radius);padding:.7rem 1rem;display:flex;align-items:center;gap:12px;min-width:0">
+        <div style="width:32px;height:32px;border-radius:50%;background:var(--color-primary-d);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0">${name.slice(0,2)}</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:13px;font-weight:700;color:var(--color-primary-d);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${name}</div>
+          <div style="font-size:11px;color:var(--color-text2);margin-top:2px">
+            構築中 <strong>${d.active}</strong> 件 &nbsp;完了 <strong>${d.completed}</strong> 件
+          </div>
+        </div>
+        <div style="text-align:right;flex-shrink:0">
+          <div style="font-size:12px;font-weight:700;color:var(--color-primary-d)">¥${d.amount.toLocaleString()}</div>
+          <div style="font-size:10px;color:var(--color-text3)">担当合計</div>
+        </div>
+      </div>`).join("");
+    document.getElementById("person-summary").innerHTML=`
+      <div style="font-size:11px;font-weight:700;color:var(--color-text2);letter-spacing:.06em;text-transform:uppercase;margin-bottom:.6rem">担当者別案件数</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px">${cards}</div>`;
+  } else {
+    document.getElementById("person-summary").innerHTML="";
+  }
+}
+
+function renderPersonFilter(){
+  const sel=document.getElementById("filter-person"),cur=sel.value;
+  const ps=[...new Set(projects.map(p=>p.person).filter(Boolean))].sort();
+  sel.innerHTML='<option value="">すべての担当者</option>'+ps.map(p=>`<option>${p}</option>`).join("");
+  sel.value=cur;
+}
+function clearFilters(){
+  ["search","filter-person","filter-deadline","filter-fix"].forEach(id=>{const el=document.getElementById(id);if(el)el.value="";});
+  render();
+}
+
+function render(){
+  renderSummary();renderPersonFilter();
+  const q=(document.getElementById("search").value||"").toLowerCase();
+  const fp=document.getElementById("filter-person").value;
+  const fd2=document.getElementById("filter-deadline").value;
+  const ff=document.getElementById("filter-fix").value;
+  const t=tod();
+
+  let list=projects.filter(p=>{
+    if(p.section!==currentSection)return false;
+    if(q&&!p.company.toLowerCase().includes(q)&&!(p.person||"").toLowerCase().includes(q))return false;
+    if(fp&&p.person!==fp)return false;
+    if(currentSection==="active"){
+      if(fd2){
+        if(!p.deadline)return false;
+        const diff=(new Date(p.deadline)-t)/(864e5);
+        if(fd2==="over"&&diff>=0)return false;
+        if(fd2==="week"&&(diff<0||diff>7))return false;
+        if(fd2==="month"&&(diff<0||diff>30))return false;
+      }
+      if(ff){
+        const fixes=p.fixes||[];
+        const pending=fixes.filter(f=>!f.done).length;
+        if(ff==="has"&&pending===0)return false;
+        if(ff==="done"&&(fixes.length===0||pending>0))return false;
+      }
+    }
+    return true;
+  });
+
+  list.sort((a,b)=>{
+    let av=a[sortKey]??"",bv=b[sortKey]??"";
+    if(sortKey==="amount"||sortKey==="progress"||sortKey==="prospectAmount"){av=Number(av);bv=Number(bv);}
+    return av<bv?-sortDir:av>bv?sortDir:0;
+  });
+
+  const area=document.getElementById("table-area");
+  if(!list.length){area.innerHTML=`<div class="table-wrap"><div class="empty">該当する案件がありません</div></div>`;return;}
+
+  if(currentSection==="active") area.innerHTML=renderActiveTable(list);
+  else if(currentSection==="completed") area.innerHTML=renderCompletedTable(list);
+  else area.innerHTML=renderProspectTable(list);
+}
+
+function renderActiveTable(list){
+  const rows=list.map(p=>{
+    const fixes=p.fixes||[],total=fixes.length,pending=fixes.filter(f=>!f.done).length;
+    const fixBadge=total===0?`<span class="fix-none">–</span>`:pending===0?`<span class="fix-all-done">✓全完了${total}</span>`:`<span class="fix-pending">${pending}残り/${total}</span>`;
+    const nm=nextMtg(p.mtg||[]);
+    const nmDiff=nm?(new Date(nm.date)-tod())/(864e5):null;
+    const nmCls=nm?(!nm.future?"past":nmDiff<=7?"soon":""):"";
+    const nmTxt=nm?`<span class="mtg-next ${nmCls}">${fd(nm.date)}${!nm.future?'<span style="font-size:10px;color:var(--color-text3)"> (済)</span>':''}</span>`:`<span style="color:var(--color-text3);font-size:12px">–</span>`;
+    return`<tr>
+      <td><span class="company-link" onclick="openPanel(${p.id})">${p.company}</span></td>
+      <td style="color:var(--color-text2);font-size:12px">${p.type||"–"}</td>
+      <td style="font-weight:500;font-size:12px">${p.person||"–"}</td>
+      <td style="white-space:nowrap">${fa(p.amount)}</td>
+      <td class="${dcls(p.deadline)}" style="white-space:nowrap">${fd(p.deadline)}</td>
+      <td>${nmTxt}</td>
+      <td style="min-width:80px"><div class="prog-wrap"><div class="prog-bar"><div class="prog-fill" style="width:${p.progress}%"></div></div><span class="prog-val">${p.progress}%</span></div></td>
+      <td><span class="badge ${scls[p.status]||"b-todo"}">${p.status}</span></td>
+      <td>${fixBadge}</td>
+      <td class="memo-cell">${p.memo||"–"}</td>
+      <td><button class="ico-btn" onclick="confirmDelete(${p.id})"><i class="ti ti-trash"></i></button></td>
+    </tr>`;
+  }).join("");
+  return`<div class="table-wrap"><table>
+    <thead><tr>
+      <th onclick="sortBy('company')">会社名</th><th onclick="sortBy('type')">種別</th>
+      <th onclick="sortBy('person')">担当者</th><th onclick="sortBy('amount')">金額</th>
+      <th onclick="sortBy('deadline')">最終期日</th><th>次回MTG</th>
+      <th onclick="sortBy('progress')">進捗</th><th onclick="sortBy('status')">ステータス</th>
+      <th>修正項目</th><th>メモ</th><th></th>
+    </tr></thead><tbody>${rows}</tbody>
+  </table></div>`;
+}
+
+function renderCompletedTable(list){
+  const rows=list.map(p=>`<tr>
+    <td><span class="company-link" onclick="openPanel(${p.id})">${p.company}</span></td>
+    <td style="color:var(--color-text2);font-size:12px">${p.type||"–"}</td>
+    <td style="font-weight:500;font-size:12px">${p.person||"–"}</td>
+    <td style="white-space:nowrap">${fa(p.amount)}</td>
+    <td style="white-space:nowrap;color:var(--color-text2)">${fd(p.deadline)}</td>
+    <td>${p.maintenance?`<span class="maintenance-badge">保守あり</span>`:p.maintenance===false?`<span style="color:var(--color-text3);font-size:12px">なし</span>`:"-"}</td>
+    <td style="font-size:12px;color:var(--color-text2)">${p.maintenancePeriod||"–"}</td>
+    <td style="white-space:nowrap">${p.maintenanceFee?`¥${Number(p.maintenanceFee).toLocaleString()}`:"–"}</td>
+    <td class="memo-cell">${p.memo||"–"}</td>
+    <td><button class="ico-btn" onclick="confirmDelete(${p.id})"><i class="ti ti-trash"></i></button></td>
+  </tr>`).join("");
+  return`<div class="table-wrap"><table>
+    <thead><tr>
+      <th onclick="sortBy('company')">会社名</th><th>種別</th><th>担当者</th>
+      <th onclick="sortBy('amount')">金額</th><th onclick="sortBy('deadline')">納品日</th>
+      <th>保守</th><th>保守期間</th><th>保守金額</th><th>メモ</th><th></th>
+    </tr></thead><tbody>${rows}</tbody>
+  </table></div>`;
+}
+
+function renderProspectTable(list){
+  const rows=list.map(p=>`<tr>
+    <td><span class="company-link" onclick="openPanel(${p.id})">${p.company}</span></td>
+    <td style="color:var(--color-text2);font-size:12px">${p.type||"–"}</td>
+    <td style="font-weight:500;font-size:12px">${p.person||"–"}</td>
+    <td style="white-space:nowrap">${p.prospectAmount?`¥${Number(p.prospectAmount).toLocaleString()}`:"–"}</td>
+    <td>${p.demoReady?`<span class="prospect-badge pb-demo-ok">✓ 完成</span>`:`<span class="prospect-badge pb-demo-ng">未完成</span>`}</td>
+    <td class="${dcls(p.nextSchedule)}" style="white-space:nowrap">${fd(p.nextSchedule)}</td>
+    <td style="font-size:12px;color:var(--color-text2)">${p.startEstimate||"–"}</td>
+    <td class="memo-cell">${p.memo||"–"}</td>
+    <td><button class="ico-btn" onclick="confirmDelete(${p.id})"><i class="ti ti-trash"></i></button></td>
+  </tr>`).join("");
+  return`<div class="table-wrap"><table>
+    <thead><tr>
+      <th onclick="sortBy('company')">会社名</th><th>種別</th><th>担当者</th>
+      <th onclick="sortBy('prospectAmount')">見込み金額</th><th>デモ</th>
+      <th>次回日程</th><th>スタート見込み</th><th>メモ</th><th></th>
+    </tr></thead><tbody>${rows}</tbody>
+  </table></div>`;
+}
+
+function sortBy(k){if(sortKey===k)sortDir*=-1;else{sortKey=k;sortDir=1;}render();}
+
+// ===== パネル =====
+function openPanel(id){
+  panelId=id;currentPTab="info";
+  const p=projects.find(x=>x.id===id);
+  document.getElementById("panel-company").textContent=p.company;
+  buildPTabs(p);renderPTab(p);
+  document.getElementById("overlay").classList.add("open");
+  document.getElementById("panel").classList.add("open");
+}
+function buildPTabs(p){
+  const tabs=p.section==="prospect"
+    ?[["info","案件情報"],["timeline","タイムライン"]]
+    :[["info","案件情報"],["fixes",`修正項目 ${p.fixes&&p.fixes.length?"("+p.fixes.filter(f=>!f.done).length+"残り)":""}`],["timeline","タイムライン"]];
+  document.getElementById("ptabs").innerHTML=tabs.map(([k,l])=>`<button class="ptab${k===currentPTab?" active":""}" onclick="switchPTab('${k}')">${l}</button>`).join("");
+  document.getElementById("save-btn").style.display=currentPTab==="info"?"inline-flex":"none";
+}
+function switchPTab(tab){
+  if(currentPTab==="info"&&tab!=="info")collectInfoFields();
+  currentPTab=tab;
+  const p=projects.find(x=>x.id===panelId);
+  buildPTabs(p);renderPTab(p);
+}
+function renderPTab(p){
+  if(currentPTab==="info"){
+    if(p.section==="active")renderInfoActive(p);
+    else if(p.section==="completed")renderInfoCompleted(p);
+    else renderInfoProspect(p);
+  }else if(currentPTab==="fixes")renderFixes(p);
+  else renderTimeline(p);
+}
+
+function renderInfoActive(p){
+  document.getElementById("panel-body").innerHTML=`
+    <div class="section">
+      <div class="section-title">基本情報</div>
+      <div class="edit-field"><label>担当者</label><input id="p-person" type="text"></div>
+      <div class="row2">
+        <div class="edit-field"><label>最終期日</label><input id="p-deadline" type="date"></div>
+        <div class="edit-field"><label>最終修正締切</label><input id="p-revision" type="date"></div>
+      </div>
+      <div class="row2">
+        <div class="edit-field"><label>金額 (円)</label><input id="p-amount" type="number"></div>
+        <div class="edit-field"><label>種別</label><input id="p-type" type="text"></div>
+      </div>
+      <div class="edit-field"><label>ステータス <span style="font-size:11px;color:var(--color-text2);font-weight:400">（変更するとタブが自動移動します）</span></label>
+        <select id="p-status">${Object.keys(STATUS_SECTION).map(s=>`<option${s===p.status?" selected":""}>${s}</option>`).join("")}</select>
+      </div>
+      <div class="edit-field"><label>進捗 — <span id="p-prog-label">${p.progress||0}</span>%</label>
+        <input type="range" id="p-progress" min="0" max="100" style="width:100%;accent-color:var(--color-primary)" oninput="document.getElementById('p-prog-label').textContent=this.value">
+      </div>
+      <div class="edit-field"><label>MTG日程</label>
+        <div id="mtg-list"></div>
+        <div class="add-row"><input type="date" id="mtg-input"><button class="btn btn-sm" onclick="addMtg()">+ 追加</button></div>
+      </div>
+      <div class="edit-field"><label>メモ</label><textarea id="p-memo" style="min-height:100px"></textarea></div>
+    </div>`;
+  document.getElementById("p-person").value=p.person||"";
+  document.getElementById("p-deadline").value=normDate(p.deadline);
+  document.getElementById("p-revision").value=normDate(p.revision);
+  document.getElementById("p-amount").value=p.amount??0;
+  document.getElementById("p-type").value=p.type||"";
+  document.getElementById("p-progress").value=p.progress??0;
+  document.getElementById("p-memo").value=p.memo||"";
+  renderMtgList(p);
+}
+
+function renderInfoCompleted(p){
+  document.getElementById("panel-body").innerHTML=`
+    <div class="section">
+      <div class="section-title">基本情報</div>
+      <div class="edit-field"><label>担当者</label><input id="p-person" type="text"></div>
+      <div class="row2">
+        <div class="edit-field"><label>金額 (円)</label><input id="p-amount" type="number"></div>
+        <div class="edit-field"><label>種別</label><input id="p-type" type="text"></div>
+      </div>
+      <div class="edit-field"><label>納品日</label><input id="p-deadline" type="date"></div>
+      <div class="edit-field"><label>ステータス <span style="font-size:11px;color:var(--color-text2);font-weight:400">（変更するとタブが自動移動します）</span></label>
+        <select id="p-status">${Object.keys(STATUS_SECTION).map(s=>`<option${s===p.status?" selected":""}>${s}</option>`).join("")}</select>
+      </div>
+    </div>
+    <div class="section">
+      <div class="section-title">保守情報</div>
+      <div class="edit-field"><label>保守</label>
+        <select id="p-maintenance">
+          <option value="">未設定</option>
+          <option value="true">あり</option>
+          <option value="false">なし</option>
+        </select>
+      </div>
+      <div class="row2">
+        <div class="edit-field"><label>保守期間</label><input id="p-maintenancePeriod" type="text" placeholder="例: 2026/06〜"></div>
+        <div class="edit-field"><label>保守金額 (円/月)</label><input id="p-maintenanceFee" type="number"></div>
+      </div>
+    </div>
+    <div class="section">
+      <div class="edit-field"><label>メモ</label><textarea id="p-memo" style="min-height:100px"></textarea></div>
+    </div>`;
+  document.getElementById("p-person").value=p.person||"";
+  document.getElementById("p-amount").value=p.amount??0;
+  document.getElementById("p-type").value=p.type||"";
+  document.getElementById("p-deadline").value=normDate(p.deadline);
+  document.getElementById("p-maintenance").value=p.maintenance===true?"true":p.maintenance===false?"false":"";
+  document.getElementById("p-maintenancePeriod").value=p.maintenancePeriod||"";
+  document.getElementById("p-maintenanceFee").value=p.maintenanceFee||0;
+  document.getElementById("p-memo").value=p.memo||"";
+}
+
+function renderInfoProspect(p){
+  document.getElementById("panel-body").innerHTML=`
+    <div class="section">
+      <div class="section-title">見込み情報</div>
+      <div class="row2">
+        <div class="edit-field"><label>担当者</label><input id="p-person" type="text"></div>
+        <div class="edit-field"><label>種別・想定構築内容</label><input id="p-type" type="text"></div>
+      </div>
+      <div class="edit-field"><label>見込み金額 (円)</label><input id="p-prospectAmount" type="number"></div>
+      <div class="edit-field"><label>ステータス <span style="font-size:11px;color:var(--color-text2);font-weight:400">（変更するとタブが自動移動します）</span></label>
+        <select id="p-status">${Object.keys(STATUS_SECTION).map(s=>`<option${s===p.status?" selected":""}>${s}</option>`).join("")}</select>
+      </div>
+      <div class="edit-field"><label>デモ完成</label>
+        <select id="p-demoReady"><option value="false">未完成</option><option value="true">完成</option></select>
+      </div>
+      <div class="row2">
+        <div class="edit-field"><label>次回日程</label><input id="p-nextSchedule" type="date"></div>
+        <div class="edit-field"><label>スタート見込み</label><input id="p-startEstimate" type="text" placeholder="例: 2026-07"></div>
+      </div>
+      <div class="edit-field"><label>MTG日程</label>
+        <div id="mtg-list"></div>
+        <div class="add-row"><input type="date" id="mtg-input"><button class="btn btn-sm" onclick="addMtg()">+ 追加</button></div>
+      </div>
+      <div class="edit-field"><label>メモ</label><textarea id="p-memo" style="min-height:100px"></textarea></div>
+    </div>`;
+  document.getElementById("p-person").value=p.person||"";
+  document.getElementById("p-type").value=p.type||"";
+  document.getElementById("p-prospectAmount").value=p.prospectAmount||0;
+  document.getElementById("p-demoReady").value=p.demoReady?"true":"false";
+  document.getElementById("p-nextSchedule").value=normDate(p.nextSchedule);
+  document.getElementById("p-startEstimate").value=p.startEstimate||"";
+  document.getElementById("p-memo").value=p.memo||"";
+  renderMtgList(p);
+}
+
+function renderMtgList(p){
+  const el=document.getElementById("mtg-list");if(!el)return;
+  el.innerHTML=(p.mtg||[]).map((m,i)=>`<span class="mtg-item">${fd(m)}<button onclick="removeMtg(${i})">×</button></span>`).join("");
+}
+
+function renderFixes(p){
+  const fixes=p.fixes||[],total=fixes.length,done=fixes.filter(f=>f.done).length,pending=total-done;
+  const pct=total?Math.round(done/total*100):0;
+  const rows=fixes.length?fixes.map((f,i)=>`
+    <div class="fix-item${f.done?" done-item":""}" onclick="toggleFix(${i})">
+      <div class="fix-check">${f.done?'<i class="ti ti-check" style="font-size:12px"></i>':''}</div>
+      <div class="fix-item-left">
+        <div class="fix-item-title${f.done?" strikethrough":""}">${f.title}</div>
+        ${f.note?`<div class="fix-note">${f.note}</div>`:""}
+      </div>
+      <button class="ico-btn" onclick="event.stopPropagation();deleteFix(${i})"><i class="ti ti-x"></i></button>
+    </div>`).join(""):`<div style="font-size:13px;color:var(--color-text2);text-align:center;padding:1.5rem 0">修正項目はありません</div>`;
+  document.getElementById("panel-body").innerHTML=`
+    <div class="section">
+      ${total>0?`<div class="fix-progress"><div class="fix-progress-bar"><div class="fix-progress-fill" style="width:${pct}%"></div></div><span class="fix-progress-label">${done}/${total} 完了 (${pct}%)</span></div>`:""}
+      <!-- クイック追加エリア -->
+      <div style="background:var(--color-primary-p);border:1px solid var(--color-primary-l);border-radius:var(--radius-sm);padding:10px;margin-bottom:10px">
+        <div style="display:flex;gap:6px;align-items:center">
+          <input id="fix-quick" placeholder="修正内容を入力してEnter…" style="flex:1;font-size:13px;padding:7px 10px;border:1px solid var(--color-border);border-radius:var(--radius-sm);background:var(--color-bg);color:var(--color-text);font-family:var(--font-sans);outline:none" onkeydown="if(event.key==='Enter'){event.preventDefault();addFixQuick();}">
+          <button class="btn btn-sm btn-primary" onclick="addFixQuick()"><i class="ti ti-plus"></i> 追加</button>
+        </div>
+        <div style="font-size:11px;color:var(--color-text3);margin-top:5px">複数行まとめて入力する場合は↓</div>
+        <div id="fix-bulk-toggle" style="margin-top:4px">
+          <button class="btn btn-sm" onclick="toggleBulkInput()" style="font-size:11px;padding:3px 8px">📋 まとめて入力</button>
+        </div>
+        <div id="fix-bulk-area" style="display:none;margin-top:8px">
+          <textarea id="fix-bulk-text" placeholder="1行1項目で入力&#10;例）&#10;ダッシュボードの表示崩れ&#10;メール通知が届かない&#10;CSV文字化け" style="width:100%;font-size:13px;padding:8px 10px;border:1px solid var(--color-border);border-radius:var(--radius-sm);background:var(--color-bg);color:var(--color-text);font-family:var(--font-sans);resize:vertical;min-height:90px;outline:none;margin-bottom:6px"></textarea>
+          <div style="display:flex;gap:6px;justify-content:flex-end">
+            <button class="btn btn-sm" onclick="toggleBulkInput()">キャンセル</button>
+            <button class="btn btn-sm btn-primary" onclick="addFixBulk()"><i class="ti ti-list-check"></i> 一括追加</button>
+          </div>
+        </div>
+      </div>
+      <div id="fix-rows">${rows}</div>
+    </div>`;
+}
+
+function renderTimeline(p){
+  const events=[];
+  if(p.revision)events.push({date:p.revision,label:"最終修正締切"});
+  if(p.deadline)events.push({date:p.deadline,label:p.section==="completed"?"納品日":"最終期日"});
+  if(p.nextSchedule)events.push({date:p.nextSchedule,label:"次回日程"});
+  (p.mtg||[]).forEach(m=>events.push({date:m,label:"MTG"}));
+  (p.fixes||[]).filter(f=>f.date).forEach(f=>events.push({date:f.date,label:`修正: ${f.title}`,done:f.done}));
+  events.sort((a,b)=>a.date.localeCompare(b.date));
+  const t=tod();
+  function tlcls(d){const diff=(new Date(d)-t)/(864e5);return diff<0?"past":diff<=14?"soon":"";}
+  const html=events.length?events.map(e=>`<div class="tl-item ${tlcls(e.date)}"><div class="tl-date">${fd(e.date)}</div><div class="tl-label">${e.label}</div></div>`).join(""):`<div style="font-size:13px;color:var(--color-text2)">日程未登録</div>`;
+  document.getElementById("panel-body").innerHTML=`<div class="section"><div class="timeline">${html}</div></div>`;
+}
+
+function collectInfoFields(){
+  const p=projects.find(x=>x.id===panelId);if(!p)return;
+  // DOMに該当フィールドが存在する場合のみ値を取得（存在しなければ既存値を保持）
+  const has=id=>document.getElementById(id)!==null;
+  const g=id=>{const el=document.getElementById(id);return el?el.value:undefined;};
+  // infoタブが描画されていない場合は何もしない
+  if(!has("p-memo"))return;
+
+  if(has("p-memo"))p.memo=g("p-memo");
+  if(has("p-person"))p.person=g("p-person");
+  if(has("p-type"))p.type=g("p-type");
+
+  if(p.section==="active"){
+    if(has("p-deadline"))p.deadline=g("p-deadline");
+    if(has("p-revision"))p.revision=g("p-revision");
+    if(has("p-amount"))p.amount=Number(g("p-amount"))||0;
+    if(has("p-status"))p.status=g("p-status");
+    if(has("p-progress"))p.progress=Number(g("p-progress"))||0;
+  }else if(p.section==="completed"){
+    if(has("p-deadline"))p.deadline=g("p-deadline");
+    if(has("p-amount"))p.amount=Number(g("p-amount"))||0;
+    if(has("p-maintenance")){const mv=g("p-maintenance");p.maintenance=mv==="true"?true:mv==="false"?false:null;}
+    if(has("p-maintenancePeriod"))p.maintenancePeriod=g("p-maintenancePeriod")||"";
+    if(has("p-maintenanceFee"))p.maintenanceFee=Number(g("p-maintenanceFee"))||0;
+    if(has("p-status"))p.status=g("p-status")||"構築完了";
+  }else if(p.section==="prospect"){
+    if(has("p-prospectAmount"))p.prospectAmount=Number(g("p-prospectAmount"))||0;
+    if(has("p-demoReady"))p.demoReady=g("p-demoReady")==="true";
+    if(has("p-nextSchedule"))p.nextSchedule=g("p-nextSchedule")||"";
+    if(has("p-startEstimate"))p.startEstimate=g("p-startEstimate")||"";
+    if(has("p-status"))p.status=g("p-status")||"契約前";
+  }
+  // ステータスに基づいてセクションを自動移動
+  const newSection=STATUS_SECTION[p.status];
+  if(newSection&&newSection!==p.section){
+    p.section=newSection;
+    if(newSection==="completed"){p.maintenance=p.maintenance??null;p.maintenanceFee=p.maintenanceFee||0;p.maintenancePeriod=p.maintenancePeriod||"";}
+    if(newSection==="prospect"){p.prospectAmount=p.prospectAmount||p.amount||0;p.demoReady=p.demoReady||false;p.nextSchedule=p.nextSchedule||"";p.startEstimate=p.startEstimate||"";}
+    showToast(`「${p.company}」を${newSection==="active"?"構築中":newSection==="completed"?"完了済み":"見込み"}に移動しました`);
+    currentSection=newSection;
+  }
+}
+function addMtg(){
+  const v=document.getElementById("mtg-input").value;if(!v)return;
+  const p=projects.find(x=>x.id===panelId);
+  if(!p.mtg)p.mtg=[];
+  if(!p.mtg.includes(v)){p.mtg.push(v);p.mtg.sort();}
+  renderMtgList(p);document.getElementById("mtg-input").value="";
+}
+function removeMtg(idx){const p=projects.find(x=>x.id===panelId);p.mtg.splice(idx,1);renderMtgList(p);}
+async function savePanel(){
+  collectInfoFields();
+  const p=projects.find(x=>x.id===panelId);
+  render();
+  buildPTabs(p);
+  renderPTab(p);
+  await saveProjectToGAS(p);
+}
+function closePanel(){
+  if(currentPTab==="info")collectInfoFields();
+  document.getElementById("overlay").classList.remove("open");
+  document.getElementById("panel").classList.remove("open");
+  panelId=null;render();
+}
+
+// クイック追加（1件・Enter対応）
+async function addFixQuick(){
+  const input=document.getElementById("fix-quick");
+  const title=input.value.trim();
+  if(!title)return;
+  const p=projects.find(x=>x.id===panelId);
+  if(!p.fixes)p.fixes=[];
+  p.fixes.push({id:nextFixId++,title,note:"",done:false});
+  input.value="";
+  buildPTabs(p);renderFixes(p);render();
+  await saveProjectToGAS(p);
+  // フォーカスを戻す
+  setTimeout(()=>{const el=document.getElementById("fix-quick");if(el)el.focus();},50);
+}
+
+// まとめて入力トグル
+function toggleBulkInput(){
+  const area=document.getElementById("fix-bulk-area");
+  area.style.display=area.style.display==="none"?"block":"none";
+  if(area.style.display==="block")document.getElementById("fix-bulk-text").focus();
+}
+
+// 一括追加（1行1項目）
+async function addFixBulk(){
+  const text=document.getElementById("fix-bulk-text").value;
+  const lines=text.split("\n").map(l=>l.trim()).filter(l=>l&&!l.match(/^[-・•*#]/)||l.replace(/^[-・•*#\s]+/,"").trim());
+  const items=text.split("\n")
+    .map(l=>l.replace(/^[-・•*#\s]+/,"").trim())
+    .filter(l=>l.length>0);
+  if(!items.length){alert("項目を入力してください");return;}
+  const p=projects.find(x=>x.id===panelId);
+  if(!p.fixes)p.fixes=[];
+  items.forEach(title=>p.fixes.push({id:nextFixId++,title:title.slice(0,50),note:"",done:false}));
+  document.getElementById("fix-bulk-text").value="";
+  toggleBulkInput();
+  buildPTabs(p);renderFixes(p);render();
+  await saveProjectToGAS(p);
+  showToast(`✓ ${items.length}件追加しました`);
+}
+async function toggleFix(idx){
+  const p=projects.find(x=>x.id===panelId);p.fixes[idx].done=!p.fixes[idx].done;
+  buildPTabs(p);renderFixes(p);render();await saveProjectToGAS(p);
+}
+async function deleteFix(idx){
+  const p=projects.find(x=>x.id===panelId);p.fixes.splice(idx,1);
+  buildPTabs(p);renderFixes(p);render();await saveProjectToGAS(p);
+}
+
+// 追加モーダル
+function openAdd(){
+  const titles={active:"構築中案件を追加",completed:"完了済み案件を追加",prospect:"見込み案件を追加"};
+  document.getElementById("add-modal-title").textContent=titles[currentSection];
+  let body="";
+  if(currentSection==="active"||currentSection==="completed"){
+    body=`<div class="row2"><div class="edit-field"><label>会社名 *</label><input id="a-company"></div><div class="edit-field"><label>種別</label><input id="a-type"></div></div>
+    <div class="row2"><div class="edit-field"><label>担当者</label><input id="a-person"></div><div class="edit-field"><label>金額 (円)</label><input id="a-amount" type="number" value="0"></div></div>
+    <div class="row2"><div class="edit-field"><label>${currentSection==="completed"?"納品日":"最終期日"}</label><input id="a-deadline" type="date"></div><div class="edit-field"><label>ステータス</label><select id="a-status">${(SECTION_STATUSES[currentSection]||SECTION_STATUSES.active).map(s=>`<option>${s}</option>`).join("")}</select></div></div>
+    ${currentSection==="completed"?`<div class="edit-field"><label>保守</label><select id="a-maintenance"><option value="">未設定</option><option value="true">あり</option><option value="false">なし</option></select></div>`:""}
+    <div class="edit-field"><label>メモ</label><textarea id="a-memo"></textarea></div>`;
+  }else{
+    body=`<div class="row2"><div class="edit-field"><label>会社名 *</label><input id="a-company"></div><div class="edit-field"><label>種別・想定構築</label><input id="a-type"></div></div>
+    <div class="row2"><div class="edit-field"><label>担当者</label><input id="a-person"></div><div class="edit-field"><label>見込み金額 (円)</label><input id="a-prospectAmount" type="number" value="0"></div></div>
+    <div class="row2"><div class="edit-field"><label>次回日程</label><input id="a-nextSchedule" type="date"></div><div class="edit-field"><label>スタート見込み</label><input id="a-startEstimate" placeholder="例: 2026-07"></div></div>
+    <div class="edit-field"><label>デモ完成</label><select id="a-demoReady"><option value="false">未完成</option><option value="true">完成</option></select></div>
+    <div class="edit-field"><label>メモ</label><textarea id="a-memo"></textarea></div>`;
+  }
+  document.getElementById("add-modal-body").innerHTML=body;
+  document.getElementById("add-modal").classList.add("open");
+}
+function closeAdd(){document.getElementById("add-modal").classList.remove("open")}
+async function saveAdd(){
+  const company=(document.getElementById("a-company")||{value:""}).value.trim();
+  if(!company){alert("会社名を入力してください");return;}
+  const g=id=>{const el=document.getElementById(id);return el?el.value:""};
+  let newP={id:nextId++,section:currentSection,company,type:g("a-type"),person:g("a-person"),amount:Number(g("a-amount"))||0,deadline:g("a-deadline"),revision:"",mtg:[],progress:0,status:g("a-status")||"未着手",memo:g("a-memo"),fixes:[],tasks:[],meetings:[],credentials:[]};
+  if(currentSection==="completed"){newP.maintenance=g("a-maintenance")==="true"?true:g("a-maintenance")==="false"?false:null;newP.maintenanceFee=0;newP.maintenancePeriod="";}
+  if(currentSection==="prospect"){newP.prospectAmount=Number(g("a-prospectAmount"))||0;newP.demoReady=g("a-demoReady")==="true";newP.nextSchedule=g("a-nextSchedule");newP.startEstimate=g("a-startEstimate");}
+  projects.push(newP);closeAdd();render();await saveProjectToGAS(newP);
+}
+async function confirmDelete(id){
+  if(!confirm("この案件を削除しますか？"))return;
+  await deleteProjectFromGAS(id);projects=projects.filter(p=>p.id!==id);render();
+}
+
+// ============================================================
+//  ロール切替 / ビュー制御
+// ============================================================
+function refresh(){
+  // worker selectを最新に
+  populateWorkerSelect();
+  if(currentRole==="admin"){
+    document.getElementById("admin-view").style.display="";
+    document.getElementById("worker-view").style.display="none";
+    if(currentAdminMode==="progress"){
+      document.getElementById("admin-progress-area").style.display="";
+      document.getElementById("admin-worker-input-area").style.display="none";
+      render();
+    }else{
+      document.getElementById("admin-progress-area").style.display="none";
+      document.getElementById("admin-worker-input-area").style.display="";
+      renderWorkerInputSummary();
+    }
+  }else{
+    document.getElementById("admin-view").style.display="none";
+    document.getElementById("worker-view").style.display="";
+    renderWorkerAll();
+  }
+}
+function switchRole(role){
+  currentRole=role;
+  document.getElementById("role-admin").classList.toggle("active",role==="admin");
+  document.getElementById("role-worker").classList.toggle("active",role==="worker");
+  refresh();
+}
+function switchAdminMode(mode){
+  currentAdminMode=mode;
+  document.getElementById("amode-progress").classList.toggle("active",mode==="progress");
+  document.getElementById("amode-worker-input").classList.toggle("active",mode==="worker-input");
+  refresh();
+}
+
+// ============================================================
+//  作業者ビュー
+// ============================================================
+// 社内PDCA定例（全案件共通）の一覧を集計
+function getInternalMeetingDates(){
+  const set=new Set();
+  projects.forEach(p=>{
+    if(p.section==="active"||p.section==="completed"){
+      (p.meetings||[]).forEach(mt=>{if((mt.mtgType||"customer")==="internal"&&mt.date)set.add(mt.date);});
+    }
+  });
+  return [...set].sort();
+}
+function renderInternalMeetingList(){
+  const el=document.getElementById("internal-mtg-list");
+  if(!el)return;
+  const dates=getInternalMeetingDates();
+  el.innerHTML=dates.length
+    ? dates.map(d=>`<span class="internal-mtg-tag">${fd(d)}<button onclick="removeInternalMeetingAll('${d}')" title="全案件から削除">×</button></span>`).join("")
+    : `<span style="font-size:12px;color:var(--color-text3)">まだ登録がありません</span>`;
+}
+async function addInternalMeetingAll(){
+  const date=document.getElementById("internal-mtg-date").value;
+  if(!date){alert("日程を選択してください");return;}
+  const targets=projects.filter(p=>p.section==="active"||p.section==="completed");
+  let added=0;
+  for(const p of targets){
+    if(!p.meetings)p.meetings=[];
+    if(!p.meetings.some(m=>m.date===date&&(m.mtgType||"customer")==="internal")){
+      p.meetings.push({id:nextMtgId++,date,mtgType:"internal",tasks:[]});
+      if(!p.mtg)p.mtg=[];
+      if(!p.mtg.includes(date)){p.mtg.push(date);p.mtg.sort();}
+      added++;
+    }
+  }
+  document.getElementById("internal-mtg-date").value="";
+  // 全案件を保存
+  setSyncState("syncing","全案件に社内定例を追加中…");
+  for(const p of targets){await gasRequest({action:"save",project:p});}
+  setSyncState("ok","保存完了 — "+new Date().toLocaleTimeString("ja-JP"));
+  showToast(`✓ ${added}件の案件に社内定例（${fd(date)}）を追加しました`);
+  renderInternalMeetingList();
+  renderWorkerAll();
+}
+async function removeInternalMeetingAll(date){
+  if(!confirm(`社内定例（${fd(date)}）を全案件から削除しますか？ぶら下がるタスクも消えます。`))return;
+  const targets=projects.filter(p=>p.section==="active"||p.section==="completed");
+  for(const p of targets){
+    const before=(p.meetings||[]).length;
+    p.meetings=(p.meetings||[]).filter(m=>!(m.date===date&&(m.mtgType||"customer")==="internal"));
+    if(p.meetings.length!==before)await gasRequest({action:"save",project:p});
+  }
+  showToast("社内定例を全案件から削除しました");
+  renderInternalMeetingList();
+  renderWorkerAll();
+}
+
+let workerOpenIds={};
+function populateWorkerSelect(){
+  const sel=document.getElementById("worker-filter-person");
+  if(sel){
+    const cur=sel.value;
+    const ps=[...new Set(projects.filter(p=>p.section==="active"||p.section==="completed").map(p=>p.person).filter(Boolean))].sort();
+    sel.innerHTML='<option value="">すべての担当者</option>'+ps.map(p=>`<option>${p}</option>`).join("");
+    sel.value=cur;
+  }
+  // 「自分は誰か」セレクト
+  const idSel=document.getElementById("worker-identity");
+  if(idSel){
+    const cur=idSel.value;
+    const persons=[...new Set(projects.map(p=>p.person).filter(Boolean))].sort();
+    idSel.innerHTML='<option value="">選択してください</option>'+persons.map(p=>`<option${p===workerIdentity?" selected":""}>${p}</option>`).join("");
+    idSel.value=workerIdentity;
+  }
+}
+function onWorkerIdentityChange(){
+  workerIdentity=document.getElementById("worker-identity").value;
+  // 自分が変わったら解除済みログイン情報をリセット
+  unlockedCreds={};
+  renderWorkerAll();
+}
+
+// 作業者：左会社名・右タスク横並び
+function renderWorkerAll(){
+  populateWorkerSelect();
+  renderInternalMeetingList();
+  const q=(document.getElementById("worker-search").value||"").toLowerCase();
+  const fp=document.getElementById("worker-filter-person").value;
+  let list=projects.filter(p=>(p.section==="active"||p.section==="completed"));
+  list=list.filter(p=>{
+    if(q&&!p.company.toLowerCase().includes(q)&&!(p.person||"").toLowerCase().includes(q))return false;
+    if(fp&&p.person!==fp)return false;
+    return true;
+  }).sort((a,b)=>a.company.localeCompare(b.company,"ja"));
+
+  const area=document.getElementById("worker-all-area");
+  if(!list.length){area.innerHTML=`<div class="wcard" style="text-align:center;color:var(--color-text2);font-size:13px;padding:2.5rem">担当案件がありません</div>`;return;}
+
+  area.innerHTML=list.map(p=>{
+    if(!p.meetings)p.meetings=[];if(!p.fixes)p.fixes=[];if(!p.credentials)p.credentials=[];
+    let taskPending=0,taskTotal=0;
+    (p.meetings||[]).forEach(mt=>{(mt.tasks||[]).forEach(t=>{taskTotal++;if(t.status!=="完了")taskPending++;});});
+    const fixPending=(p.fixes||[]).filter(f=>!f.done).length;
+    const nm=nextMtg(p.mtg||[]);
+    const pendBadge=(taskPending+fixPending)>0
+      ? `<span class="acc-summary-badge asb-pending">残${taskPending+fixPending}件</span>`
+      : `<span class="acc-summary-badge asb-clear">✓完了</span>`;
+    return `<div class="wrow">
+      <div class="wrow-left">
+        <div class="wrow-company">${p.company}</div>
+        <span class="badge ${scls[p.status]||"b-todo"}" style="align-self:flex-start">${p.status}</span>
+        <div class="wrow-meta">
+          ${p.person?`<span>担当：${p.person}</span>`:""}
+          ${nm?`<span>次回MTG：${fd(nm.date)}</span>`:""}
+        </div>
+        <div>${pendBadge}</div>
+        <button class="wrow-cred-btn" onclick="toggleCredPanel(${p.id})"><i class="ti ti-key"></i> ログイン情報</button>
+        <div id="w-creds-${p.id}" style="display:none;margin-top:6px">${renderCredentials(p,p.id)}</div>
+      </div>
+      <div class="wrow-right">
+        <div>
+          <div class="wcol-title"><i class="ti ti-calendar-event"></i> 定例日程ごとのタスク <span style="font-size:10px;font-weight:400;color:var(--color-text3)">（横スクロール）</span></div>
+          <div class="mtg-add-bar" style="margin-bottom:8px">
+            <span style="font-size:11px;color:#1F5C8B;font-weight:600;display:flex;align-items:center">お客様定例</span>
+            <input type="date" id="mtg-new-date-${p.id}" style="font-size:12px">
+            <button class="btn btn-sm btn-primary" onclick="addMeeting(${p.id})"><i class="ti ti-plus"></i> 追加</button>
+          </div>
+          <div id="w-meetings-${p.id}">${renderMeetings(p)}</div>
+        </div>
+        <div class="wrow-cols" style="margin-top:14px">
+          <div>
+            <div class="wcol-title"><i class="ti ti-refresh"></i> PDCA・修正項目</div>
+            <div id="w-fixes-${p.id}">${renderWorkerFixes(p)}</div>
+            <div class="task-add-grid" style="margin-top:6px">
+              <input id="wf-title-${p.id}" placeholder="修正項目…" onkeydown="if(event.key==='Enter')addWorkerFix(${p.id})">
+              <button class="btn btn-sm btn-primary" onclick="addWorkerFix(${p.id})" style="grid-column:span 3"><i class="ti ti-plus"></i> 追加</button>
+            </div>
+          </div>
+          <div>
+            <div class="wcol-title"><i class="ti ti-clock-exclamation"></i> 次回繰越</div>
+            <div id="w-carryover-${p.id}">${renderCarryover(p)}</div>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  }).join("");
+}
+function toggleCredPanel(pid){
+  const el=document.getElementById("w-creds-"+pid);
+  el.style.display=el.style.display==="none"?"block":"none";
+}
+
+// 1社分の入力本体（アコーディオン内）
+function renderWorkerBody(p){
+  if(!p.meetings)p.meetings=[];if(!p.fixes)p.fixes=[];if(!p.credentials)p.credentials=[];
+  return `
+  <div class="wsection" style="margin-top:1rem">
+    <div class="wsection-title"><i class="ti ti-calendar-event"></i> 定例日程ごとのタスク</div>
+    <div class="mtg-add-bar">
+      <select id="mtg-new-type-${p.id}" style="font-size:13px;padding:7px 10px;border:1px solid var(--color-border);border-radius:var(--radius-sm);background:var(--color-bg);outline:none;font-family:var(--font-sans)">
+        <option value="customer">お客様定例</option>
+        <option value="internal">社内定例</option>
+      </select>
+      <input type="date" id="mtg-new-date-${p.id}">
+      <button class="btn btn-sm btn-primary" onclick="addMeeting(${p.id})"><i class="ti ti-plus"></i> 定例追加</button>
+    </div>
+    <div id="w-meetings-${p.id}">${renderMeetings(p)}</div>
+  </div>
+
+  <div class="wsection">
+    <div class="wsection-title"><i class="ti ti-refresh"></i> PDCA・修正項目</div>
+    <div id="w-fixes-${p.id}">${renderWorkerFixes(p)}</div>
+    <div class="task-add-grid">
+      <input id="wf-title-${p.id}" placeholder="修正項目…" onkeydown="if(event.key==='Enter')addWorkerFix(${p.id})">
+      <button class="btn btn-sm btn-primary" onclick="addWorkerFix(${p.id})" style="grid-column:span 3"><i class="ti ti-plus"></i> 追加</button>
+    </div>
+  </div>
+
+  <div class="wsection">
+    <div class="wsection-title"><i class="ti ti-clock-exclamation"></i> 次回繰越タスク一覧</div>
+    <div id="w-carryover-${p.id}">${renderCarryover(p)}</div>
+  </div>
+
+  <div class="wsection" style="margin-bottom:0">
+    <div class="wsection-title"><i class="ti ti-key"></i> システムのログイン情報 <span style="font-size:10px;color:var(--color-text3);font-weight:400">（管理者・担当者のみ閲覧）</span></div>
+    <div id="w-creds-${p.id}">${renderCredentials(p,p.id)}</div>
+  </div>`;
+}
+
+// --- 定例日程ごとのタスク ---
+function renderMeetings(p){
+  const typeLabel={customer:"お客様定例",internal:"社内定例"};
+  const typeCls={customer:"mtg-type-customer",internal:"mtg-type-internal"};
+  const meetings=(p.meetings||[]).slice().sort((a,b)=>{
+    if((a.mtgType||"customer")!==(b.mtgType||"customer"))return (a.mtgType==="internal")?1:-1;
+    return (b.date||"").localeCompare(a.date||"");
+  });
+  if(!meetings.length)return `<div style="font-size:13px;color:var(--color-text3);text-align:center;padding:1rem">定例日程がありません。上の欄から追加してください。</div>`;
+  const blocks=meetings.map(mt=>{
+    const tp=mt.mtgType||"customer";
+    const tasks=mt.tasks||[];
+    const pending=tasks.filter(t=>t.status!=="完了").length;
+    const taskRows=tasks.length?tasks.map(t=>`
+      <div class="mtg-task-wrap">
+        <div class="mtg-task-row ${t.status==="完了"?"done":""}">
+          <span class="tt">${t.title}</span>
+          <button class="task-status-btn ${tcls[t.status]||"tb-todo"}" onclick="cycleTaskStatus(${p.id},${mt.id},${t.id})">${t.status}</button>
+          <button class="ico-btn" onclick="deleteMtgTask(${p.id},${mt.id},${t.id})"><i class="ti ti-x"></i></button>
+        </div>
+        <textarea class="task-memo" placeholder="メモ…" onchange="updateTaskMemo(${p.id},${mt.id},${t.id},this.value)">${t.memo||""}</textarea>
+      </div>`).join(""):`<div style="font-size:12px;color:var(--color-text3);padding:6px 0">タスクなし</div>`;
+    return `<div class="mtg-block">
+      <div class="mtg-block-head">
+        <span class="mtg-type ${typeCls[tp]}">${typeLabel[tp]}</span>
+        <span class="mtg-date">${fd(mt.date)}</span>
+        <button class="ico-btn" style="margin-left:auto" onclick="deleteMeeting(${p.id},${mt.id})"><i class="ti ti-trash"></i></button>
+      </div>
+      <div class="mtg-block-body">
+        <div style="font-size:11px;color:var(--color-text3);margin-bottom:4px">${tasks.length?`${pending}件残り / ${tasks.length}件`:"タスクなし"}</div>
+        ${taskRows}
+        <div class="mtg-task-add">
+          <input id="mt-task-${mt.id}" placeholder="タスク追加…" onkeydown="if(event.key==='Enter')addMtgTask(${p.id},${mt.id})">
+          <button class="btn btn-sm" onclick="addMtgTask(${p.id},${mt.id})"><i class="ti ti-plus"></i></button>
+        </div>
+        <div style="margin-top:6px">
+          <button class="btn btn-sm" style="font-size:11px;padding:3px 8px" onclick="toggleBulkPaste(${mt.id})"><i class="ti ti-clipboard-text"></i> 議事録から一括</button>
+          <div id="bulk-paste-${mt.id}" style="display:none;margin-top:6px">
+            <textarea id="bulk-text-${mt.id}" placeholder="議事録を貼り付け（1行1タスク）" style="width:100%;font-size:12px;padding:7px 9px;border:1px solid var(--color-border);border-radius:var(--radius-sm);background:var(--color-bg);font-family:var(--font-sans);resize:vertical;min-height:70px;outline:none;margin-bottom:6px"></textarea>
+            <div style="display:flex;gap:6px;justify-content:flex-end">
+              <button class="btn btn-sm" style="font-size:11px" onclick="toggleBulkPaste(${mt.id})">キャンセル</button>
+              <button class="btn btn-sm btn-primary" style="font-size:11px" onclick="addBulkTasks(${p.id},${mt.id})">一括追加</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  }).join("");
+  return `<div class="mtg-scroll">${blocks}</div>`;
+}
+async function updateTaskMemo(pid,mid,tid,val){
+  const p=projects.find(x=>x.id===pid);
+  const mt=p.meetings.find(m=>m.id===mid);
+  const t=mt.tasks.find(x=>x.id===tid);
+  t.memo=val;
+  await saveProjectToGAS(p);
+}
+async function addMeeting(pid){
+  const p=projects.find(x=>x.id===pid);
+  const date=document.getElementById("mtg-new-date-"+pid).value;
+  const mtgType="customer"; // 個別追加はお客様定例のみ（社内は上部一括）
+  if(!date){alert("日程を選択してください");return;}
+  if(!p.meetings)p.meetings=[];
+  if(p.meetings.some(m=>m.date===date&&(m.mtgType||"customer")===mtgType)){alert("同じ日程がすでにあります");return;}
+  p.meetings.push({id:nextMtgId++,date,mtgType,tasks:[]});
+  if(!p.mtg)p.mtg=[];
+  if(!p.mtg.includes(date)){p.mtg.push(date);p.mtg.sort();}
+  document.getElementById("mtg-new-date-"+pid).value="";
+  document.getElementById("w-meetings-"+pid).innerHTML=renderMeetings(p);
+  await saveProjectToGAS(p);
+}
+async function deleteMeeting(pid,mid){
+  if(!confirm("この定例日程とぶら下がるタスクを削除しますか？"))return;
+  const p=projects.find(x=>x.id===pid);
+  const mt=p.meetings.find(m=>m.id===mid);
+  p.meetings=p.meetings.filter(m=>m.id!==mid);
+  if(mt&&p.mtg)p.mtg=p.mtg.filter(d=>d!==mt.date);
+  document.getElementById("w-meetings-"+pid).innerHTML=renderMeetings(p);
+  await saveProjectToGAS(p);
+}
+async function addMtgTask(pid,mid){
+  const p=projects.find(x=>x.id===pid);
+  const mt=p.meetings.find(m=>m.id===mid);
+  const input=document.getElementById("mt-task-"+mid);
+  const title=input.value.trim();if(!title)return;
+  if(!mt.tasks)mt.tasks=[];
+  mt.tasks.push({id:nextTaskId++,title,status:"未対応"});
+  document.getElementById("w-meetings-"+pid).innerHTML=renderMeetings(p);
+  await saveProjectToGAS(p);
+}
+function toggleBulkPaste(mid){
+  const el=document.getElementById("bulk-paste-"+mid);
+  el.style.display=el.style.display==="none"?"block":"none";
+  if(el.style.display==="block")document.getElementById("bulk-text-"+mid).focus();
+}
+async function addBulkTasks(pid,mid){
+  const p=projects.find(x=>x.id===pid);
+  const mt=p.meetings.find(m=>m.id===mid);
+  const text=document.getElementById("bulk-text-"+mid).value;
+  // 1行1タスク。行頭の記号（・-•*# 数字.）を除去
+  const items=text.split("\n")
+    .map(l=>l.replace(/^[\s　]*[・\-•*#○◯●▪️\d]+[\.\)、]?[\s　]*/,"").trim())
+    .filter(l=>l.length>0);
+  if(!items.length){alert("タスクを入力してください");return;}
+  if(!mt.tasks)mt.tasks=[];
+  items.forEach(title=>mt.tasks.push({id:nextTaskId++,title:title.slice(0,60),status:"未対応"}));
+  document.getElementById("w-meetings-"+pid).innerHTML=renderMeetings(p);
+  await saveProjectToGAS(p);
+  showToast(`✓ ${items.length}件のタスクを追加しました`);
+}
+async function cycleTaskStatus(pid,mid,tid){
+  const p=projects.find(x=>x.id===pid);
+  const mt=p.meetings.find(m=>m.id===mid);
+  const t=mt.tasks.find(x=>x.id===tid);
+  t.status=TASK_NEXT[t.status]||"未対応";
+  document.getElementById("w-meetings-"+pid).innerHTML=renderMeetings(p);
+  const co=document.getElementById("w-carryover-"+pid);if(co)co.innerHTML=renderCarryover(p);
+  await saveProjectToGAS(p);
+}
+async function deleteMtgTask(pid,mid,tid){
+  const p=projects.find(x=>x.id===pid);
+  const mt=p.meetings.find(m=>m.id===mid);
+  mt.tasks=mt.tasks.filter(x=>x.id!==tid);
+  document.getElementById("w-meetings-"+pid).innerHTML=renderMeetings(p);
+  await saveProjectToGAS(p);
+}
+// 次回繰越タスク一覧（全定例から status==="次回繰越" を集約）
+function renderCarryover(p){
+  const typeLabel={customer:"お客様定例",internal:"社内定例"};
+  const items=[];
+  (p.meetings||[]).forEach(mt=>{
+    (mt.tasks||[]).forEach(t=>{if(t.status==="次回繰越")items.push({date:mt.date,title:t.title,mtgType:mt.mtgType||"customer"});});
+  });
+  if(!items.length)return `<div style="font-size:13px;color:var(--color-text3);text-align:center;padding:1rem">次回繰越のタスクはありません</div>`;
+  items.sort((a,b)=>(a.date||"").localeCompare(b.date||""));
+  return items.map(it=>`<div class="mtg-task-item">
+    <span class="tt">${it.title}</span>
+    <span class="task-status-btn tb-carry">次回繰越</span>
+    <span class="task-date-val">${typeLabel[it.mtgType]} ${fd(it.date)}</span>
+  </div>`).join("");
+}
+
+// --- 作業者の修正項目（既存fixesと共通） ---
+function renderWorkerFixes(p){
+  const fixes=p.fixes||[];
+  if(!fixes.length)return `<div style="font-size:13px;color:var(--color-text3);text-align:center;padding:1rem">修正項目はありません</div>`;
+  return fixes.map((f,i)=>`<div class="task-item ${f.done?"done":""}" style="grid-template-columns:auto 1fr auto">
+    <div class="task-check" onclick="toggleWorkerFix(${p.id},${i})">${f.done?'<i class="ti ti-check" style="font-size:12px"></i>':''}</div>
+    <div class="task-title ${f.done?"strike":""}">${f.title}</div>
+    <button class="ico-btn" onclick="deleteWorkerFix(${p.id},${i})"><i class="ti ti-x"></i></button>
+  </div>`).join("");
+}
+async function addWorkerFix(pid){
+  const p=projects.find(x=>x.id===pid);
+  const title=document.getElementById("wf-title-"+pid).value.trim();if(!title)return;
+  if(!p.fixes)p.fixes=[];
+  p.fixes.push({id:nextFixId++,title,note:"",done:false});
+  document.getElementById("wf-title-"+pid).value="";
+  document.getElementById("w-fixes-"+pid).innerHTML=renderWorkerFixes(p);
+  await saveProjectToGAS(p);
+}
+async function toggleWorkerFix(pid,idx){
+  const p=projects.find(x=>x.id===pid);p.fixes[idx].done=!p.fixes[idx].done;
+  document.getElementById("w-fixes-"+pid).innerHTML=renderWorkerFixes(p);
+  await saveProjectToGAS(p);
+}
+async function deleteWorkerFix(pid,idx){
+  const p=projects.find(x=>x.id===pid);p.fixes.splice(idx,1);
+  document.getElementById("w-fixes-"+pid).innerHTML=renderWorkerFixes(p);
+  await saveProjectToGAS(p);
+}
+
+// --- 未対応繰越（dueがあって未完了のtask/fix） ---
+// --- ログイン情報（パスコード保護） ---
+function renderCredentials(p,pid){
+  // アクセス可否判定
+  // 管理者ビュー：常に表示OK（パスなし）
+  // 作業者ビュー：選んだ「自分」がこの案件の担当者に含まれていれば表示OK
+  let canView=false;
+  if(currentRole==="admin"){
+    canView=true;
+  }else{
+    if(!workerIdentity){
+      return `<div class="cred-locked">
+        <i class="ti ti-user-question" style="font-size:24px;color:var(--color-text3);display:block;margin-bottom:6px"></i>
+        <div style="font-size:12px;color:var(--color-text2)">上部で「あなたは誰か」を選んでください</div>
+      </div>`;
+    }
+    const persons=(p.person||"").split(/[\/・,、]/).map(s=>s.trim());
+    canView=persons.includes(workerIdentity);
+  }
+  if(!canView){
+    return `<div class="cred-locked">
+      <i class="ti ti-lock" style="font-size:24px;color:var(--color-text3);display:block;margin-bottom:6px"></i>
+      <div style="font-size:12px;color:var(--color-text2)">担当案件のみ閲覧できます<br>（担当：${p.person||"未設定"}）</div>
+    </div>`;
+  }
+  const creds=p.credentials||[];
+  const list=creds.length?creds.map((c,i)=>`
+    <div class="cred-item">
+      <div class="cred-item-head">
+        <i class="ti ti-server" style="color:var(--color-primary-m)"></i>
+        <strong>${c.system||"(システム名未設定)"}</strong>
+        <button class="ico-btn" onclick="deleteCred(${pid},${i})"><i class="ti ti-x"></i></button>
+      </div>
+      ${c.url?`<div class="cred-row"><span class="ck">URL</span><span class="cv">${c.url}</span><button class="copy-btn" onclick="copyText('${escq(c.url)}')">コピー</button></div>`:""}
+      <div class="cred-row"><span class="ck">ID</span><span class="cv">${c.username||"–"}</span>${c.username?`<button class="copy-btn" onclick="copyText('${escq(c.username)}')">コピー</button>`:""}</div>
+      <div class="cred-row"><span class="ck">PW</span><span class="cv">${c.password||"–"}</span>${c.password?`<button class="copy-btn" onclick="copyText('${escq(c.password)}')">コピー</button>`:""}</div>
+      ${c.note?`<div style="font-size:11px;color:var(--color-text2);margin-top:4px">${c.note}</div>`:""}
+    </div>`).join(""):`<div style="font-size:13px;color:var(--color-text3);text-align:center;padding:1rem">ログイン情報は未登録です</div>`;
+  return `${list}
+    <div style="border:1px dashed var(--color-border2);border-radius:var(--radius-sm);padding:10px;margin-top:8px">
+      <div class="wfield"><input id="cr-system-${pid}" placeholder="システム名（例: kintone）"></div>
+      <div class="wfield"><input id="cr-url-${pid}" placeholder="URL（任意）"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+        <div class="wfield"><input id="cr-user-${pid}" placeholder="ID"></div>
+        <div class="wfield"><input id="cr-pass-${pid}" placeholder="パスワード"></div>
+      </div>
+      <div class="wfield"><input id="cr-note-${pid}" placeholder="備考（任意）"></div>
+      <button class="btn btn-sm btn-primary" onclick="addCred(${pid})"><i class="ti ti-plus"></i> ログイン情報を追加</button>
+    </div>`;
+}
+function escq(s){return String(s).replace(/'/g,"\\'").replace(/"/g,'&quot;');}
+function copyText(t){navigator.clipboard.writeText(t).then(()=>showToast("コピーしました"));}
+function requestPasscode(pid){
+  pendingCredProjectId=pid;
+  document.getElementById("passcode-input").value="";
+  document.getElementById("passcode-error").style.display="none";
+  document.getElementById("passcode-modal").classList.add("open");
+  setTimeout(()=>document.getElementById("passcode-input").focus(),100);
+}
+function checkPasscode(){
+  const v=document.getElementById("passcode-input").value;
+  if(v===PASSCODE){
+    unlockedCreds[pendingCredProjectId]=true;
+    document.getElementById("passcode-modal").classList.remove("open");
+    const p=projects.find(x=>x.id===pendingCredProjectId);
+    const el=document.getElementById("w-creds-"+pendingCredProjectId);
+    if(el&&p){el.innerHTML=renderCredentials(p,pendingCredProjectId);el.style.display="block";}
+  }else{
+    document.getElementById("passcode-error").style.display="block";
+  }
+}
+async function addCred(pid){
+  const p=projects.find(x=>x.id===pid);
+  const system=document.getElementById("cr-system-"+pid).value.trim();
+  if(!system){alert("システム名を入力してください");return;}
+  if(!p.credentials)p.credentials=[];
+  p.credentials.push({id:nextCredId++,system,url:document.getElementById("cr-url-"+pid).value.trim(),username:document.getElementById("cr-user-"+pid).value.trim(),password:document.getElementById("cr-pass-"+pid).value.trim(),note:document.getElementById("cr-note-"+pid).value.trim()});
+  document.getElementById("w-creds-"+pid).innerHTML=renderCredentials(p,pid);
+  await saveProjectToGAS(p);
+  showToast("✓ ログイン情報を追加しました");
+}
+async function deleteCred(pid,idx){
+  if(!confirm("このログイン情報を削除しますか？"))return;
+  const p=projects.find(x=>x.id===pid);p.credentials.splice(idx,1);
+  document.getElementById("w-creds-"+pid).innerHTML=renderCredentials(p,pid);
+  await saveProjectToGAS(p);
+}
+
+// ============================================================
+//  管理者：作業者の入力を見る（集約ビュー）
+// ============================================================
+function renderWorkerInputSummary(){
+  const area=document.getElementById("admin-worker-input-area");
+  const targets=projects.filter(p=>(p.section==="active"||p.section==="completed"));
+  const withInput=targets.filter(p=>(p.meetings&&p.meetings.length)||(p.fixes&&p.fixes.length));
+  if(!withInput.length){
+    area.innerHTML=`<div class="wcard" style="text-align:center;color:var(--color-text2);font-size:13px;padding:2.5rem">作業者からの入力はまだありません</div>`;
+    return;
+  }
+  area.innerHTML=withInput.map(p=>{
+    const meetings=(p.meetings||[]).slice().sort((a,b)=>(b.date||"").localeCompare(a.date||""));
+    const fixes=p.fixes||[];
+    const fixDone=fixes.filter(f=>f.done).length;
+    // 定例ごとのブロック（閲覧専用）
+    const mtgBlocks=meetings.length?meetings.map(mt=>{
+      const tp=mt.mtgType||"customer";
+      const typeLabel={customer:"お客様定例",internal:"社内定例"};
+      const typeCls={customer:"mtg-type-customer",internal:"mtg-type-internal"};
+      const tasks=mt.tasks||[];
+      const pending=tasks.filter(t=>t.status!=="完了").length;
+      const taskRows=tasks.length?tasks.map(t=>`
+        <div class="mtg-task-item ${t.status==="完了"?"done":""}">
+          <span class="tt">${t.title}</span>
+          <span class="task-status-btn ${tcls[t.status]||"tb-todo"}">${t.status}</span>
+        </div>`).join(""):`<div style="font-size:12px;color:var(--color-text3);padding:6px 0">タスクなし</div>`;
+      return `<div class="mtg-block">
+        <div class="mtg-block-head">
+          <span class="mtg-type ${typeCls[tp]}">${typeLabel[tp]}</span>
+          <span class="mtg-date">${fd(mt.date)}</span>
+          <span class="mtg-count">${tasks.length?`${pending}件残り / ${tasks.length}件`:"タスクなし"}</span>
+        </div>
+        <div class="mtg-block-body">${taskRows}</div>
+      </div>`;
+    }).join(""):`<div style="font-size:12px;color:var(--color-text3);padding:6px">定例日程なし</div>`;
+    const fixRows=fixes.length?fixes.map(f=>`
+      <div class="mtg-task-item ${f.done?"done":""}">
+        <span class="tt">${f.title}</span>
+        <span class="task-status-btn ${f.done?"tb-done":"tb-todo"}">${f.done?"完了":"未完了"}</span>
+      </div>`).join(""):`<div style="font-size:12px;color:var(--color-text3);padding:6px">修正項目なし</div>`;
+    return `<div class="wcard">
+      <div class="wcard-head">
+        <i class="ti ti-building" style="color:var(--color-primary-m)"></i>
+        <h3>${p.company}</h3>
+        <span style="font-size:12px;color:var(--color-text2)">${p.person||""}</span>
+      </div>
+      <div class="wsection">
+        <div class="wsection-title"><i class="ti ti-calendar-event"></i> 定例日程ごとのタスク</div>
+        ${mtgBlocks}
+      </div>
+      <div class="wsection" style="margin-bottom:0">
+        <div class="wsection-title"><i class="ti ti-refresh"></i> PDCA・修正項目 <span style="font-size:11px;font-weight:400;color:var(--color-text2)">(${fixDone}/${fixes.length}完了)</span></div>
+        ${fixRows}
+      </div>
+    </div>`;
+  }).join("");
+}
+
+["search","filter-person","filter-deadline","filter-fix"].forEach(id=>{
+  const el=document.getElementById(id);if(!el)return;
+  el.addEventListener(id==="search"?"input":"change",render);
+});
+document.getElementById("add-modal").addEventListener("click",e=>{if(e.target===e.currentTarget)closeAdd()});
+document.getElementById("passcode-modal").addEventListener("click",e=>{if(e.target===e.currentTarget)e.currentTarget.classList.remove("open")});
+
+// URL末尾(#worker)で初期ロールを決定
+if(location.hash==="#worker"){
+  currentRole="worker";
+  document.getElementById("role-admin").classList.remove("active");
+  document.getElementById("role-worker").classList.add("active");
+  // 作業者ビュー時は管理者切替ボタンを隠す（手軽な制限）
+  document.getElementById("role-admin").style.display="none";
+}
+loadFromGAS();
+</script>
+</body>
+</html>
